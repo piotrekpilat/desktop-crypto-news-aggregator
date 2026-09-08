@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Crypto News Widget</title>
+    <link rel="stylesheet" href="./main.css">
+</head>
+<body>
+    <!-- DESKTOP WIDGET CLEAN CONTAINER -->
+    <div class="widget-frame" id="phoneFrame">
+        
+        <!-- SLEEK CLEAN TOP HEADER / WINDOW CONTROLS -->
+        <div class="widget-top-bar" style="--wails-draggable: drag;">
+            <div class="top-bar-title">
+                <span class="app-icon">⚡</span>
+                <span class="app-name">Crypto News</span>
+            </div>
+            <div class="top-bar-controls">
+                <button class="window-btn pin-btn" id="btnAlwaysOnTop" title="Zawsze na wierzchu (Pin)">
+                    <span class="pin-icon">📌</span>
+                </button>
+                <button class="window-btn min-btn" id="btnMinimize" title="Minimalizuj">−</button>
+                <button class="window-btn close-btn" id="btnClose" title="Zamknij">✕</button>
+            </div>
+        </div>
+
+        <!-- APP CONTENT SCREEN CONTAINER -->
+        <div class="widget-content">
+            
+            <!-- 1. GLOBAL ALARM TOGGLE BAR -->
+            <div class="global-alarm-bar" id="globalAlarmBar">
+                <div class="alarm-bar-left">
+                    <div class="alarm-icon-box" id="alarmIconBox">
+                        <svg class="alarm-bell-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+                        </svg>
+                    </div>
+                    <div class="alarm-info-text">
+                        <div class="alarm-title" id="txtAlarmTitle">Alarm wibracyjny</div>
+                        <div class="alarm-subtitle" id="txtAlarmStatus">Aktywny (max 10 powtórzeń)</div>
+                    </div>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" id="chkAlarmToggle" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <!-- 2. NIGHT MODE INDICATOR BAR -->
+            <div class="night-mode-bar" id="nightModeBar" style="display: none;">
+                <div class="night-bar-left" id="txtNightModeBanner">🌙 Obowiązuje Tryb Nocny (22:00 – 07:00)</div>
+                <div class="night-bar-right" id="txtNightModeMuted">Wibracje wyciszone</div>
+            </div>
+
+            <!-- 3. ACTIVE ALARM BANNER -->
+            <div class="active-alarm-banner" id="activeAlarmBanner" style="display: none;">
+                <div class="alarm-banner-left">
+                    <div class="alarm-banner-title">📳 <span id="txtAlarmBannerTitle">Nowa wiadomość oczekuje</span></div>
+                    <div class="alarm-banner-info" id="txtAlarmBannerInfo">Wibracja 1 z 10 (kolejna za 60s)</div>
+                </div>
+                <button class="btn-acknowledge" id="btnAcknowledgeAlarm">Widziałem</button>
+            </div>
+
+            <!-- MAIN CONTENT VIEWS CONTAINER -->
+            <div class="app-main-viewport">
+                
+                <!-- TAB 1 & 2: CHART_AND_FEED / FEED_ONLY -->
+                <div class="view-tab" id="viewFeed">
+                    <!-- Top Header Bar with Coin Selector -->
+                    <div class="top-header-bar">
+                        <div class="coin-selector-container">
+                            <div class="coin-selector-btn" id="btnCoinDropdown">
+                                <div class="coin-badge" id="currentCoinBadge" style="background: #0033AD;">₳</div>
+                                <div class="coin-pair-text" id="currentCoinPair">ADA / USDT</div>
+                                <svg class="dropdown-arrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M7 10l5 5 5-5z"/>
+                                </svg>
+                            </div>
+                            <!-- Dropdown menu -->
+                            <div class="coin-dropdown-menu" id="coinDropdownMenu"></div>
+                        </div>
+
+                        <div class="header-right-meta">
+                            <div class="price-box">
+                                <div class="price-value" id="currentPriceVal">$0.2000</div>
+                                <div class="price-change" id="currentPriceChange">
+                                    <span class="live-market-dot" id="liveMarketDot"></span>
+                                    <span id="priceChangeText">+0.00% 24h</span>
+                                </div>
+                            </div>
+                            <button class="icon-btn-refresh" id="btnRefreshData" title="Odśwież">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Clean Chart View (Canvas) -->
+                    <div class="chart-section" id="chartSection">
+                        <canvas id="priceChartCanvas"></canvas>
+                    </div>
+
+                    <!-- Keywords Filter Bar -->
+                    <div class="keywords-bar">
+                        <button class="btn-add-keyword" id="btnAddKeyword">+ Słowo</button>
+                        <div class="keywords-list" id="keywordsList">
+                            <span class="keyword-empty-hint" id="txtNoKeywords">Brak filtrów słów kluczowych</span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Chips Bar (Sources) -->
+                    <div class="sources-chips-bar" id="sourcesChipsBar"></div>
+
+                    <!-- Section Header -->
+                    <div class="news-list-header">
+                        <div class="news-header-title" id="txtNewsCount">WIADOMOŚCI (0)</div>
+                        <div class="news-header-hint" id="txtNewsHint">Dotknij newsa, by podświetlić kropkę</div>
+                    </div>
+
+                    <!-- Scrollable News Cards List -->
+                    <div class="news-scroll-list" id="newsCardsList"></div>
+                </div>
+
+                <!-- TAB 3: FAVORITES -->
+                <div class="view-tab" id="viewFavorites" style="display: none;">
+                    <div class="fav-header">
+                        <svg class="fav-header-star" viewBox="0 0 24 24" width="22" height="22" fill="#F59E0B">
+                            <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                        </svg>
+                        <div class="fav-header-title" id="txtFavCount">Ulubione Wiadomości (0)</div>
+                    </div>
+                    <div class="news-scroll-list" id="favCardsList"></div>
+                </div>
+
+                <!-- TAB 4: SETTINGS WITH 3 SUB-TABS -->
+                <div class="view-tab" id="viewSettings" style="display: none;">
+                    <div class="settings-header-title" id="txtSettingsTitle">Ustawienia Aplikacji</div>
+                    
+                    <!-- Sub-tabs header -->
+                    <div class="settings-subtabs-nav">
+                        <div class="subtab-item active" data-subtab="PAIRS" id="tabNavPairs">🪙 Pary</div>
+                        <div class="subtab-item" data-subtab="SOURCES" id="tabNavSources">📡 Źródła</div>
+                        <div class="subtab-item" data-subtab="APP_CONFIG" id="tabNavAppConfig">⚙️ Aplikacja &amp; Noc</div>
+                    </div>
+
+                    <!-- Subtab Content: PAIRS -->
+                    <div class="subtab-content" id="subtabContentPairs">
+                        <div class="subtab-section-header">
+                            <div class="pairs-count-label" id="txtObservedPairsHeader">OBSERWOWANE PARY (5 / 450 z Binance)</div>
+                            <button class="btn-fetch-pairs" id="btnFetchPairs">Pobierz pary 🔄</button>
+                        </div>
+                        <div class="search-box-container">
+                            <input type="text" class="search-input" id="inputPairSearch" placeholder="Szukaj pary (np. BTC, ADA, SOL, PEPE)...">
+                            <button class="search-clear-btn" id="btnClearPairSearch" style="display: none;">✕</button>
+                        </div>
+                        <div class="pairs-scroll-list" id="pairsListContainer"></div>
+                    </div>
+
+                    <!-- Subtab Content: SOURCES -->
+                    <div class="subtab-content" id="subtabContentSources" style="display: none;">
+                        <div class="sources-list-header-txt" id="txtSourcesTitle">AKTYWNE ŹRÓDŁA (RSS Direct)</div>
+                        <div class="sources-manage-list" id="sourcesManageList"></div>
+                    </div>
+
+                    <!-- Subtab Content: APP_CONFIG -->
+                    <div class="subtab-content" id="subtabContentAppConfig" style="display: none;">
+                        
+                        <!-- Card 1: Alarm wibracyjny -->
+                        <div class="settings-card">
+                            <div class="card-section-title cyan" id="txtCardAlarmHeader">ALARM WIBRACYJNY &amp; CYKLE</div>
+                            <div class="setting-row">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowAlarmToggle">Alarm wibracyjny</div>
+                                    <div class="setting-desc" id="txtRowAlarmDesc">Wibracje / dźwięk po odebraniu nowych newsów</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chkSettingsAlarm">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowAlarmRepeats">Ilość powtórzeń wibracji</div>
+                                    <div class="setting-desc" id="txtRowAlarmRepeatsDesc">Maksymalna liczba powtórzeń co 60s</div>
+                                </div>
+                                <div class="stepper-controls">
+                                    <button class="stepper-btn" id="btnVibrationsMinus">−</button>
+                                    <span class="stepper-value" id="valMaxVibrations">10</span>
+                                    <button class="stepper-btn" id="btnVibrationsPlus">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Tryb Nocny -->
+                        <div class="settings-card">
+                            <div class="card-section-title gold" id="txtCardNightHeader">PORY NOCNE (CICHE GODZINY)</div>
+                            <div class="setting-row">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowNightToggle">Włącz tryb nocny</div>
+                                    <div class="setting-desc" id="txtRowNightDesc">Całkowicie blokuje wibracje w nocy</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chkSettingsNight">
+                                    <span class="slider round slider-gold"></span>
+                                </label>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row clickable" id="rowEditNightStart">
+                                <div class="setting-label" id="txtRowNightStart">Godzina rozpoczęcia (Od)</div>
+                                <div class="edit-badge-gold">
+                                    <span id="valNightStart">22:00</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
+                            </div>
+                            <div class="setting-row clickable" id="rowEditNightEnd" style="margin-top: 8px;">
+                                <div class="setting-label" id="txtRowNightEnd">Godzina zakończenia (Do)</div>
+                                <div class="edit-badge-gold">
+                                    <span id="valNightEnd">07:00</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 3: Język -->
+                        <div class="settings-card">
+                            <div class="card-section-title purple" id="txtCardLangHeader">JĘZYK APLIKACJI</div>
+                            <div class="lang-pills-row">
+                                <div class="lang-pill" data-lang="pl" id="pillLangPL">🇵🇱 Polski</div>
+                                <div class="lang-pill" data-lang="en" id="pillLangEN">🇬🇧 English</div>
+                                <div class="lang-pill" data-lang="de" id="pillLangDE">🇩🇪 Deutsch</div>
+                            </div>
+                        </div>
+
+                        <!-- Card 4: Autostart -->
+                        <div class="settings-card">
+                            <div class="setting-row">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowAutostart">Autostart przy uruchomieniu systemu</div>
+                                    <div class="setting-desc" id="txtRowAutostartDesc">Automatyczny start widgetu po zalogowaniu</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chkSettingsAutostart">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Card 5: Kasowanie i historia -->
+                        <div class="settings-card">
+                            <div class="card-section-title red" id="txtCardHistoryHeader">KASOWANIE I HISTORIA NEWSÓW</div>
+                            <div class="setting-desc" id="txtHistoryDesc">Newsy są zapisywane lokalnie (zapisano: 0 / limit: 3650).</div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row clickable" id="rowEditMaxNews">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowMaxNews">Maksymalna liczba newsów</div>
+                                    <div class="setting-desc" id="txtRowMaxNewsDesc">Limit przechowywanych wiadomości w pamięci</div>
+                                </div>
+                                <div class="edit-badge-cyan">
+                                    <span id="valMaxStoredNews">3650</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
+                            </div>
+                            <!-- Preset limits -->
+                            <div class="limit-presets-row">
+                                <div class="preset-pill" data-limit="500">500</div>
+                                <div class="preset-pill" data-limit="1000">1000</div>
+                                <div class="preset-pill" data-limit="2000">2000</div>
+                                <div class="preset-pill" data-limit="3650">3650</div>
+                                <div class="preset-pill" data-limit="5000">5000</div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <button class="btn-clear-history" id="btnClearHistory">Wyczyść historię</button>
+                        </div>
+
+                        <!-- Card 6: Status połączeń -->
+                        <div class="settings-card">
+                            <div class="setting-row">
+                                <div class="setting-col">
+                                    <div class="setting-label">Binance Spot API</div>
+                                    <div class="status-indicator-txt online" id="txtStatusBinance">Połączono (API Live)</div>
+                                </div>
+                                <button class="icon-btn-refresh" id="btnRefreshStatus" title="Odśwież">
+                                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row">
+                                <div class="setting-col">
+                                    <div class="setting-label">Bezpośrednie źródła RSS</div>
+                                    <div class="status-indicator-txt online" id="txtStatusFeeds">Źródła RSS: Aktywne &amp; Live</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BOTTOM NAVIGATION BAR (4 TABS) -->
+            <div class="bottom-nav-bar">
+                <div class="nav-item active" data-tab="CHART_AND_FEED" id="navItemChart">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M23 8c0 1.1-.9 2-2 2-.18 0-.35-.02-.51-.07l-3.56 3.55c.05.16.07.34.07.52 0 1.1-.9 2-2 2s-2-.9-2-2c0-.18.02-.36.07-.52l-2.55-2.55c-.16.05-.34.07-.52.07s-.36-.02-.52-.07l-4.55 4.56c.05.16.07.33.07.51 0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2c.18 0 .35.02.51.07l4.56-4.55C8.02 9.36 8 9.18 8 9c0-1.1.9-2 2-2s2 .9 2 2c0 .18-.02.36-.07.52l2.55 2.55c.16-.05.34-.07.52-.07s.36.02.52.07l3.55-3.56C18.52 8.35 18.5 8.18 18.5 8c0-1.1.9-2 2-2s2 .9 2 2z"/>
+                    </svg>
+                    <span class="nav-label" id="lblNavChart">Wykres &amp; News</span>
+                </div>
+                <div class="nav-item" data-tab="FEED_ONLY" id="navItemFeed">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                    </svg>
+                    <span class="nav-label" id="lblNavFeed">Tylko Feed</span>
+                </div>
+                <div class="nav-item" data-tab="FAVORITES" id="navItemFav">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                    <span class="nav-label" id="lblNavFav">Ulubione</span>
+                </div>
+                <div class="nav-item" data-tab="SETTINGS" id="navItemSettings">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                    <span class="nav-label" id="lblNavSettings">Ustawienia</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODAL DIALOGS -->
+
+        <!-- 1. Add Keyword Modal -->
+        <div class="modal-backdrop" id="modalAddKeyword" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalKeywordTitle">Dodaj filtr słowa kluczowego</div>
+                <input type="text" class="modal-input" id="inputKeywordText" placeholder="np. hack, etf, upgrade, btc">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelKeyword">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmKeyword">Dodaj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Edit Night Start Modal -->
+        <div class="modal-backdrop" id="modalEditNightStart" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalNightStartTitle">Zmień godzinę rozpoczęcia (Od)</div>
+                <div class="modal-hint" id="txtModalNightHint1">Format GG:mm (np. 22:00, 07:30)</div>
+                <input type="text" class="modal-input" id="inputNightStartTime" placeholder="22:00">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelNightStart">Anuluj</button>
+                    <button class="modal-btn-gold" id="btnConfirmNightStart">Zapisz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Edit Night End Modal -->
+        <div class="modal-backdrop" id="modalEditNightEnd" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalNightEndTitle">Zmień godzinę zakończenia (Do)</div>
+                <div class="modal-hint" id="txtModalNightHint2">Format GG:mm (np. 22:00, 07:30)</div>
+                <input type="text" class="modal-input" id="inputNightEndTime" placeholder="07:00">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelNightEnd">Anuluj</button>
+                    <button class="modal-btn-gold" id="btnConfirmNightEnd">Zapisz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Edit Max News Limit Modal -->
+        <div class="modal-backdrop" id="modalEditMaxNews" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalMaxNewsTitle">Ustaw limit liczby newsów</div>
+                <div class="modal-hint" id="txtModalMaxNewsHint">Wpisz limit (od 50 do 50000)</div>
+                <input type="number" class="modal-input" id="inputMaxNewsVal" placeholder="3650">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelMaxNews">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmMaxNews">Zapisz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Clear History Confirm Modal -->
+        <div class="modal-backdrop" id="modalClearHistory" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalClearTitle">Wyczyścić historię newsów?</div>
+                <div class="modal-desc" id="txtModalClearDesc">Ta operacja trwale usunie lokalnie zapisane newsy. Ulubione i ustawienia źródeł pozostaną bez zmian.</div>
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelClearHistory">Anuluj</button>
+                    <button class="modal-btn-danger" id="btnConfirmClearHistory">Wyczyść</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. In-App Mobile Browser Overlay Dialog -->
+        <div class="in-app-browser-modal" id="inAppBrowserModal" style="display: none;">
+            <div class="browser-nav-bar">
+                <div class="browser-controls-left">
+                    <button class="browser-btn" id="btnBrowserClose" title="Zamknij">✕</button>
+                    <div class="browser-meta">
+                        <div class="browser-title" id="browserTitle">Artykuł</div>
+                        <div class="browser-url" id="browserUrl">https://...</div>
+                    </div>
+                </div>
+                <div class="browser-controls-right">
+                    <button class="browser-btn" id="btnBrowserRefresh" title="Odśwież">🔄</button>
+                    <button class="browser-btn" id="btnBrowserExternal" title="Otwórz w zewnętrznej przeglądarce">↗</button>
+                </div>
+            </div>
+            <div class="browser-body">
+                <iframe id="browserIframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MAIN APP SCRIPT -->
+    <script src="./main.js"></script>
+</body>
+</html>

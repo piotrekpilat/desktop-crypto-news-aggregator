@@ -1,0 +1,29 @@
+# Binaries and compiled output
+desktop-widget
+*.exe
+*.dll
+*.so
+*.dylib
+*.out
+
+# Wails build output
+build/bin/
+build/windows/installer/wails_tools.nsh
+build/windows/installer/tmp/
+
+# Dependencies / Vendors
+vendor/
+node_modules/
+frontend/node_modules/
+
+# IDEs and OS files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs & temp files
+*.log
+tmp/
