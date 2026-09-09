@@ -30,6 +30,22 @@ export function CloseWindow() {
   return window['go']['main']['App']['CloseWindow']();
 }
 
+export function ExportNewsCSV() {
+  return window['go']['main']['App']['ExportNewsCSV']();
+}
+
+export function ExportNewsCsvDialog() {
+  return window['go']['main']['App']['ExportNewsCsvDialog']();
+}
+
+export function ExportSettingsDialog() {
+  return window['go']['main']['App']['ExportSettingsDialog']();
+}
+
+export function ExportSettingsJSON() {
+  return window['go']['main']['App']['ExportSettingsJSON']();
+}
+
 export function FetchAvailablePairs() {
   return window['go']['main']['App']['FetchAvailablePairs']();
 }
@@ -40,6 +56,22 @@ export function GetState() {
 
 export function HideWindow() {
   return window['go']['main']['App']['HideWindow']();
+}
+
+export function ImportNewsCSV(arg1) {
+  return window['go']['main']['App']['ImportNewsCSV'](arg1);
+}
+
+export function ImportNewsCsvDialog() {
+  return window['go']['main']['App']['ImportNewsCsvDialog']();
+}
+
+export function ImportSettingsDialog() {
+  return window['go']['main']['App']['ImportSettingsDialog']();
+}
+
+export function ImportSettingsJSON(arg1) {
+  return window['go']['main']['App']['ImportSettingsJSON'](arg1);
 }
 
 export function MinimizeWindow() {

@@ -1190,6 +1190,65 @@ html, body {
     background: rgba(255, 107, 107, 0.1);
 }
 
+/* Data Transfer / Import-Export Buttons */
+.import-export-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.btn-data-transfer {
+    background: #1E293B;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+}
+
+.btn-data-transfer:hover {
+    background: #273549;
+    border-color: rgba(0, 229, 255, 0.4);
+    transform: translateY(-1px);
+}
+
+.btn-data-transfer:active {
+    transform: translateY(0);
+}
+
+.transfer-btn-icon {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.transfer-btn-content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.transfer-btn-title {
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.transfer-btn-sub {
+    color: #8B949E;
+    font-size: 10px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .status-indicator-txt {
     font-size: 11px;
     margin-top: 2px;

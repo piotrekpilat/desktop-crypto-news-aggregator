@@ -1,0 +1,152 @@
+{
+  "version": 1,
+  "exported_at": 1788989103554,
+  "observed_coins": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+    "ADAUSDT"
+  ],
+  "current_coin": "ADAUSDT",
+  "filter_keywords": [],
+  "alarm_enabled": true,
+  "max_vibrations": 10,
+  "night_mode_enabled": true,
+  "night_mode_start": "22:00",
+  "night_mode_end": "07:00",
+  "app_language": "en",
+  "max_stored_news": 3650,
+  "use_internal_browser": false,
+  "sources": [
+    {
+      "id": "cp_api",
+      "name": "CryptoPanic",
+      "url": "https://cryptopanic.com/developers/api/",
+      "colorHex": "#00E5FF",
+      "isActive": false,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "cs_rss",
+      "name": "CryptoSlate",
+      "url": "https://cryptoslate.com/feed/",
+      "colorHex": "#38BDF8",
+      "isActive": false,
+      "failureCount": 2,
+      "autoDisabledAfterFailure": true
+    },
+    {
+      "id": "macro_cal",
+      "name": "Makro Kalendarz (FED/CPI)",
+      "url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+      "colorHex": "#F59E0B",
+      "isActive": false,
+      "failureCount": 2,
+      "autoDisabledAfterFailure": true
+    },
+    {
+      "id": "ct_rss",
+      "name": "Cointelegraph",
+      "url": "https://cointelegraph.com/rss",
+      "colorHex": "#F59E0B",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "dc_rss",
+      "name": "Decrypt",
+      "url": "https://decrypt.co/feed",
+      "colorHex": "#34D399",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "ut_rss",
+      "name": "U.Today",
+      "url": "https://u.today/rss",
+      "colorHex": "#FF3366",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "tg_whale",
+      "name": "Whale Alert (TG)",
+      "url": "https://t.me/s/whale_alert_io",
+      "colorHex": "#2AABEE",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "rd_rss",
+      "name": "Reddit",
+      "url": "https://www.reddit.com/r/CryptoCurrency/new/.rss",
+      "colorHex": "#FF4500",
+      "isActive": false,
+      "failureCount": 2,
+      "autoDisabledAfterFailure": true
+    },
+    {
+      "id": "cd_rss",
+      "name": "CoinDesk",
+      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+      "colorHex": "#A855F7",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "tg_binance",
+      "name": "Binance News (TG)",
+      "url": "https://t.me/s/binance_announcements",
+      "colorHex": "#F3BA2F",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "tg_unfolded",
+      "name": "Unfolded (TG)",
+      "url": "https://t.me/s/unfolded",
+      "colorHex": "#00E5FF",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "tg_wu",
+      "name": "Wu Blockchain (TG)",
+      "url": "https://t.me/s/wublockchainenglish",
+      "colorHex": "#FF9900",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "iog_news",
+      "name": "IOG News",
+      "url": "https://www.iog.io/feed.xml",
+      "colorHex": "#0033AD",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    },
+    {
+      "id": "llama_hacks",
+      "name": "DefiLlama (Hacks \u0026 Exploits)",
+      "url": "https://api.llama.fi/hacks",
+      "colorHex": "#FF3366",
+      "isActive": true,
+      "failureCount": 0,
+      "autoDisabledAfterFailure": false
+    }
+  ],
+  "favorite_news_ids": [
+    "tg-https://t.me/whale_alert_io/103038"
+  ]
+}

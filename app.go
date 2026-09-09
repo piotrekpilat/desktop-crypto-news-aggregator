@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"os"
 	"os/exec"
 	"sort"
 	"strconv"
@@ -1121,5 +1122,217 @@ func (a *App) MinimizeWindow() {
 
 func (a *App) CloseWindow() {
 	wailsRuntime.Quit(a.ctx)
+}
+
+// ---------------- DATA IMPORT / EXPORT METHODS ----------------
+
+func (a *App) ExportSettingsJSON() (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	favList := make([]string, 0, len(a.favoriteIDs))
+	for id := range a.favoriteIDs {
+		favList = append(favList, id)
+	}
+
+	obsList := make([]string, 0, len(a.observedSymbols))
+	for sym := range a.observedSymbols {
+		obsList = append(obsList, sym)
+	}
+
+	sourcesCopy := make([]FeedSource, len(a.sources))
+	copy(sourcesCopy, a.sources)
+
+	keywordsCopy := make([]string, len(a.activeKeywords))
+	copy(keywordsCopy, a.activeKeywords)
+
+	settings := AppSettingsExport{
+		Version:            1,
+		ExportedAt:         time.Now().UnixMilli(),
+		ObservedCoins:      obsList,
+		CurrentCoin:        a.currentCoinSymbol,
+		FilterKeywords:     keywordsCopy,
+		AlarmEnabled:       a.alarmEnabled,
+		MaxVibrations:      a.maxVibrations,
+		NightModeEnabled:   a.nightModeEnabled,
+		NightModeStart:     a.nightModeStart,
+		NightModeEnd:       a.nightModeEnd,
+		AppLanguage:        a.currentLanguage,
+		MaxStoredNews:      a.maxStoredNews,
+		UseInternalBrowser: a.useInternalBrowser,
+		Sources:            sourcesCopy,
+		FavoriteNewsIDs:    favList,
+		CryptoPanicToken:   a.cryptoPanicToken,
+	}
+
+	return ExportSettingsToJSON(settings)
+}
+
+func (a *App) ImportSettingsJSON(jsonContent string) (FullAppState, error) {
+	imported, err := ImportSettingsFromJSON(jsonContent)
+	if err != nil {
+		return a.GetState(), err
+	}
+
+	a.mu.Lock()
+	if len(imported.ObservedCoins) > 0 {
+		a.observedSymbols = make(map[string]bool)
+		for _, sym := range imported.ObservedCoins {
+			a.observedSymbols[sym] = true
+		}
+	}
+
+	if imported.CurrentCoin != "" {
+		a.currentCoinSymbol = imported.CurrentCoin
+		if !a.observedSymbols[a.currentCoinSymbol] {
+			a.observedSymbols[a.currentCoinSymbol] = true
+		}
+	}
+
+	a.activeKeywords = imported.FilterKeywords
+	a.alarmEnabled = imported.AlarmEnabled
+	a.maxVibrations = imported.MaxVibrations
+	a.nightModeEnabled = imported.NightModeEnabled
+	if imported.NightModeStart != "" {
+		a.nightModeStart = imported.NightModeStart
+	}
+	if imported.NightModeEnd != "" {
+		a.nightModeEnd = imported.NightModeEnd
+	}
+	if imported.AppLanguage != "" {
+		a.currentLanguage = imported.AppLanguage
+	}
+	if imported.MaxStoredNews > 0 {
+		a.maxStoredNews = imported.MaxStoredNews
+	}
+	a.useInternalBrowser = imported.UseInternalBrowser
+
+	if len(imported.Sources) > 0 {
+		a.sources = imported.Sources
+	}
+
+	if len(imported.FavoriteNewsIDs) > 0 {
+		a.favoriteIDs = make(map[string]bool)
+		for _, id := range imported.FavoriteNewsIDs {
+			a.favoriteIDs[id] = true
+		}
+		for i := range a.allNews {
+			a.allNews[i].IsFavorite = a.favoriteIDs[a.allNews[i].ID]
+		}
+	}
+
+	if imported.CryptoPanicToken != "" {
+		a.cryptoPanicToken = imported.CryptoPanicToken
+	}
+
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.loadDataSync()
+	return a.GetState(), nil
+}
+
+func (a *App) ExportNewsCSV() (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return ExportNewsToCSV(a.allNews)
+}
+
+func (a *App) ImportNewsCSV(csvContent string) (FullAppState, error) {
+	imported, err := ImportNewsFromCSV(csvContent)
+	if err != nil {
+		return a.GetState(), err
+	}
+	if len(imported) == 0 {
+		return a.GetState(), fmt.Errorf("Brak wiadomości w pliku CSV")
+	}
+
+	a.mu.Lock()
+	for _, item := range imported {
+		a.knownNewsIDs[item.ID] = true
+	}
+	a.allNews = a.mergeNews(a.allNews, imported)
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	return a.GetState(), nil
+}
+
+func (a *App) ExportSettingsDialog() (string, error) {
+	filePath, err := wailsRuntime.SaveFileDialog(a.ctx, wailsRuntime.SaveDialogOptions{
+		DefaultFilename: fmt.Sprintf("crypto_settings_%s.json", time.Now().Format("20060102_1504")),
+		Title:           "Eksportuj ustawienia (JSON)",
+		Filters: []wailsRuntime.FileFilter{
+			{DisplayName: "Pliki JSON (*.json)", Pattern: "*.json"},
+		},
+	})
+	if err != nil || filePath == "" {
+		return "", err
+	}
+	jsonStr, err := a.ExportSettingsJSON()
+	if err != nil {
+		return "", err
+	}
+	err = os.WriteFile(filePath, []byte(jsonStr), 0644)
+	if err != nil {
+		return "", err
+	}
+	return filePath, nil
+}
+
+func (a *App) ImportSettingsDialog() (FullAppState, error) {
+	filePath, err := wailsRuntime.OpenFileDialog(a.ctx, wailsRuntime.OpenDialogOptions{
+		Title: "Importuj ustawienia (JSON)",
+		Filters: []wailsRuntime.FileFilter{
+			{DisplayName: "Pliki JSON (*.json)", Pattern: "*.json"},
+		},
+	})
+	if err != nil || filePath == "" {
+		return a.GetState(), err
+	}
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return a.GetState(), err
+	}
+	return a.ImportSettingsJSON(string(data))
+}
+
+func (a *App) ExportNewsCsvDialog() (string, error) {
+	filePath, err := wailsRuntime.SaveFileDialog(a.ctx, wailsRuntime.SaveDialogOptions{
+		DefaultFilename: fmt.Sprintf("crypto_news_%s.csv", time.Now().Format("20060102_1504")),
+		Title:           "Eksportuj wiadomości (CSV)",
+		Filters: []wailsRuntime.FileFilter{
+			{DisplayName: "Pliki CSV (*.csv)", Pattern: "*.csv"},
+		},
+	})
+	if err != nil || filePath == "" {
+		return "", err
+	}
+	csvStr, err := a.ExportNewsCSV()
+	if err != nil {
+		return "", err
+	}
+	err = os.WriteFile(filePath, []byte(csvStr), 0644)
+	if err != nil {
+		return "", err
+	}
+	return filePath, nil
+}
+
+func (a *App) ImportNewsCsvDialog() (FullAppState, error) {
+	filePath, err := wailsRuntime.OpenFileDialog(a.ctx, wailsRuntime.OpenDialogOptions{
+		Title: "Importuj wiadomości (CSV)",
+		Filters: []wailsRuntime.FileFilter{
+			{DisplayName: "Pliki CSV (*.csv)", Pattern: "*.csv"},
+		},
+	})
+	if err != nil || filePath == "" {
+		return a.GetState(), err
+	}
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		return a.GetState(), err
+	}
+	return a.ImportNewsCSV(string(data))
 }
 

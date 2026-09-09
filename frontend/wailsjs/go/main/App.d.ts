@@ -16,11 +16,27 @@ export function ClearNewsHistory():Promise<main.FullAppState>;
 
 export function CloseWindow():Promise<void>;
 
+export function ExportNewsCSV():Promise<string>;
+
+export function ExportNewsCsvDialog():Promise<string>;
+
+export function ExportSettingsDialog():Promise<string>;
+
+export function ExportSettingsJSON():Promise<string>;
+
 export function FetchAvailablePairs():Promise<main.FullAppState>;
 
 export function GetState():Promise<main.FullAppState>;
 
 export function HideWindow():Promise<void>;
+
+export function ImportNewsCSV(arg1:string):Promise<main.FullAppState>;
+
+export function ImportNewsCsvDialog():Promise<main.FullAppState>;
+
+export function ImportSettingsDialog():Promise<main.FullAppState>;
+
+export function ImportSettingsJSON(arg1:string):Promise<main.FullAppState>;
 
 export function MinimizeWindow():Promise<void>;
 

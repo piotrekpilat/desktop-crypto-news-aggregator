@@ -284,7 +284,45 @@
                             <button class="btn-clear-history" id="btnClearHistory">Wyczyść historię</button>
                         </div>
 
-                        <!-- Card 6: Status połączeń -->
+                        <!-- Card 6: Import & Export -->
+                        <div class="settings-card">
+                            <div class="card-section-title cyan" id="txtCardImportExportHeader">IMPORT / EKSPORT DANYCH</div>
+                            <div class="setting-desc" id="txtImportExportDesc">Kopia zapasowa konfiguracji (JSON) oraz wiadomości (CSV).</div>
+                            <div class="setting-divider"></div>
+                            
+                            <div class="import-export-grid">
+                                <button class="btn-data-transfer" id="btnExportSettings">
+                                    <div class="transfer-btn-icon">💾</div>
+                                    <div class="transfer-btn-content">
+                                        <div class="transfer-btn-title" id="lblExportSettings">Eksportuj ustawienia</div>
+                                        <div class="transfer-btn-sub" id="lblExportSettingsSub">Plik .json z konfiguracją</div>
+                                    </div>
+                                </button>
+                                <button class="btn-data-transfer" id="btnImportSettings">
+                                    <div class="transfer-btn-icon">📥</div>
+                                    <div class="transfer-btn-content">
+                                        <div class="transfer-btn-title" id="lblImportSettings">Importuj ustawienia</div>
+                                        <div class="transfer-btn-sub" id="lblImportSettingsSub">Wczytaj plik .json</div>
+                                    </div>
+                                </button>
+                                <button class="btn-data-transfer" id="btnExportNews">
+                                    <div class="transfer-btn-icon">📊</div>
+                                    <div class="transfer-btn-content">
+                                        <div class="transfer-btn-title" id="lblExportNews">Eksportuj wiadomości</div>
+                                        <div class="transfer-btn-sub" id="lblExportNewsSub">Plik .csv ze wszystkimi polami</div>
+                                    </div>
+                                </button>
+                                <button class="btn-data-transfer" id="btnImportNews">
+                                    <div class="transfer-btn-icon">📑</div>
+                                    <div class="transfer-btn-content">
+                                        <div class="transfer-btn-title" id="lblImportNews">Importuj wiadomości</div>
+                                        <div class="transfer-btn-sub" id="lblImportNewsSub">Wczytaj i dołącz z pliku .csv</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card 7: Status połączeń -->
                         <div class="settings-card">
                             <div class="setting-row">
                                 <div class="setting-col">

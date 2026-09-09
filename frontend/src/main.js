@@ -55,6 +55,16 @@ const I18N = {
         history_clear_btn: "Wyczyść historię",
         history_clear_title: "Wyczyścić historię newsów?",
         history_clear_msg: "Ta operacja trwale usunie lokalnie zapisane newsy. Ulubione i ustawienia źródeł pozostaną bez zmian.",
+        section_import_export: "IMPORT / EKSPORT DANYCH",
+        import_export_desc: "Kopia zapasowa konfiguracji (JSON) oraz wiadomości (CSV).",
+        btn_export_settings: "Eksportuj ustawienia",
+        btn_export_settings_sub: "Plik .json z konfiguracją",
+        btn_import_settings: "Importuj ustawienia",
+        btn_import_settings_sub: "Wczytaj plik .json",
+        btn_export_news: "Eksportuj wiadomości",
+        btn_export_news_sub: "Plik .csv ze wszystkimi polami",
+        btn_import_news: "Importuj wiadomości",
+        btn_import_news_sub: "Wczytaj i dołącz z pliku .csv",
         status_binance_ok: "Połączono (%d par z API)",
         status_binance_off: "Tryb offline",
         status_backend_ok: "Źródła RSS: Aktywne & Live",
@@ -129,6 +139,16 @@ const I18N = {
         history_clear_btn: "Clear history",
         history_clear_title: "Clear news history?",
         history_clear_msg: "This permanently removes locally saved news. Favorites and source settings will remain.",
+        section_import_export: "IMPORT & EXPORT DATA",
+        import_export_desc: "Backup configuration (JSON) and news history (CSV).",
+        btn_export_settings: "Export settings",
+        btn_export_settings_sub: "Configuration .json file",
+        btn_import_settings: "Import settings",
+        btn_import_settings_sub: "Load .json file",
+        btn_export_news: "Export news",
+        btn_export_news_sub: "Complete .csv file with all fields",
+        btn_import_news: "Import news",
+        btn_import_news_sub: "Load and append from .csv file",
         status_binance_ok: "Connected (%d pairs from API)",
         status_binance_off: "Offline mode",
         status_backend_ok: "Direct Feeds: Active & Live",
@@ -203,6 +223,16 @@ const I18N = {
         history_clear_btn: "Verlauf löschen",
         history_clear_title: "Verlauf wirklich löschen?",
         history_clear_msg: "Dies löscht gespeicherte Nachrichten dauerhaft. Favoriten bleiben erhalten.",
+        section_import_export: "DATEN IMPORTIEREN & EXPORTIEREN",
+        import_export_desc: "Sicherungskopie der Einstellungen (JSON) und Nachrichten (CSV).",
+        btn_export_settings: "Einstellungen exportieren",
+        btn_export_settings_sub: "Konfigurationsdatei (.json)",
+        btn_import_settings: "Einstellungen importieren",
+        btn_import_settings_sub: ".json-Datei laden",
+        btn_export_news: "Nachrichten exportieren",
+        btn_export_news_sub: "Vollständige .csv-Datei mit allen Feldern",
+        btn_import_news: "Nachrichten importieren",
+        btn_import_news_sub: "Aus .csv laden und anhängen",
         status_binance_ok: "Verbunden (%d Paare von API)",
         status_binance_off: "Offline-Modus",
         status_backend_ok: "RSS-Feeds: Aktiv & Live",
@@ -994,6 +1024,17 @@ function renderAppConfigSubtab(state) {
     document.getElementById('valMaxStoredNews').innerText = state.maxStoredNews;
     document.getElementById('btnClearHistory').innerText = t('history_clear_btn');
 
+    document.getElementById('txtCardImportExportHeader').innerText = t('section_import_export');
+    document.getElementById('txtImportExportDesc').innerText = t('import_export_desc');
+    document.getElementById('lblExportSettings').innerText = t('btn_export_settings');
+    document.getElementById('lblExportSettingsSub').innerText = t('btn_export_settings_sub');
+    document.getElementById('lblImportSettings').innerText = t('btn_import_settings');
+    document.getElementById('lblImportSettingsSub').innerText = t('btn_import_settings_sub');
+    document.getElementById('lblExportNews').innerText = t('btn_export_news');
+    document.getElementById('lblExportNewsSub').innerText = t('btn_export_news_sub');
+    document.getElementById('lblImportNews').innerText = t('btn_import_news');
+    document.getElementById('lblImportNewsSub').innerText = t('btn_import_news_sub');
+
     document.querySelectorAll('.preset-pill').forEach(pill => {
         if (parseInt(pill.getAttribute('data-limit'), 10) === state.maxStoredNews) {
             pill.classList.add('active');
@@ -1119,6 +1160,32 @@ document.addEventListener('DOMContentLoaded', () => {
             window.go.main.App.SetMaxStoredNews(limit).then(renderState);
         };
     });
+
+    // Import / Export Handlers
+    document.getElementById('btnExportSettings').onclick = () => {
+        if (window.go && window.go.main && window.go.main.App && window.go.main.App.ExportSettingsDialog) {
+            window.go.main.App.ExportSettingsDialog().catch(err => console.error("Export settings error:", err));
+        }
+    };
+    document.getElementById('btnImportSettings').onclick = () => {
+        if (window.go && window.go.main && window.go.main.App && window.go.main.App.ImportSettingsDialog) {
+            window.go.main.App.ImportSettingsDialog().then(st => {
+                if (st) renderState(st);
+            }).catch(err => console.error("Import settings error:", err));
+        }
+    };
+    document.getElementById('btnExportNews').onclick = () => {
+        if (window.go && window.go.main && window.go.main.App && window.go.main.App.ExportNewsCsvDialog) {
+            window.go.main.App.ExportNewsCsvDialog().catch(err => console.error("Export news error:", err));
+        }
+    };
+    document.getElementById('btnImportNews').onclick = () => {
+        if (window.go && window.go.main && window.go.main.App && window.go.main.App.ImportNewsCsvDialog) {
+            window.go.main.App.ImportNewsCsvDialog().then(st => {
+                if (st) renderState(st);
+            }).catch(err => console.error("Import news error:", err));
+        }
+    };
 
     // 9. Modals Open / Close
     // Add Keyword
