@@ -67,8 +67,46 @@ func ParseDateStr(dateStr string) int64 {
 func FormatTimeAgo(millis int64, lang string) string {
 	diff := time.Now().UnixMilli() - millis
 	if diff < 0 {
-		diff = 0
+		futureDiff := -diff
+		futureMinutes := futureDiff / (60 * 1000)
+		futureHours := futureDiff / (60 * 60 * 1000)
+		switch lang {
+		case "pl":
+			if futureMinutes < 1 {
+				return "Za chwilę"
+			}
+			if futureMinutes < 60 {
+				return fmt.Sprintf("Za %d min", futureMinutes)
+			}
+			if futureHours < 24 {
+				return fmt.Sprintf("Za %d godz.", futureHours)
+			}
+			return time.UnixMilli(millis).Format("02 Jan, 15:04")
+		case "de":
+			if futureMinutes < 1 {
+				return "Gleich"
+			}
+			if futureMinutes < 60 {
+				return fmt.Sprintf("In %d Min.", futureMinutes)
+			}
+			if futureHours < 24 {
+				return fmt.Sprintf("In %d Std.", futureHours)
+			}
+			return time.UnixMilli(millis).Format("02.01, 15:04")
+		default:
+			if futureMinutes < 1 {
+				return "In a moment"
+			}
+			if futureMinutes < 60 {
+				return fmt.Sprintf("In %d min", futureMinutes)
+			}
+			if futureHours < 24 {
+				return fmt.Sprintf("In %d hrs", futureHours)
+			}
+			return time.UnixMilli(millis).Format("02 Jan, 15:04")
+		}
 	}
+
 	minutes := diff / (60 * 1000)
 	hours := diff / (60 * 60 * 1000)
 
@@ -128,6 +166,9 @@ func NewFeedClient() *FeedClient {
 
 // FetchSource fetches news for a single source
 func (fc *FeedClient) FetchSource(source FeedSource, cryptoPanicToken string) ([]CryptoNewsItem, error) {
+	if source.ID == "llama_hacks" || strings.Contains(strings.ToLower(source.URL), "api.llama.fi/hacks") {
+		return fc.fetchDefiLlamaHacks(source)
+	}
 	if source.ID == "macro_cal" || strings.Contains(strings.ToLower(source.URL), "ff_calendar") {
 		return fc.fetchMacroCalendar(source)
 	}
@@ -141,6 +182,164 @@ func (fc *FeedClient) FetchSource(source FeedSource, cryptoPanicToken string) ([
 		return fc.fetchReddit(source)
 	}
 	return fc.fetchGenericRss(source)
+}
+
+// 0. DefiLlama Hacks & Exploits
+type defiLlamaHackItem struct {
+	Date           int64       `json:"date"`
+	Name           string      `json:"name"`
+	Classification string      `json:"classification"`
+	Technique      string      `json:"technique"`
+	Amount         float64     `json:"amount"`
+	TargetType     string      `json:"targetType"`
+	Source         string      `json:"source"`
+	BridgeHack     bool        `json:"bridgeHack"`
+	Chain          interface{} `json:"chain"`
+}
+
+func formatHackAmount(amount float64) string {
+	if amount >= 1_000_000_000 {
+		return fmt.Sprintf("$%.2fB USD", amount/1_000_000_000)
+	}
+	if amount >= 1_000_000 {
+		return fmt.Sprintf("$%.2fM USD", amount/1_000_000)
+	}
+	if amount >= 1_000 {
+		return fmt.Sprintf("$%.1fK USD", amount/1_000)
+	}
+	if amount > 0 {
+		return fmt.Sprintf("$%.0f USD", amount)
+	}
+	return "Nieznana kwota"
+}
+
+func (fc *FeedClient) fetchDefiLlamaHacks(source FeedSource) ([]CryptoNewsItem, error) {
+	req, err := http.NewRequest("GET", source.URL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", "CryptoNewsApp/1.0")
+
+	resp, err := fc.httpCli.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []defiLlamaHackItem
+	if err := json.Unmarshal(body, &items); err != nil {
+		return nil, err
+	}
+
+	var result []CryptoNewsItem
+	for _, it := range items {
+		name := strings.TrimSpace(it.Name)
+		if name == "" || it.Date <= 0 {
+			continue
+		}
+
+		timeMillis := it.Date * 1000
+		formattedTime := FormatTimeAgo(timeMillis, "pl")
+
+		var chains []string
+		if chList, ok := it.Chain.([]interface{}); ok {
+			for _, c := range chList {
+				if cStr, ok := c.(string); ok && strings.TrimSpace(cStr) != "" {
+					chains = append(chains, strings.TrimSpace(cStr))
+				}
+			}
+		} else if chStr, ok := it.Chain.(string); ok && strings.TrimSpace(chStr) != "" {
+			chains = append(chains, strings.TrimSpace(chStr))
+		}
+
+		prefix := "🚨 EXPLOIT: "
+		if it.BridgeHack {
+			prefix = "🚨 BRIDGE EXPLOIT: "
+		}
+
+		formattedAmt := formatHackAmount(it.Amount)
+		title := prefix + name
+		if it.Amount > 0 {
+			title += fmt.Sprintf(" (%s)", formattedAmt)
+		}
+
+		var descParts []string
+		if strings.TrimSpace(it.Technique) != "" {
+			descParts = append(descParts, "Technika: "+strings.TrimSpace(it.Technique))
+		}
+		if len(chains) > 0 {
+			descParts = append(descParts, "Łańcuch: "+strings.Join(chains, ", "))
+		}
+		if strings.TrimSpace(it.Classification) != "" {
+			descParts = append(descParts, "Typ: "+strings.TrimSpace(it.Classification))
+		}
+		if strings.TrimSpace(it.TargetType) != "" {
+			descParts = append(descParts, "Cel: "+strings.TrimSpace(it.TargetType))
+		}
+
+		desc := strings.Join(descParts, " | ")
+		if desc == "" {
+			desc = fmt.Sprintf("Wykryto incydent bezpieczeństwa w protokole %s", name)
+		}
+
+		tags := []string{"#Exploit", "#DeFi"}
+		if it.BridgeHack {
+			tags = append(tags, "#Bridge")
+		}
+		for i, c := range chains {
+			if i >= 2 {
+				break
+			}
+			tags = append(tags, "#"+c)
+		}
+
+		sourceLabel := "DefiLlama • Security"
+		if len(chains) > 0 {
+			sourceLabel = "DefiLlama • " + chains[0]
+		}
+
+		finalURL := it.Source
+		if !strings.HasPrefix(finalURL, "http://") && !strings.HasPrefix(finalURL, "https://") {
+			finalURL = "https://defillama.com/hacks"
+		}
+
+		idKey := fmt.Sprintf("llama_hack_%s_%d_%f", name, it.Date, it.Amount)
+
+		result = append(result, CryptoNewsItem{
+			ID:                Md5Hash(idKey),
+			Title:             title,
+			Description:       desc,
+			Source:            sourceLabel,
+			URL:               finalURL,
+			PublishedAtMillis: timeMillis,
+			FormattedTime:     formattedTime,
+			Tag:               strings.Join(tags, " "),
+			ColorHex:          "#FF3366",
+		})
+	}
+
+	// Sort newest first & limit to 50
+	for i := 0; i < len(result); i++ {
+		for j := i + 1; j < len(result); j++ {
+			if result[i].PublishedAtMillis < result[j].PublishedAtMillis {
+				result[i], result[j] = result[j], result[i]
+			}
+		}
+	}
+	if len(result) > 50 {
+		result = result[:50]
+	}
+
+	return result, nil
 }
 
 // 1. Kalendarz Makro
@@ -435,17 +634,30 @@ func (fc *FeedClient) fetchReddit(source FeedSource) ([]CryptoNewsItem, error) {
 	return fc.fetchGenericRss(source)
 }
 
-// 4. Generic RSS 2.0
-type rssFeed struct {
+// 4. Generic RSS 2.0 & Atom XML Parser
+type genericRssFeed struct {
 	Channel struct {
 		Items []struct {
 			Title       string `xml:"title"`
 			Link        string `xml:"link"`
 			Description string `xml:"description"`
+			Content     string `xml:"content"`
+			Encoded     string `xml:"encoded"`
 			PubDate     string `xml:"pubDate"`
 			Guid        string `xml:"guid"`
 		} `xml:"item"`
 	} `xml:"channel"`
+	Entries []struct {
+		ID      string `xml:"id"`
+		Title   string `xml:"title"`
+		Link    struct {
+			Href string `xml:"href,attr"`
+		} `xml:"link"`
+		Content string `xml:"content"`
+		Summary string `xml:"summary"`
+		Updated string `xml:"updated"`
+		PubDate string `xml:"published"`
+	} `xml:"entry"`
 }
 
 func (fc *FeedClient) fetchGenericRss(source FeedSource) ([]CryptoNewsItem, error) {
@@ -470,18 +682,27 @@ func (fc *FeedClient) fetchGenericRss(source FeedSource) ([]CryptoNewsItem, erro
 		return nil, err
 	}
 
-	var feed rssFeed
+	var feed genericRssFeed
 	if err := xml.Unmarshal(body, &feed); err != nil {
 		return nil, err
 	}
 
 	var result []CryptoNewsItem
+
+	// 1. Process RSS 2.0 items
 	for _, it := range feed.Channel.Items {
 		title := strings.TrimSpace(it.Title)
 		if title == "" {
 			continue
 		}
-		desc := CleanHtml(it.Description)
+		rawDesc := it.Description
+		if rawDesc == "" {
+			rawDesc = it.Encoded
+		}
+		if rawDesc == "" {
+			rawDesc = it.Content
+		}
+		desc := CleanHtml(rawDesc)
 		if len([]rune(desc)) > 300 {
 			desc = string([]rune(desc)[:297]) + "..."
 		}
@@ -505,6 +726,47 @@ func (fc *FeedClient) fetchGenericRss(source FeedSource) ([]CryptoNewsItem, erro
 			ColorHex:          source.ColorHex,
 		})
 	}
+
+	// 2. Process Atom XML entries
+	for _, e := range feed.Entries {
+		title := strings.TrimSpace(e.Title)
+		if title == "" {
+			continue
+		}
+		content := e.Content
+		if content == "" {
+			content = e.Summary
+		}
+		cleanContent := CleanHtml(content)
+		if len([]rune(cleanContent)) > 300 {
+			cleanContent = string([]rune(cleanContent)[:297]) + "..."
+		}
+
+		dateStr := e.Updated
+		if dateStr == "" {
+			dateStr = e.PubDate
+		}
+		timeMillis := ParseDateStr(dateStr)
+		link := strings.TrimSpace(e.Link.Href)
+
+		id := "atom-" + e.ID
+		if e.ID == "" {
+			id = "atom-" + Md5Hash(title)
+		}
+
+		result = append(result, CryptoNewsItem{
+			ID:                id,
+			Title:             title,
+			Description:       cleanContent,
+			Source:            source.Name,
+			URL:               link,
+			PublishedAtMillis: timeMillis,
+			FormattedTime:     FormatTimeAgo(timeMillis, "pl"),
+			Tag:               "#Crypto",
+			ColorHex:          source.ColorHex,
+		})
+	}
+
 	return result, nil
 }
 

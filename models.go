@@ -114,14 +114,18 @@ var DefaultInitialCoins = []CoinInfo{
 func GetDefaultSources() []FeedSource {
 	return []FeedSource{
 		{ID: "macro_cal", Name: "Makro Kalendarz (FED/CPI)", URL: "https://nfs.faireconomy.media/ff_calendar_thisweek.json", ColorHex: "#F59E0B", IsActive: false},
+		{ID: "llama_hacks", Name: "DefiLlama (Hacks & Exploits)", URL: "https://api.llama.fi/hacks", ColorHex: "#FF3366", IsActive: true},
+		{ID: "tg_unfolded", Name: "Unfolded (TG)", URL: "https://t.me/s/unfolded", ColorHex: "#00E5FF", IsActive: true},
+		{ID: "tg_wu", Name: "Wu Blockchain (TG)", URL: "https://t.me/s/wublockchainenglish", ColorHex: "#FF9900", IsActive: true},
 		{ID: "tg_binance", Name: "Binance News (TG)", URL: "https://t.me/s/binance_announcements", ColorHex: "#F3BA2F", IsActive: true},
+		{ID: "tg_whale", Name: "Whale Alert (TG)", URL: "https://t.me/s/whale_alert_io", ColorHex: "#2AABEE", IsActive: true},
 		{ID: "cd_rss", Name: "CoinDesk", URL: "https://www.coindesk.com/arc/outboundfeeds/rss/", ColorHex: "#A855F7", IsActive: true},
 		{ID: "ct_rss", Name: "Cointelegraph", URL: "https://cointelegraph.com/rss", ColorHex: "#F59E0B", IsActive: true},
 		{ID: "cp_api", Name: "CryptoPanic", URL: "https://cryptopanic.com/developers/api/", ColorHex: "#00E5FF", IsActive: false},
 		{ID: "cs_rss", Name: "CryptoSlate", URL: "https://cryptoslate.com/feed/", ColorHex: "#38BDF8", IsActive: true},
 		{ID: "dc_rss", Name: "Decrypt", URL: "https://decrypt.co/feed", ColorHex: "#34D399", IsActive: true},
+		{ID: "iog_news", Name: "IOG News", URL: "https://www.iog.io/feed.xml", ColorHex: "#0033AD", IsActive: true},
 		{ID: "rd_rss", Name: "Reddit", URL: "https://www.reddit.com/r/CryptoCurrency/new/.rss", ColorHex: "#FF4500", IsActive: true},
 		{ID: "ut_rss", Name: "U.Today", URL: "https://u.today/rss", ColorHex: "#FF3366", IsActive: true},
-		{ID: "tg_whale", Name: "Whale Alert (TG)", URL: "https://t.me/s/whale_alert_io", ColorHex: "#2AABEE", IsActive: true},
 	}
 }

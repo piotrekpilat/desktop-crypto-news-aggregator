@@ -10,6 +10,14 @@ export function AddKeyword(arg1) {
   return window['go']['main']['App']['AddKeyword'](arg1);
 }
 
+export function AddRssSource(arg1, arg2) {
+  return window['go']['main']['App']['AddRssSource'](arg1, arg2);
+}
+
+export function AddTelegramSource(arg1, arg2) {
+  return window['go']['main']['App']['AddTelegramSource'](arg1, arg2);
+}
+
 export function ClearKeywords() {
   return window['go']['main']['App']['ClearKeywords']();
 }
@@ -48,6 +56,10 @@ export function RefreshData() {
 
 export function RemoveKeyword(arg1) {
   return window['go']['main']['App']['RemoveKeyword'](arg1);
+}
+
+export function RemoveSource(arg1) {
+  return window['go']['main']['App']['RemoveSource'](arg1);
 }
 
 export function SaveCryptoPanicToken(arg1) {

@@ -6,6 +6,10 @@ export function AcknowledgeAlarm():Promise<main.FullAppState>;
 
 export function AddKeyword(arg1:string):Promise<main.FullAppState>;
 
+export function AddRssSource(arg1:string,arg2:string):Promise<main.FullAppState>;
+
+export function AddTelegramSource(arg1:string,arg2:string):Promise<main.FullAppState>;
+
 export function ClearKeywords():Promise<main.FullAppState>;
 
 export function ClearNewsHistory():Promise<main.FullAppState>;
@@ -25,6 +29,8 @@ export function OpenExternalUrl(arg1:string):Promise<void>;
 export function RefreshData():Promise<main.FullAppState>;
 
 export function RemoveKeyword(arg1:string):Promise<main.FullAppState>;
+
+export function RemoveSource(arg1:string):Promise<main.FullAppState>;
 
 export function SaveCryptoPanicToken(arg1:string):Promise<main.FullAppState>;
 

@@ -160,7 +160,16 @@
 
                     <!-- Subtab Content: SOURCES -->
                     <div class="subtab-content" id="subtabContentSources" style="display: none;">
-                        <div class="sources-list-header-txt" id="txtSourcesTitle">AKTYWNE ŹRÓDŁA (RSS Direct)</div>
+                        <div class="subtab-section-header" style="margin-bottom: 2px;">
+                            <div class="sources-list-header-txt" id="txtTelegramSourcesTitle" style="color: #00E5FF;">KANAŁY TELEGRAM (PUBLICZNE)</div>
+                            <button class="btn-add-source-header" id="btnAddTelegramSource">+ Dodaj kanał</button>
+                        </div>
+                        <div class="sources-manage-list" id="telegramSourcesManageList"></div>
+
+                        <div class="subtab-section-header" style="margin-top: 12px; margin-bottom: 2px;">
+                            <div class="sources-list-header-txt" id="txtSourcesTitle">GŁÓWNE ŹRÓDŁA NEWSÓW &amp; RSS / ATOM</div>
+                            <button class="btn-add-source-header" id="btnAddRssSource">+ Dodaj RSS / Atom</button>
+                        </div>
                         <div class="sources-manage-list" id="sourcesManageList"></div>
                     </div>
 
@@ -393,6 +402,34 @@
                 <div class="modal-actions">
                     <button class="modal-btn-cancel" id="btnCancelClearHistory">Anuluj</button>
                     <button class="modal-btn-danger" id="btnConfirmClearHistory">Wyczyść</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Add Telegram Source Modal -->
+        <div class="modal-backdrop" id="modalAddTelegram" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalTelegramTitle">Dodaj publiczny kanał Telegram</div>
+                <div class="modal-hint" id="txtModalTelegramHint">np. @unfolded, @tier10k lub t.me/...</div>
+                <input type="text" class="modal-input" id="inputTelegramHandle" placeholder="@channelname / URL">
+                <input type="text" class="modal-input" id="inputTelegramName" placeholder="Nazwa kanału (opcjonalna)" style="margin-top: 8px;">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelTelegram">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmTelegram">Dodaj</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Add RSS / Atom Source Modal -->
+        <div class="modal-backdrop" id="modalAddRss" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalRssTitle">Dodaj własne źródło RSS / Atom</div>
+                <div class="modal-hint" id="txtModalRssHint">URL kanału (np. https://strona.pl/feed.xml lub rss.xml)</div>
+                <input type="text" class="modal-input" id="inputRssUrl" placeholder="https://example.com/feed.xml">
+                <input type="text" class="modal-input" id="inputRssName" placeholder="Nazwa źródła (opcjonalna)" style="margin-top: 8px;">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelRss">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmRss">Dodaj</button>
                 </div>
             </div>
         </div>

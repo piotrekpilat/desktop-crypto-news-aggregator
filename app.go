@@ -835,6 +835,104 @@ func (a *App) ToggleSource(sourceID string, active bool) FullAppState {
 	return a.GetState()
 }
 
+func (a *App) AddTelegramSource(handleOrUrl string, customName string) FullAppState {
+	cleanHandle := strings.TrimSpace(handleOrUrl)
+	cleanHandle = strings.TrimPrefix(cleanHandle, "https://t.me/s/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "https://t.me/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "t.me/s/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "t.me/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "@")
+	cleanHandle = strings.TrimSpace(cleanHandle)
+
+	if cleanHandle == "" {
+		return a.GetState()
+	}
+
+	sourceID := "tg_" + strings.ToLower(cleanHandle)
+	a.mu.Lock()
+	for _, s := range a.sources {
+		if s.ID == sourceID {
+			a.mu.Unlock()
+			return a.GetState()
+		}
+	}
+
+	displayName := strings.TrimSpace(customName)
+	if displayName == "" {
+		displayName = "@" + cleanHandle + " (TG)"
+	}
+
+	newSource := FeedSource{
+		ID:       sourceID,
+		Name:     displayName,
+		URL:      "https://t.me/s/" + cleanHandle,
+		ColorHex: "#2AABEE",
+		IsActive: true,
+	}
+
+	a.sources = append(a.sources, newSource)
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.fetchFeedsDirect(false)
+	return a.GetState()
+}
+
+func (a *App) AddRssSource(urlInput string, customName string) FullAppState {
+	cleanURL := strings.TrimSpace(urlInput)
+	if cleanURL == "" {
+		return a.GetState()
+	}
+	if !strings.HasPrefix(cleanURL, "http://") && !strings.HasPrefix(cleanURL, "https://") {
+		cleanURL = "https://" + cleanURL
+	}
+
+	sourceID := "rss_custom_" + Md5Hash(cleanURL)[:8]
+	a.mu.Lock()
+	for _, s := range a.sources {
+		if s.ID == sourceID || strings.EqualFold(s.URL, cleanURL) {
+			a.mu.Unlock()
+			return a.GetState()
+		}
+	}
+
+	displayName := strings.TrimSpace(customName)
+	if displayName == "" {
+		displayName = "RSS / Atom"
+	}
+
+	newSource := FeedSource{
+		ID:       sourceID,
+		Name:     displayName,
+		URL:      cleanURL,
+		ColorHex: "#38BDF8",
+		IsActive: true,
+	}
+
+	a.sources = append(a.sources, newSource)
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.fetchFeedsDirect(false)
+	return a.GetState()
+}
+
+func (a *App) RemoveSource(sourceID string) FullAppState {
+	a.mu.Lock()
+	var updated []FeedSource
+	for _, s := range a.sources {
+		if s.ID != sourceID {
+			updated = append(updated, s)
+		}
+	}
+	a.sources = updated
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.fetchFeedsDirect(false)
+	return a.GetState()
+}
+
 func (a *App) SaveCryptoPanicToken(token string) FullAppState {
 	a.mu.Lock()
 	a.cryptoPanicToken = strings.TrimSpace(token)

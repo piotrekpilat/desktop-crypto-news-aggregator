@@ -24,7 +24,10 @@ const I18N = {
         pairs_header: "OBSERWOWANE PARY (%d / %d z Binance)",
         pairs_fetch_btn: "Pobierz pary 🔄",
         pairs_search_placeholder: "Szukaj pary (np. BTC, ADA, SOL, PEPE)...",
-        sources_title: "AKTYWNE ŹRÓDŁA (RSS Direct)",
+        sources_title: "GŁÓWNE ŹRÓDŁA NEWSÓW & RSS / ATOM",
+        telegram_sources_title: "KANAŁY TELEGRAM (PUBLICZNE)",
+        btn_add_tg: "+ Dodaj kanał",
+        btn_add_rss: "+ Dodaj RSS / Atom",
         cp_token_title: "Token API CryptoPanic",
         cp_token_desc: "Token jest bezpiecznie zapisany. Zapis aktywuje źródło CryptoPanic.",
         cp_token_placeholder: "Wklej token API",
@@ -95,7 +98,10 @@ const I18N = {
         pairs_header: "OBSERVED PAIRS (%d / %d from Binance)",
         pairs_fetch_btn: "Fetch pairs 🔄",
         pairs_search_placeholder: "Search crypto pair (e.g. BTC, ADA, SOL)...",
-        sources_title: "ACTIVE NEWS SOURCES (RSS Direct)",
+        sources_title: "MAIN NEWS & RSS / ATOM SOURCES",
+        telegram_sources_title: "TELEGRAM CHANNELS (PUBLIC)",
+        btn_add_tg: "+ Add channel",
+        btn_add_rss: "+ Add RSS / Atom",
         cp_token_title: "CryptoPanic API token",
         cp_token_desc: "Token is securely saved on this device. Saving activates CryptoPanic.",
         cp_token_placeholder: "Paste API token",
@@ -166,7 +172,10 @@ const I18N = {
         pairs_header: "BEOBACHTETE PAARE (%d / %d von Binance)",
         pairs_fetch_btn: "Paare laden 🔄",
         pairs_search_placeholder: "Kryptopaar suchen (z.B. BTC, ADA, SOL)...",
-        sources_title: "AKTIVE QUELLEN (RSS Direct)",
+        sources_title: "HAUPTNACHRICHTEN & RSS / ATOM-QUELLEN",
+        telegram_sources_title: "TELEGRAM-KANÄLE (ÖFFENTLICH)",
+        btn_add_tg: "+ Kanal hinzufügen",
+        btn_add_rss: "+ RSS / Atom hinzufügen",
         cp_token_title: "CryptoPanic API Token",
         cp_token_desc: "Token wird sicher gespeichert. Speichern aktiviert CryptoPanic.",
         cp_token_placeholder: "API-Token einfügen",
@@ -849,13 +858,25 @@ function renderPairsSubtab(state) {
 // 2. Sources Subtab
 function renderSourcesSubtab(state) {
     document.getElementById('txtSourcesTitle').innerText = t('sources_title');
-    const container = document.getElementById('sourcesManageList');
-    container.innerHTML = '';
+    document.getElementById('txtTelegramSourcesTitle').innerText = t('telegram_sources_title');
+    document.getElementById('btnAddTelegramSource').innerText = t('btn_add_tg');
+    document.getElementById('btnAddRssSource').innerText = t('btn_add_rss');
 
-    const sorted = [...(state.sourcesList || [])].sort((a, b) => a.name.localeCompare(b.name));
-    sorted.forEach(src => {
+    const tgContainer = document.getElementById('telegramSourcesManageList');
+    const genContainer = document.getElementById('sourcesManageList');
+    tgContainer.innerHTML = '';
+    genContainer.innerHTML = '';
+
+    const allSources = state.sourcesList || [];
+    const tgSources = allSources.filter(s => s.id.startsWith('tg_') || s.url.includes('t.me/')).sort((a, b) => a.name.localeCompare(b.name));
+    const genSources = allSources.filter(s => !s.id.startsWith('tg_') && !s.url.includes('t.me/')).sort((a, b) => a.name.localeCompare(b.name));
+
+    const defaultIds = ['llama_hacks', 'tg_binance', 'tg_whale', 'tg_unfolded', 'tg_wu', 'cd_rss', 'ct_rss', 'cp_api', 'cs_rss', 'dc_rss', 'iog_news', 'rd_rss', 'ut_rss', 'macro_cal'];
+
+    function createSourceCard(src, isTg) {
         const card = document.createElement('div');
         card.className = 'source-card';
+        const isCustom = !defaultIds.includes(src.id);
 
         let cpTokenHtml = '';
         if (src.id === 'cp_api' && src.isActive) {
@@ -875,13 +896,19 @@ function renderSourcesSubtab(state) {
         card.innerHTML = `
             <div class="source-card-main">
                 <div>
-                    <div class="source-card-name">${escapeHtml(src.name)}</div>
+                    <div class="source-card-name">
+                        ${escapeHtml(src.name)}
+                        ${isCustom ? '<span class="custom-source-badge">CUSTOM</span>' : ''}
+                    </div>
                     <div class="source-card-url">${escapeHtml(src.url)}</div>
                 </div>
-                <label class="switch">
-                    <input type="checkbox" class="chk-source" ${src.isActive ? 'checked' : ''}>
-                    <span class="slider round"></span>
-                </label>
+                <div style="display: flex; align-items: center;">
+                    ${isCustom ? `<button class="btn-source-delete" title="Usuń źródło">🗑️</button>` : ''}
+                    <label class="switch">
+                        <input type="checkbox" class="chk-source" ${src.isActive ? 'checked' : ''}>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
             ${cpTokenHtml}
         `;
@@ -889,6 +916,16 @@ function renderSourcesSubtab(state) {
         card.querySelector('.chk-source').onchange = (e) => {
             window.go.main.App.ToggleSource(src.id, e.target.checked).then(renderState);
         };
+
+        if (isCustom) {
+            const delBtn = card.querySelector('.btn-source-delete');
+            if (delBtn) {
+                delBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    window.go.main.App.RemoveSource(src.id).then(renderState);
+                };
+            }
+        }
 
         if (src.id === 'cp_api' && src.isActive) {
             const saveBtn = card.querySelector('#btnSaveCpToken');
@@ -908,8 +945,11 @@ function renderSourcesSubtab(state) {
             }
         }
 
-        container.appendChild(card);
-    });
+        return card;
+    }
+
+    tgSources.forEach(src => tgContainer.appendChild(createSourceCard(src, true)));
+    genSources.forEach(src => genContainer.appendChild(createSourceCard(src, false)));
 }
 
 // 3. App & Night Subtab
@@ -1156,6 +1196,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnConfirmClearHistory').onclick = () => {
         window.go.main.App.ClearNewsHistory().then(renderState);
         document.getElementById('modalClearHistory').style.display = 'none';
+    };
+
+    // Add Telegram Source
+    document.getElementById('btnAddTelegramSource').onclick = () => {
+        document.getElementById('modalAddTelegram').style.display = 'flex';
+        document.getElementById('inputTelegramHandle').value = '';
+        document.getElementById('inputTelegramName').value = '';
+    };
+    document.getElementById('btnCancelTelegram').onclick = () => {
+        document.getElementById('modalAddTelegram').style.display = 'none';
+    };
+    document.getElementById('btnConfirmTelegram').onclick = () => {
+        const handle = document.getElementById('inputTelegramHandle').value.trim();
+        const name = document.getElementById('inputTelegramName').value.trim();
+        if (handle) {
+            window.go.main.App.AddTelegramSource(handle, name).then(renderState);
+        }
+        document.getElementById('modalAddTelegram').style.display = 'none';
+    };
+
+    // Add RSS / Atom Source
+    document.getElementById('btnAddRssSource').onclick = () => {
+        document.getElementById('modalAddRss').style.display = 'flex';
+        document.getElementById('inputRssUrl').value = '';
+        document.getElementById('inputRssName').value = '';
+    };
+    document.getElementById('btnCancelRss').onclick = () => {
+        document.getElementById('modalAddRss').style.display = 'none';
+    };
+    document.getElementById('btnConfirmRss').onclick = () => {
+        const url = document.getElementById('inputRssUrl').value.trim();
+        const name = document.getElementById('inputRssName').value.trim();
+        if (url) {
+            window.go.main.App.AddRssSource(url, name).then(renderState);
+        }
+        document.getElementById('modalAddRss').style.display = 'none';
     };
 
     // In-app browser close / refresh / external
