@@ -9,24 +9,26 @@ import (
 )
 
 type SavedSettings struct {
-	FavoriteNewsIDs    []string         `json:"favoriteNewsIds"`
-	ObservedCoins      []string         `json:"observedCoins"`
-	CurrentCoin        string           `json:"currentCoin"`
-	FilterKeywords     []string         `json:"filterKeywords"`
-	AlarmEnabled       bool             `json:"alarmEnabled"`
-	MaxVibrations      int              `json:"maxVibrations"`
-	NightModeEnabled   bool             `json:"nightModeEnabled"`
-	NightModeStart     string           `json:"nightModeStart"`
-	NightModeEnd       string           `json:"nightModeEnd"`
-	AppLanguage        string           `json:"appLanguage"`
-	MaxStoredNews      int              `json:"maxStoredNews"`
-	UseInternalBrowser bool             `json:"useInternalBrowser"`
-	AlwaysOnTop        bool             `json:"alwaysOnTop"`
-	Autostart          bool             `json:"autostart"`
-	CryptoPanicToken   string           `json:"cryptoPanicToken"`
-	Sources            []FeedSource     `json:"sources"`
-	NewsHistory        []CryptoNewsItem `json:"newsHistory"`
-	HistoryClearedAt   int64            `json:"historyClearedAt"`
+	FavoriteNewsIDs       []string         `json:"favoriteNewsIds"`
+	SeenNewsIDs           []string         `json:"seenNewsIds"`
+	SelectedSourceFilters []string         `json:"selectedSourceFilters"`
+	ObservedCoins         []string         `json:"observedCoins"`
+	CurrentCoin           string           `json:"currentCoin"`
+	FilterKeywords        []string         `json:"filterKeywords"`
+	AlarmEnabled          bool             `json:"alarmEnabled"`
+	MaxVibrations         int              `json:"maxVibrations"`
+	NightModeEnabled      bool             `json:"nightModeEnabled"`
+	NightModeStart        string           `json:"nightModeStart"`
+	NightModeEnd          string           `json:"nightModeEnd"`
+	AppLanguage           string           `json:"appLanguage"`
+	MaxStoredNews         int              `json:"maxStoredNews"`
+	UseInternalBrowser    bool             `json:"useInternalBrowser"`
+	AlwaysOnTop           bool             `json:"alwaysOnTop"`
+	Autostart             bool             `json:"autostart"`
+	CryptoPanicToken      string           `json:"cryptoPanicToken"`
+	Sources               []FeedSource     `json:"sources"`
+	NewsHistory           []CryptoNewsItem `json:"newsHistory"`
+	HistoryClearedAt      int64            `json:"historyClearedAt"`
 }
 
 type StorageManager struct {
@@ -169,23 +171,25 @@ Comment=Crypto News & Market Desktop Widget
 
 func (sm *StorageManager) defaultSettings() *SavedSettings {
 	return &SavedSettings{
-		FavoriteNewsIDs:    []string{},
-		ObservedCoins:      []string{"ADAUSDT", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"},
-		CurrentCoin:        "ADAUSDT",
-		FilterKeywords:     []string{},
-		AlarmEnabled:       true,
-		MaxVibrations:      10,
-		NightModeEnabled:   true,
-		NightModeStart:     "22:00",
-		NightModeEnd:       "07:00",
-		AppLanguage:        "pl",
-		MaxStoredNews:      3650,
-		UseInternalBrowser: false,
-		AlwaysOnTop:        false,
-		Autostart:          false,
-		CryptoPanicToken:   "",
-		Sources:            GetDefaultSources(),
-		NewsHistory:        []CryptoNewsItem{},
-		HistoryClearedAt:   0,
+		FavoriteNewsIDs:       []string{},
+		SeenNewsIDs:           []string{},
+		SelectedSourceFilters: []string{"Wszystkie"},
+		ObservedCoins:         []string{"ADAUSDT", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"},
+		CurrentCoin:           "ADAUSDT",
+		FilterKeywords:        []string{},
+		AlarmEnabled:          true,
+		MaxVibrations:         10,
+		NightModeEnabled:      true,
+		NightModeStart:        "22:00",
+		NightModeEnd:          "07:00",
+		AppLanguage:           "pl",
+		MaxStoredNews:         3650,
+		UseInternalBrowser:    false,
+		AlwaysOnTop:           false,
+		Autostart:             false,
+		CryptoPanicToken:      "",
+		Sources:               GetDefaultSources(),
+		NewsHistory:           []CryptoNewsItem{},
+		HistoryClearedAt:      0,
 	}
 }

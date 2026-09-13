@@ -24,15 +24,17 @@ type App struct {
 	binanceCli    *BinanceClient
 
 	// Internal state
-	allNews           []CryptoNewsItem
-	sources           []FeedSource
-	cryptoPanicToken  string
-	pricePoints       []PricePoint
-	favoriteIDs       map[string]bool
-	allAvailableCoins []CoinInfo
-	observedSymbols   map[string]bool
-	currentCoinSymbol string
-	activeKeywords    []string
+	allNews               []CryptoNewsItem
+	sources               []FeedSource
+	cryptoPanicToken      string
+	pricePoints           []PricePoint
+	favoriteIDs           map[string]bool
+	seenNewsIDs           map[string]bool
+	allAvailableCoins     []CoinInfo
+	observedSymbols       map[string]bool
+	currentCoinSymbol     string
+	activeKeywords        []string
+	selectedSourceFilters []string
 
 	alarmEnabled       bool
 	maxVibrations      int
@@ -56,33 +58,35 @@ type App struct {
 	isLiveMarket       bool
 	isOffline          bool
 
-	alarmCycle         AlarmCycleState
-	alarmTickerStop    chan struct{}
-	knownNewsIDs       map[string]bool
-	historyClearedAt   int64
+	alarmCycle       AlarmCycleState
+	alarmTickerStop  chan struct{}
+	knownNewsIDs     map[string]bool
+	historyClearedAt int64
 }
 
 func NewApp() *App {
 	storage := NewStorageManager()
 	return &App{
-		storage:            storage,
-		feedCli:            NewFeedClient(),
-		binanceCli:         NewBinanceClient(),
-		favoriteIDs:        make(map[string]bool),
-		observedSymbols:    make(map[string]bool),
-		knownNewsIDs:       make(map[string]bool),
-		currentCoinSymbol:  "ADAUSDT",
-		activeSourceFilter: "Wszystkie",
-		currentTab:         TabChartAndFeed,
-		settingsSubTab:     SubTabPairs,
-		allAvailableCoins:  DefaultInitialCoins,
-		maxVibrations:      10,
-		nightModeStart:     "22:00",
-		nightModeEnd:       "07:00",
-		currentLanguage:    "pl",
-		maxStoredNews:      3650,
-		useInternalBrowser: false,
-		windowVisible:      true,
+		storage:               storage,
+		feedCli:               NewFeedClient(),
+		binanceCli:            NewBinanceClient(),
+		favoriteIDs:           make(map[string]bool),
+		seenNewsIDs:           make(map[string]bool),
+		observedSymbols:       make(map[string]bool),
+		knownNewsIDs:          make(map[string]bool),
+		currentCoinSymbol:     "ADAUSDT",
+		activeSourceFilter:    "Wszystkie",
+		selectedSourceFilters: []string{"Wszystkie"},
+		currentTab:            TabChartAndFeed,
+		settingsSubTab:        SubTabPairs,
+		allAvailableCoins:     DefaultInitialCoins,
+		maxVibrations:         10,
+		nightModeStart:        "22:00",
+		nightModeEnd:          "07:00",
+		currentLanguage:       "pl",
+		maxStoredNews:         3650,
+		useInternalBrowser:    false,
+		windowVisible:         true,
 	}
 }
 
@@ -110,6 +114,22 @@ func (a *App) loadSettings() {
 	a.favoriteIDs = make(map[string]bool)
 	for _, id := range s.FavoriteNewsIDs {
 		a.favoriteIDs[id] = true
+	}
+
+	a.seenNewsIDs = make(map[string]bool)
+	for _, id := range s.SeenNewsIDs {
+		a.seenNewsIDs[id] = true
+	}
+
+	if len(s.SelectedSourceFilters) > 0 {
+		a.selectedSourceFilters = s.SelectedSourceFilters
+	} else {
+		a.selectedSourceFilters = []string{"Wszystkie"}
+	}
+	if len(a.selectedSourceFilters) == 1 {
+		a.activeSourceFilter = a.selectedSourceFilters[0]
+	} else {
+		a.activeSourceFilter = strings.Join(a.selectedSourceFilters, ", ")
 	}
 
 	a.observedSymbols = make(map[string]bool)
@@ -141,6 +161,7 @@ func (a *App) loadSettings() {
 	a.knownNewsIDs = make(map[string]bool)
 	for _, n := range s.NewsHistory {
 		n.IsFavorite = a.favoriteIDs[n.ID]
+		n.IsSeen = a.seenNewsIDs[n.ID]
 		a.allNews = append(a.allNews, n)
 		a.knownNewsIDs[n.ID] = true
 	}
@@ -156,6 +177,11 @@ func (a *App) saveSettingsLocked() {
 		favList = append(favList, id)
 	}
 
+	seenList := make([]string, 0, len(a.seenNewsIDs))
+	for id := range a.seenNewsIDs {
+		seenList = append(seenList, id)
+	}
+
 	obsList := make([]string, 0, len(a.observedSymbols))
 	for sym := range a.observedSymbols {
 		obsList = append(obsList, sym)
@@ -167,24 +193,26 @@ func (a *App) saveSettingsLocked() {
 	}
 
 	settings := &SavedSettings{
-		FavoriteNewsIDs:    favList,
-		ObservedCoins:      obsList,
-		CurrentCoin:        a.currentCoinSymbol,
-		FilterKeywords:     a.activeKeywords,
-		AlarmEnabled:       a.alarmEnabled,
-		MaxVibrations:      a.maxVibrations,
-		NightModeEnabled:   a.nightModeEnabled,
-		NightModeStart:     a.nightModeStart,
-		NightModeEnd:       a.nightModeEnd,
-		AppLanguage:        a.currentLanguage,
-		MaxStoredNews:      a.maxStoredNews,
-		UseInternalBrowser: a.useInternalBrowser,
-		AlwaysOnTop:        a.alwaysOnTop,
-		Autostart:          a.autostart,
-		CryptoPanicToken:   a.cryptoPanicToken,
-		Sources:            a.sources,
-		NewsHistory:        history,
-		HistoryClearedAt:   a.historyClearedAt,
+		FavoriteNewsIDs:       favList,
+		SeenNewsIDs:           seenList,
+		SelectedSourceFilters: a.selectedSourceFilters,
+		ObservedCoins:         obsList,
+		CurrentCoin:           a.currentCoinSymbol,
+		FilterKeywords:        a.activeKeywords,
+		AlarmEnabled:          a.alarmEnabled,
+		MaxVibrations:         a.maxVibrations,
+		NightModeEnabled:      a.nightModeEnabled,
+		NightModeStart:        a.nightModeStart,
+		NightModeEnd:          a.nightModeEnd,
+		AppLanguage:           a.currentLanguage,
+		MaxStoredNews:         a.maxStoredNews,
+		UseInternalBrowser:    a.useInternalBrowser,
+		AlwaysOnTop:           a.alwaysOnTop,
+		Autostart:             a.autostart,
+		CryptoPanicToken:      a.cryptoPanicToken,
+		Sources:               a.sources,
+		NewsHistory:           history,
+		HistoryClearedAt:      a.historyClearedAt,
 	}
 
 	go a.storage.Save(settings)
@@ -315,7 +343,18 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 	var eligible []CryptoNewsItem
 	for _, n := range accumulated {
 		if n.PublishedAtMillis > clearedAt {
+			if len(a.activeKeywords) > 0 {
+				fullText := strings.ToLower(n.Title + " " + n.Description + " " + n.Tag)
+				for _, kw := range a.activeKeywords {
+					k := strings.TrimSpace(strings.ToLower(kw))
+					if k != "" && strings.Contains(fullText, k) {
+						a.favoriteIDs[n.ID] = true
+						break
+					}
+				}
+			}
 			n.IsFavorite = a.favoriteIDs[n.ID]
+			n.IsSeen = a.seenNewsIDs[n.ID]
 			n.AssociatedPrice = a.findPriceForTime(a.pricePoints, n.PublishedAtMillis)
 			n.FormattedTime = FormatTimeAgo(n.PublishedAtMillis, a.currentLanguage)
 			eligible = append(eligible, n)
@@ -368,6 +407,7 @@ func (a *App) mergeNews(existing []CryptoNewsItem, incoming []CryptoNewsItem) []
 	merged := make([]CryptoNewsItem, 0, len(newsMap))
 	for _, n := range newsMap {
 		n.IsFavorite = a.favoriteIDs[n.ID]
+		n.IsSeen = a.seenNewsIDs[n.ID]
 		merged = append(merged, n)
 	}
 
@@ -575,16 +615,44 @@ func (a *App) getSampleNews(points []PricePoint) []CryptoNewsItem {
 	}
 }
 
-func (a *App) applyFilters(list []CryptoNewsItem, sourceFilter string, keywords []string) []CryptoNewsItem {
+func (a *App) applyFilters(list []CryptoNewsItem, sourceFilters []string, keywords []string) []CryptoNewsItem {
 	var result []CryptoNewsItem
+
+	// Check if all/any source filter is "all"
+	hasAllSources := len(sourceFilters) == 0
+	if !hasAllSources {
+		hasAllSources = true
+		for _, f := range sourceFilters {
+			cleanF := strings.TrimSpace(f)
+			if cleanF != "" && !strings.EqualFold(cleanF, "Wszystkie") && !strings.EqualFold(cleanF, "All") && !strings.EqualFold(cleanF, "Alle") {
+				hasAllSources = false
+				break
+			}
+		}
+	}
+
 	for _, news := range list {
-		matchesSource := true
-		if sourceFilter != "Wszystkie" && sourceFilter != "All" && sourceFilter != "Alle" {
-			if strings.Contains(strings.ToLower(sourceFilter), "makro") {
-				matchesSource = strings.Contains(strings.ToLower(news.Source), "makro") || strings.Contains(strings.ToLower(news.Tag), "makro")
-			} else {
-				matchesSource = strings.Contains(strings.ToLower(news.Source), strings.ToLower(sourceFilter)) ||
-					strings.Contains(strings.ToLower(sourceFilter), strings.ToLower(news.Source))
+		matchesSource := false
+		if hasAllSources {
+			matchesSource = true
+		} else {
+			for _, sf := range sourceFilters {
+				cleanFilter := strings.TrimSpace(sf)
+				if cleanFilter == "" || strings.EqualFold(cleanFilter, "Wszystkie") || strings.EqualFold(cleanFilter, "All") || strings.EqualFold(cleanFilter, "Alle") {
+					continue
+				}
+				if strings.Contains(strings.ToLower(cleanFilter), "makro") {
+					if strings.Contains(strings.ToLower(news.Source), "makro") || strings.Contains(strings.ToLower(news.Tag), "makro") {
+						matchesSource = true
+						break
+					}
+				} else {
+					if strings.Contains(strings.ToLower(news.Source), strings.ToLower(cleanFilter)) ||
+						strings.Contains(strings.ToLower(cleanFilter), strings.ToLower(news.Source)) {
+						matchesSource = true
+						break
+					}
+				}
 			}
 		}
 
@@ -634,6 +702,13 @@ func (a *App) GetState() FullAppState {
 		}
 	}
 
+	unreadNewsCount := 0
+	for _, n := range a.allNews {
+		if !n.IsSeen {
+			unreadNewsCount++
+		}
+	}
+
 	baseList := a.allNews
 	if a.currentTab == TabFavorites {
 		var favs []CryptoNewsItem
@@ -643,9 +718,17 @@ func (a *App) GetState() FullAppState {
 			}
 		}
 		baseList = favs
+	} else if a.currentTab == TabNew {
+		var unread []CryptoNewsItem
+		for _, n := range a.allNews {
+			if !n.IsSeen {
+				unread = append(unread, n)
+			}
+		}
+		baseList = unread
 	}
 
-	filteredNews := a.applyFilters(baseList, a.activeSourceFilter, a.activeKeywords)
+	filteredNews := a.applyFilters(baseList, a.selectedSourceFilters, a.activeKeywords)
 
 	selectedNewsID := a.selectedNewsID
 	if selectedNewsID == "" && len(filteredNews) > 0 {
@@ -669,6 +752,7 @@ func (a *App) GetState() FullAppState {
 		PriceChangePercent:         a.priceChangePercent,
 		SelectedNewsID:             selectedNewsID,
 		ActiveSourceFilter:         a.activeSourceFilter,
+		SelectedSourceFilters:      a.selectedSourceFilters,
 		CurrentTab:                 a.currentTab,
 		SettingsSubTab:             a.settingsSubTab,
 		IsOffline:                  a.isOffline,
@@ -684,6 +768,7 @@ func (a *App) GetState() FullAppState {
 		AlarmCycle:                 a.alarmCycle,
 		MaxStoredNews:              a.maxStoredNews,
 		TotalStoredNewsCount:       len(a.allNews),
+		UnreadNewsCount:            unreadNewsCount,
 		UseInternalBrowser:         a.useInternalBrowser,
 		AlwaysOnTop:                a.alwaysOnTop,
 		Autostart:                  a.autostart,
@@ -746,6 +831,15 @@ func (a *App) AddKeyword(keyword string) FullAppState {
 		}
 		if !exists {
 			a.activeKeywords = append(a.activeKeywords, trimmed)
+			// Auto-favorite matching existing news
+			kLower := strings.ToLower(trimmed)
+			for i := range a.allNews {
+				fullText := strings.ToLower(a.allNews[i].Title + " " + a.allNews[i].Description + " " + a.allNews[i].Tag)
+				if strings.Contains(fullText, kLower) {
+					a.favoriteIDs[a.allNews[i].ID] = true
+					a.allNews[i].IsFavorite = true
+				}
+			}
 			a.saveSettingsLocked()
 		}
 	}
@@ -807,8 +901,96 @@ func (a *App) SwitchSettingsSubTab(subTab string) FullAppState {
 }
 
 func (a *App) SetSourceFilter(filter string) FullAppState {
+	return a.ToggleSourceFilter(filter)
+}
+
+func (a *App) ToggleSourceFilter(filter string) FullAppState {
 	a.mu.Lock()
-	a.activeSourceFilter = filter
+	trimmed := strings.TrimSpace(filter)
+	if trimmed == "" || strings.EqualFold(trimmed, "Wszystkie") || strings.EqualFold(trimmed, "All") || strings.EqualFold(trimmed, "Alle") {
+		a.selectedSourceFilters = []string{"Wszystkie"}
+		a.activeSourceFilter = "Wszystkie"
+	} else {
+		var newFilters []string
+		for _, f := range a.selectedSourceFilters {
+			if !strings.EqualFold(f, "Wszystkie") && !strings.EqualFold(f, "All") && !strings.EqualFold(f, "Alle") {
+				newFilters = append(newFilters, f)
+			}
+		}
+		found := false
+		var updated []string
+		for _, f := range newFilters {
+			if strings.EqualFold(f, trimmed) {
+				found = true
+			} else {
+				updated = append(updated, f)
+			}
+		}
+		if !found {
+			updated = append(updated, trimmed)
+		}
+		if len(updated) == 0 {
+			updated = []string{"Wszystkie"}
+		}
+		a.selectedSourceFilters = updated
+		if len(updated) == 1 {
+			a.activeSourceFilter = updated[0]
+		} else {
+			a.activeSourceFilter = strings.Join(updated, ", ")
+		}
+	}
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SetSourceFilters(filters []string) FullAppState {
+	a.mu.Lock()
+	var cleaned []string
+	for _, f := range filters {
+		t := strings.TrimSpace(f)
+		if t != "" && !strings.EqualFold(t, "Wszystkie") && !strings.EqualFold(t, "All") && !strings.EqualFold(t, "Alle") {
+			cleaned = append(cleaned, t)
+		}
+	}
+	if len(cleaned) == 0 {
+		cleaned = []string{"Wszystkie"}
+	}
+	a.selectedSourceFilters = cleaned
+	if len(cleaned) == 1 {
+		a.activeSourceFilter = cleaned[0]
+	} else {
+		a.activeSourceFilter = strings.Join(cleaned, ", ")
+	}
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) ClearSourceFilters() FullAppState {
+	return a.SetSourceFilters([]string{"Wszystkie"})
+}
+
+func (a *App) MarkNewsAsSeen(newsID string) FullAppState {
+	a.mu.Lock()
+	a.seenNewsIDs[newsID] = true
+	for i := range a.allNews {
+		if a.allNews[i].ID == newsID {
+			a.allNews[i].IsSeen = true
+		}
+	}
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) MarkAllNewsAsSeen() FullAppState {
+	a.mu.Lock()
+	for i := range a.allNews {
+		a.allNews[i].IsSeen = true
+		a.seenNewsIDs[a.allNews[i].ID] = true
+	}
+	a.saveSettingsLocked()
 	a.mu.Unlock()
 	return a.GetState()
 }
@@ -816,6 +998,15 @@ func (a *App) SetSourceFilter(filter string) FullAppState {
 func (a *App) SelectNews(newsID string) FullAppState {
 	a.mu.Lock()
 	a.selectedNewsID = newsID
+	if newsID != "" {
+		a.seenNewsIDs[newsID] = true
+		for i := range a.allNews {
+			if a.allNews[i].ID == newsID {
+				a.allNews[i].IsSeen = true
+			}
+		}
+		a.saveSettingsLocked()
+	}
 	a.mu.Unlock()
 	return a.GetState()
 }
@@ -1135,6 +1326,11 @@ func (a *App) ExportSettingsJSON() (string, error) {
 		favList = append(favList, id)
 	}
 
+	seenList := make([]string, 0, len(a.seenNewsIDs))
+	for id := range a.seenNewsIDs {
+		seenList = append(seenList, id)
+	}
+
 	obsList := make([]string, 0, len(a.observedSymbols))
 	for sym := range a.observedSymbols {
 		obsList = append(obsList, sym)
@@ -1146,23 +1342,28 @@ func (a *App) ExportSettingsJSON() (string, error) {
 	keywordsCopy := make([]string, len(a.activeKeywords))
 	copy(keywordsCopy, a.activeKeywords)
 
+	sourceFiltersCopy := make([]string, len(a.selectedSourceFilters))
+	copy(sourceFiltersCopy, a.selectedSourceFilters)
+
 	settings := AppSettingsExport{
-		Version:            1,
-		ExportedAt:         time.Now().UnixMilli(),
-		ObservedCoins:      obsList,
-		CurrentCoin:        a.currentCoinSymbol,
-		FilterKeywords:     keywordsCopy,
-		AlarmEnabled:       a.alarmEnabled,
-		MaxVibrations:      a.maxVibrations,
-		NightModeEnabled:   a.nightModeEnabled,
-		NightModeStart:     a.nightModeStart,
-		NightModeEnd:       a.nightModeEnd,
-		AppLanguage:        a.currentLanguage,
-		MaxStoredNews:      a.maxStoredNews,
-		UseInternalBrowser: a.useInternalBrowser,
-		Sources:            sourcesCopy,
-		FavoriteNewsIDs:    favList,
-		CryptoPanicToken:   a.cryptoPanicToken,
+		Version:               1,
+		ExportedAt:            time.Now().UnixMilli(),
+		ObservedCoins:         obsList,
+		CurrentCoin:           a.currentCoinSymbol,
+		FilterKeywords:        keywordsCopy,
+		AlarmEnabled:          a.alarmEnabled,
+		MaxVibrations:         a.maxVibrations,
+		NightModeEnabled:      a.nightModeEnabled,
+		NightModeStart:        a.nightModeStart,
+		NightModeEnd:          a.nightModeEnd,
+		AppLanguage:           a.currentLanguage,
+		MaxStoredNews:         a.maxStoredNews,
+		UseInternalBrowser:    a.useInternalBrowser,
+		Sources:               sourcesCopy,
+		FavoriteNewsIDs:       favList,
+		SeenNewsIDs:           seenList,
+		SelectedSourceFilters: sourceFiltersCopy,
+		CryptoPanicToken:      a.cryptoPanicToken,
 	}
 
 	return ExportSettingsToJSON(settings)
@@ -1218,6 +1419,25 @@ func (a *App) ImportSettingsJSON(jsonContent string) (FullAppState, error) {
 		}
 		for i := range a.allNews {
 			a.allNews[i].IsFavorite = a.favoriteIDs[a.allNews[i].ID]
+		}
+	}
+
+	if len(imported.SeenNewsIDs) > 0 {
+		a.seenNewsIDs = make(map[string]bool)
+		for _, id := range imported.SeenNewsIDs {
+			a.seenNewsIDs[id] = true
+		}
+		for i := range a.allNews {
+			a.allNews[i].IsSeen = a.seenNewsIDs[a.allNews[i].ID]
+		}
+	}
+
+	if len(imported.SelectedSourceFilters) > 0 {
+		a.selectedSourceFilters = imported.SelectedSourceFilters
+		if len(a.selectedSourceFilters) == 1 {
+			a.activeSourceFilter = a.selectedSourceFilters[0]
+		} else {
+			a.activeSourceFilter = strings.Join(a.selectedSourceFilters, ", ")
 		}
 	}
 

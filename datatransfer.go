@@ -11,37 +11,41 @@ import (
 )
 
 type AppSettingsExport struct {
-	Version            int          `json:"version"`
-	ExportedAt         int64        `json:"exported_at"`
-	ObservedCoins      []string     `json:"observed_coins"`
-	CurrentCoin        string       `json:"current_coin"`
-	FilterKeywords     []string     `json:"filter_keywords"`
-	AlarmEnabled       bool         `json:"alarm_enabled"`
-	MaxVibrations      int          `json:"max_vibrations"`
-	NightModeEnabled   bool         `json:"night_mode_enabled"`
-	NightModeStart     string       `json:"night_mode_start"`
-	NightModeEnd       string       `json:"night_mode_end"`
-	AppLanguage        string       `json:"app_language"`
-	MaxStoredNews      int          `json:"max_stored_news"`
-	UseInternalBrowser bool         `json:"use_internal_browser"`
-	Sources            []FeedSource `json:"sources"`
-	FavoriteNewsIDs    []string     `json:"favorite_news_ids"`
-	CryptoPanicToken   string       `json:"cryptopanic_token,omitempty"`
+	Version               int          `json:"version"`
+	ExportedAt            int64        `json:"exported_at"`
+	ObservedCoins         []string     `json:"observed_coins"`
+	CurrentCoin           string       `json:"current_coin"`
+	FilterKeywords        []string     `json:"filter_keywords"`
+	AlarmEnabled          bool         `json:"alarm_enabled"`
+	MaxVibrations         int          `json:"max_vibrations"`
+	NightModeEnabled      bool         `json:"night_mode_enabled"`
+	NightModeStart        string       `json:"night_mode_start"`
+	NightModeEnd          string       `json:"night_mode_end"`
+	AppLanguage           string       `json:"app_language"`
+	MaxStoredNews         int          `json:"max_stored_news"`
+	UseInternalBrowser    bool         `json:"use_internal_browser"`
+	Sources               []FeedSource `json:"sources"`
+	FavoriteNewsIDs       []string     `json:"favorite_news_ids"`
+	SeenNewsIDs           []string     `json:"seen_news_ids"`
+	SelectedSourceFilters []string     `json:"selected_source_filters"`
+	CryptoPanicToken      string       `json:"cryptopanic_token,omitempty"`
 
 	// Fallback alias fields for camelCase JSON compatibility
-	ObservedCoinsCamel   []string     `json:"observedCoins,omitempty"`
-	CurrentCoinCamel     string       `json:"currentCoin,omitempty"`
-	FilterKeywordsCamel  []string     `json:"filterKeywords,omitempty"`
-	AlarmEnabledCamel    *bool        `json:"alarmEnabled,omitempty"`
-	MaxVibrationsCamel   *int         `json:"maxVibrations,omitempty"`
-	NightModeEnabledCamel *bool       `json:"nightModeEnabled,omitempty"`
-	NightModeStartCamel  string       `json:"nightModeStart,omitempty"`
-	NightModeEndCamel    string       `json:"nightModeEnd,omitempty"`
-	AppLanguageCamel     string       `json:"appLanguage,omitempty"`
-	MaxStoredNewsCamel   *int         `json:"maxStoredNews,omitempty"`
-	UseInternalBrowserCamel *bool     `json:"useInternalBrowser,omitempty"`
-	FavoriteNewsIDsCamel []string     `json:"favoriteNewsIds,omitempty"`
-	CryptoPanicTokenCamel string      `json:"cryptoPanicToken,omitempty"`
+	ObservedCoinsCamel         []string     `json:"observedCoins,omitempty"`
+	CurrentCoinCamel           string       `json:"currentCoin,omitempty"`
+	FilterKeywordsCamel        []string     `json:"filterKeywords,omitempty"`
+	AlarmEnabledCamel          *bool        `json:"alarmEnabled,omitempty"`
+	MaxVibrationsCamel         *int         `json:"maxVibrations,omitempty"`
+	NightModeEnabledCamel      *bool        `json:"nightModeEnabled,omitempty"`
+	NightModeStartCamel        string       `json:"nightModeStart,omitempty"`
+	NightModeEndCamel          string       `json:"nightModeEnd,omitempty"`
+	AppLanguageCamel           string       `json:"appLanguage,omitempty"`
+	MaxStoredNewsCamel         *int         `json:"maxStoredNews,omitempty"`
+	UseInternalBrowserCamel    *bool        `json:"useInternalBrowser,omitempty"`
+	FavoriteNewsIDsCamel       []string     `json:"favoriteNewsIds,omitempty"`
+	SeenNewsIDsCamel           []string     `json:"seenNewsIds,omitempty"`
+	SelectedSourceFiltersCamel []string     `json:"selectedSourceFilters,omitempty"`
+	CryptoPanicTokenCamel      string       `json:"cryptoPanicToken,omitempty"`
 }
 
 func ExportSettingsToJSON(settings AppSettingsExport) (string, error) {
@@ -106,6 +110,12 @@ func ImportSettingsFromJSON(jsonContent string) (*AppSettingsExport, error) {
 	if len(parsed.FavoriteNewsIDs) == 0 && len(parsed.FavoriteNewsIDsCamel) > 0 {
 		parsed.FavoriteNewsIDs = parsed.FavoriteNewsIDsCamel
 	}
+	if len(parsed.SeenNewsIDs) == 0 && len(parsed.SeenNewsIDsCamel) > 0 {
+		parsed.SeenNewsIDs = parsed.SeenNewsIDsCamel
+	}
+	if len(parsed.SelectedSourceFilters) == 0 && len(parsed.SelectedSourceFiltersCamel) > 0 {
+		parsed.SelectedSourceFilters = parsed.SelectedSourceFiltersCamel
+	}
 	if parsed.CryptoPanicToken == "" && parsed.CryptoPanicTokenCamel != "" {
 		parsed.CryptoPanicToken = parsed.CryptoPanicTokenCamel
 	}
@@ -150,6 +160,7 @@ func ExportNewsToCSV(newsList []CryptoNewsItem) (string, error) {
 		"colorHex",
 		"associatedPrice",
 		"isFavorite",
+		"isSeen",
 	}
 	if err := writer.Write(header); err != nil {
 		return "", err
@@ -168,6 +179,7 @@ func ExportNewsToCSV(newsList []CryptoNewsItem) (string, error) {
 			item.ColorHex,
 			strconv.FormatFloat(item.AssociatedPrice, 'f', -1, 64),
 			strconv.FormatBool(item.IsFavorite),
+			strconv.FormatBool(item.IsSeen),
 		}
 		if err := writer.Write(row); err != nil {
 			return "", err
@@ -262,6 +274,7 @@ func ImportNewsFromCSV(csvContent string) ([]CryptoNewsItem, error) {
 		}
 		priceStr := getField(row, 9, "associatedPrice", "price", "associated_price")
 		favStr := getField(row, 10, "isFavorite", "is_favorite", "favorite", "fav")
+		seenStr := getField(row, 11, "isSeen", "is_seen", "seen", "read", "is_read", "isread")
 
 		if title == "" && description == "" {
 			continue
@@ -274,6 +287,7 @@ func ImportNewsFromCSV(csvContent string) ([]CryptoNewsItem, error) {
 
 		associatedPrice, _ := strconv.ParseFloat(priceStr, 64)
 		isFav := strings.EqualFold(favStr, "true") || favStr == "1" || strings.EqualFold(favStr, "yes")
+		isSeen := strings.EqualFold(seenStr, "true") || seenStr == "1" || strings.EqualFold(seenStr, "yes")
 
 		id := idRaw
 		if id == "" {
@@ -300,6 +314,7 @@ func ImportNewsFromCSV(csvContent string) ([]CryptoNewsItem, error) {
 			ColorHex:          colorHex,
 			AssociatedPrice:   associatedPrice,
 			IsFavorite:        isFav,
+			IsSeen:            isSeen,
 		})
 	}
 

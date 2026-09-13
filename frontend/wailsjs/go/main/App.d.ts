@@ -14,6 +14,8 @@ export function ClearKeywords():Promise<main.FullAppState>;
 
 export function ClearNewsHistory():Promise<main.FullAppState>;
 
+export function ClearSourceFilters():Promise<main.FullAppState>;
+
 export function CloseWindow():Promise<void>;
 
 export function ExportNewsCSV():Promise<string>;
@@ -37,6 +39,10 @@ export function ImportNewsCsvDialog():Promise<main.FullAppState>;
 export function ImportSettingsDialog():Promise<main.FullAppState>;
 
 export function ImportSettingsJSON(arg1:string):Promise<main.FullAppState>;
+
+export function MarkAllNewsAsSeen():Promise<main.FullAppState>;
+
+export function MarkNewsAsSeen(arg1:string):Promise<main.FullAppState>;
 
 export function MinimizeWindow():Promise<void>;
 
@@ -72,6 +78,8 @@ export function SetNightModeEnabled(arg1:boolean):Promise<main.FullAppState>;
 
 export function SetSourceFilter(arg1:string):Promise<main.FullAppState>;
 
+export function SetSourceFilters(arg1:Array<string>):Promise<main.FullAppState>;
+
 export function SetUseInternalBrowser(arg1:boolean):Promise<main.FullAppState>;
 
 export function ShowWindow():Promise<void>;
@@ -87,5 +95,7 @@ export function ToggleFavorite(arg1:string):Promise<main.FullAppState>;
 export function ToggleObservedCoin(arg1:string):Promise<main.FullAppState>;
 
 export function ToggleSource(arg1:string,arg2:boolean):Promise<main.FullAppState>;
+
+export function ToggleSourceFilter(arg1:string):Promise<main.FullAppState>;
 
 export function ToggleWindowVisibility():Promise<void>;

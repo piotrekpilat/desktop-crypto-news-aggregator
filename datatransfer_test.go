@@ -7,18 +7,18 @@ import (
 
 func TestExportAndImportSettingsJSON(t *testing.T) {
 	original := AppSettingsExport{
-		Version:          1,
-		ExportedAt:       1715000000000,
-		ObservedCoins:    []string{"BTCUSDT", "ETHUSDT", "ADAUSDT"},
-		CurrentCoin:      "BTCUSDT",
-		FilterKeywords:   []string{"hack", "etf", "upgrade"},
-		AlarmEnabled:     true,
-		MaxVibrations:    12,
-		NightModeEnabled: true,
-		NightModeStart:   "23:00",
-		NightModeEnd:     "06:30",
-		AppLanguage:      "de",
-		MaxStoredNews:    5000,
+		Version:               1,
+		ExportedAt:            1715000000000,
+		ObservedCoins:         []string{"BTCUSDT", "ETHUSDT", "ADAUSDT"},
+		CurrentCoin:           "BTCUSDT",
+		FilterKeywords:        []string{"hack", "etf", "upgrade"},
+		AlarmEnabled:          true,
+		MaxVibrations:         12,
+		NightModeEnabled:      true,
+		NightModeStart:        "23:00",
+		NightModeEnd:          "06:30",
+		AppLanguage:           "de",
+		MaxStoredNews:         5000,
 		Sources: []FeedSource{
 			{
 				ID:       "src_test",
@@ -28,8 +28,10 @@ func TestExportAndImportSettingsJSON(t *testing.T) {
 				IsActive: true,
 			},
 		},
-		FavoriteNewsIDs:  []string{"fav_1", "fav_2"},
-		CryptoPanicToken: "test_token_123",
+		FavoriteNewsIDs:       []string{"fav_1", "fav_2"},
+		SeenNewsIDs:           []string{"fav_1", "seen_3"},
+		SelectedSourceFilters: []string{"CoinDesk", "Whale Alert"},
+		CryptoPanicToken:      "test_token_123",
 	}
 
 	jsonStr, err := ExportSettingsToJSON(original)
@@ -58,6 +60,12 @@ func TestExportAndImportSettingsJSON(t *testing.T) {
 	if len(imported.Sources) != 1 || imported.Sources[0].Name != "Test Source" {
 		t.Errorf("Sources mismatch: got %+v", imported.Sources)
 	}
+	if len(imported.SeenNewsIDs) != 2 || imported.SeenNewsIDs[1] != "seen_3" {
+		t.Errorf("SeenNewsIDs mismatch: got %+v", imported.SeenNewsIDs)
+	}
+	if len(imported.SelectedSourceFilters) != 2 || imported.SelectedSourceFilters[0] != "CoinDesk" {
+		t.Errorf("SelectedSourceFilters mismatch: got %+v", imported.SelectedSourceFilters)
+	}
 	if imported.CryptoPanicToken != original.CryptoPanicToken {
 		t.Errorf("CryptoPanicToken mismatch: got %s, want %s", imported.CryptoPanicToken, original.CryptoPanicToken)
 	}
@@ -77,6 +85,7 @@ func TestExportAndImportNewsCSV(t *testing.T) {
 			ColorHex:          "#F7931A",
 			AssociatedPrice:   68500.50,
 			IsFavorite:        true,
+			IsSeen:            true,
 		},
 		{
 			ID:                "n_002",
@@ -90,6 +99,7 @@ func TestExportAndImportNewsCSV(t *testing.T) {
 			ColorHex:          "#627EEA",
 			AssociatedPrice:   3520.10,
 			IsFavorite:        false,
+			IsSeen:            false,
 		},
 	}
 
@@ -124,6 +134,9 @@ func TestExportAndImportNewsCSV(t *testing.T) {
 	if !first.IsFavorite {
 		t.Errorf("IsFavorite expected true")
 	}
+	if !first.IsSeen {
+		t.Errorf("IsSeen expected true")
+	}
 
 	second := imported[1]
 	if second.Title != "Polskie znaki: ąćęłńóśźż" {
@@ -132,11 +145,14 @@ func TestExportAndImportNewsCSV(t *testing.T) {
 	if second.IsFavorite {
 		t.Errorf("Second IsFavorite expected false")
 	}
+	if second.IsSeen {
+		t.Errorf("Second IsSeen expected false")
+	}
 }
 
 func TestImportNewsCSVWithAlternativeHeaders(t *testing.T) {
-	customCSV := `title,link,desc,source,timestamp,favorite
-"Major Crypto Exploit Detected","https://llama.fi/hacks/1","Loss of $10M detected in lending protocol","DefiLlama",1715003000000,"1"`
+	customCSV := `title,link,desc,source,timestamp,favorite,seen
+"Major Crypto Exploit Detected","https://llama.fi/hacks/1","Loss of $10M detected in lending protocol","DefiLlama",1715003000000,"1","true"`
 
 	imported, err := ImportNewsFromCSV(customCSV)
 	if err != nil {
@@ -161,5 +177,8 @@ func TestImportNewsCSVWithAlternativeHeaders(t *testing.T) {
 	}
 	if !item.IsFavorite {
 		t.Errorf("IsFavorite expected true")
+	}
+	if !item.IsSeen {
+		t.Errorf("IsSeen expected true")
 	}
 }

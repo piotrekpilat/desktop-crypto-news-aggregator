@@ -17,6 +17,19 @@ const I18N = {
         fav_title: "Ulubione Wiadomości (%d)",
         fav_empty_title: "Brak zapisanych wiadomości",
         fav_empty_desc: "Kliknij ikonkę gwiazdki na karcie newsa, aby dodać go tutaj.",
+        new_title: "Nowe Wiadomości (%d)",
+        new_empty_title: "Wszystko przeczytane!",
+        new_empty_desc: "Brak nowych nieprzeczytanych wiadomości.",
+        btn_mark_all_seen: "✓ Oznacz jako przeczytane",
+        badge_new: "NOWE",
+        sources_filter_title: "Filtruj źródła wiadomości",
+        sources_filter_search_placeholder: "Szukaj źródła...",
+        sources_filter_select_all: "Zaznacz wszystkie",
+        sources_filter_clear: "Wyczyść",
+        sources_filter_apply: "Zastosuj",
+        sources_filter_btn_all: "Źródła: Wszystkie",
+        sources_filter_btn_selected: "Źródła: Wybrane (%d)",
+        sources_filter_clear_all: "Wyczyść filtry",
         settings_title: "Ustawienia Aplikacji",
         tab_pairs: "🪙 Pary",
         tab_sources: "📡 Źródła",
@@ -77,12 +90,18 @@ const I18N = {
         btn_add: "Dodaj",
         btn_save: "Zapisz",
         btn_clear: "Wyczyść",
-        nav_chart: "Wykres & News",
-        nav_feed: "Tylko Feed",
+        nav_chart: "Wykres",
+        nav_feed: "Feed",
+        nav_new: "Nowe",
         nav_fav: "Ulubione",
         nav_settings: "Ustawienia",
         macro_forecast: "Prognoza:",
-        macro_previous: "Poprzedni:"
+        macro_previous: "Poprzedni:",
+        news_search_placeholder: "Szukaj w wiadomościach (treść, tytuł, źródło)...",
+        new_news_search_placeholder: "Szukaj w nowych wiadomościach...",
+        fav_news_search_placeholder: "Szukaj w ulubionych...",
+        sources_search_manage_placeholder: "Szukaj źródła (np. telegram, coindesk, btc)...",
+        sources_search_empty: "Nie znaleziono źródeł pasujących do zapytania."
     },
     en: {
         alarm_title: "Vibration Alarm",
@@ -101,6 +120,19 @@ const I18N = {
         fav_title: "Favorite News (%d)",
         fav_empty_title: "No saved news",
         fav_empty_desc: "Click the star icon on any news card to add it here.",
+        new_title: "New Messages (%d)",
+        new_empty_title: "All caught up!",
+        new_empty_desc: "No new unread news items.",
+        btn_mark_all_seen: "✓ Mark all as read",
+        badge_new: "NEW",
+        sources_filter_title: "Filter News Sources",
+        sources_filter_search_placeholder: "Search source...",
+        sources_filter_select_all: "Select all",
+        sources_filter_clear: "Clear",
+        sources_filter_apply: "Apply",
+        sources_filter_btn_all: "Sources: All",
+        sources_filter_btn_selected: "Sources: Selected (%d)",
+        sources_filter_clear_all: "Clear filters",
         settings_title: "App Settings",
         tab_pairs: "🪙 Pairs",
         tab_sources: "📡 Sources",
@@ -161,12 +193,18 @@ const I18N = {
         btn_add: "Add",
         btn_save: "Save",
         btn_clear: "Clear",
-        nav_chart: "Chart & News",
-        nav_feed: "Feed Only",
+        nav_chart: "Chart",
+        nav_feed: "Feed",
+        nav_new: "New",
         nav_fav: "Favorites",
         nav_settings: "Settings",
         macro_forecast: "Forecast:",
-        macro_previous: "Previous:"
+        macro_previous: "Previous:",
+        news_search_placeholder: "Search news (content, title, source)...",
+        new_news_search_placeholder: "Search in new messages...",
+        fav_news_search_placeholder: "Search in favorites...",
+        sources_search_manage_placeholder: "Search sources (e.g. telegram, coindesk, btc)...",
+        sources_search_empty: "No sources found matching query."
     },
     de: {
         alarm_title: "Vibrationsalarm",
@@ -185,6 +223,19 @@ const I18N = {
         fav_title: "Favoriten (%d)",
         fav_empty_title: "Keine gespeicherten Nachrichten",
         fav_empty_desc: "Klicken Sie auf den Stern bei einer Nachricht, um sie hier zu speichern.",
+        new_title: "Neue Nachrichten (%d)",
+        new_empty_title: "Alles gelesen!",
+        new_empty_desc: "Keine neuen ungelesenen Nachrichten.",
+        btn_mark_all_seen: "✓ Alle als gelesen markieren",
+        badge_new: "NEU",
+        sources_filter_title: "Nachrichtenquellen filtern",
+        sources_filter_search_placeholder: "Quelle suchen...",
+        sources_filter_select_all: "Alle auswählen",
+        sources_filter_clear: "Leeren",
+        sources_filter_apply: "Anwenden",
+        sources_filter_btn_all: "Quellen: Alle",
+        sources_filter_btn_selected: "Quellen: Ausgewählt (%d)",
+        sources_filter_clear_all: "Filter zurücksetzen",
         settings_title: "Einstellungen",
         tab_pairs: "🪙 Paare",
         tab_sources: "📡 Quellen",
@@ -245,12 +296,18 @@ const I18N = {
         btn_add: "Hinzufügen",
         btn_save: "Speichern",
         btn_clear: "Löschen",
-        nav_chart: "Chart & News",
-        nav_feed: "Nur Feed",
+        nav_chart: "Wykres",
+        nav_feed: "Feed",
+        nav_new: "Neu",
         nav_fav: "Favoriten",
         nav_settings: "Einstellungen",
         macro_forecast: "Prognose:",
-        macro_previous: "Vorherig:"
+        macro_previous: "Vorherig:",
+        news_search_placeholder: "Nachrichten durchsuchen (Inhalt, Titel, Quelle)...",
+        new_news_search_placeholder: "Neue Nachrichten durchsuchen...",
+        fav_news_search_placeholder: "Favoriten durchsuchen...",
+        sources_search_manage_placeholder: "Quellen suchen (z.B. telegram, coindesk, btc)...",
+        sources_search_empty: "Keine Quellen gefunden, die der Suche entsprechen."
     }
 };
 
@@ -258,6 +315,12 @@ let currentAppState = null;
 let animationFrameId = null;
 let chartAnimationStartTime = performance.now();
 let pairSearchQuery = "";
+let tempSelectedSourceFilters = [];
+let sourceFilterSearchQuery = "";
+let newsSearchQuery = "";
+let newNewsSearchQuery = "";
+let favNewsSearchQuery = "";
+let sourceManageSearchQuery = "";
 
 // Web Audio API Alarm Sound
 function playAlarmSound() {
@@ -362,25 +425,21 @@ function renderState(state) {
     // 6. Keywords Bar
     renderKeywords(state.keywords || []);
 
-    // 7. Sources Filter Chips
-    renderSourceChips(state.sourcesList || [], state.activeSourceFilter);
+    // 7. Select2 Sources Filter Bar
+    renderSelect2SourceFilterBar(state.sourcesList || [], state.selectedSourceFilters || ['Wszystkie']);
 
-    // 8. News Header & List
-    const newsList = state.newsList || [];
-    document.getElementById('txtNewsCount').innerText = t('news_title', newsList.length);
-    document.getElementById('txtNewsHint').innerText = t('news_hint');
-    renderNewsCards(newsList, state.selectedNewsID, document.getElementById('newsCardsList'));
-
-    // 9. Favorites Tab
-    document.getElementById('txtFavCount').innerText = t('fav_title', newsList.length);
-    if (state.currentTab === 'FAVORITES') {
-        renderNewsCards(newsList, state.selectedNewsID, document.getElementById('favCardsList'), true);
+    // 8. Unread Badge Counter in Bottom Nav
+    const navNewBadge = document.getElementById('navNewBadge');
+    if (navNewBadge) {
+        if (state.unreadNewsCount > 0) {
+            navNewBadge.style.display = 'inline-block';
+            navNewBadge.innerText = state.unreadNewsCount > 99 ? '99+' : String(state.unreadNewsCount);
+        } else {
+            navNewBadge.style.display = 'none';
+        }
     }
 
-    // 10. Settings Tab
-    renderSettingsView(state);
-
-    // 11. Navigation Bar Active Tab
+    // 9. Navigation Bar Active Tab & Labels
     document.querySelectorAll('.nav-item').forEach(item => {
         if (item.getAttribute('data-tab') === state.currentTab) {
             item.classList.add('active');
@@ -391,29 +450,78 @@ function renderState(state) {
 
     document.getElementById('lblNavChart').innerText = t('nav_chart');
     document.getElementById('lblNavFeed').innerText = t('nav_feed');
+    document.getElementById('lblNavNew').innerText = t('nav_new');
     document.getElementById('lblNavFav').innerText = t('nav_fav');
     document.getElementById('lblNavSettings').innerText = t('nav_settings');
 
-    // Switch visible view tab
+    // 10. Switch visible view tab & Render News Cards
     const viewFeed = document.getElementById('viewFeed');
     const chartSection = document.getElementById('chartSection');
+    const viewNew = document.getElementById('viewNew');
     const viewFavorites = document.getElementById('viewFavorites');
     const viewSettings = document.getElementById('viewSettings');
 
     viewFeed.style.display = 'none';
+    if (viewNew) viewNew.style.display = 'none';
     viewFavorites.style.display = 'none';
     viewSettings.style.display = 'none';
 
-    if (state.currentTab === 'CHART_AND_FEED') {
+    const baseNewsList = state.newsList || [];
+
+    if (state.currentTab === 'CHART_AND_FEED' || state.currentTab === 'FEED_ONLY') {
         viewFeed.style.display = 'flex';
-        chartSection.style.display = 'block';
-    } else if (state.currentTab === 'FEED_ONLY') {
-        viewFeed.style.display = 'flex';
-        chartSection.style.display = 'none';
+        chartSection.style.display = state.currentTab === 'CHART_AND_FEED' ? 'block' : 'none';
+
+        const q = newsSearchQuery.toLowerCase().trim();
+        const filtered = baseNewsList.filter(n => {
+            if (!q) return true;
+            return (n.title && n.title.toLowerCase().includes(q)) ||
+                   (n.description && n.description.toLowerCase().includes(q)) ||
+                   (n.source && n.source.toLowerCase().includes(q)) ||
+                   (n.tag && n.tag.toLowerCase().includes(q));
+        });
+
+        document.getElementById('txtNewsCount').innerText = t('news_title', filtered.length);
+        document.getElementById('txtNewsHint').innerText = t('news_hint');
+        const inputNews = document.getElementById('inputNewsSearch');
+        if (inputNews) inputNews.placeholder = t('news_search_placeholder');
+        renderNewsCards(filtered, state.selectedNewsID, document.getElementById('newsCardsList'));
+    } else if (state.currentTab === 'NEW') {
+        if (viewNew) {
+            viewNew.style.display = 'flex';
+            const q = newNewsSearchQuery.toLowerCase().trim();
+            const filtered = baseNewsList.filter(n => {
+                if (!q) return true;
+                return (n.title && n.title.toLowerCase().includes(q)) ||
+                       (n.description && n.description.toLowerCase().includes(q)) ||
+                       (n.source && n.source.toLowerCase().includes(q)) ||
+                       (n.tag && n.tag.toLowerCase().includes(q));
+            });
+
+            document.getElementById('txtNewNewsCount').innerText = t('new_title', filtered.length);
+            document.getElementById('btnMarkAllSeen').innerText = t('btn_mark_all_seen');
+            const inputNew = document.getElementById('inputNewNewsSearch');
+            if (inputNew) inputNew.placeholder = t('new_news_search_placeholder');
+            renderNewsCards(filtered, state.selectedNewsID, document.getElementById('newCardsList'), false, true);
+        }
     } else if (state.currentTab === 'FAVORITES') {
         viewFavorites.style.display = 'flex';
+        const q = favNewsSearchQuery.toLowerCase().trim();
+        const filtered = baseNewsList.filter(n => {
+            if (!q) return true;
+            return (n.title && n.title.toLowerCase().includes(q)) ||
+                   (n.description && n.description.toLowerCase().includes(q)) ||
+                   (n.source && n.source.toLowerCase().includes(q)) ||
+                   (n.tag && n.tag.toLowerCase().includes(q));
+        });
+
+        document.getElementById('txtFavCount').innerText = t('fav_title', filtered.length);
+        const inputFav = document.getElementById('inputFavNewsSearch');
+        if (inputFav) inputFav.placeholder = t('fav_news_search_placeholder');
+        renderNewsCards(filtered, state.selectedNewsID, document.getElementById('favCardsList'), true, false);
     } else if (state.currentTab === 'SETTINGS') {
         viewSettings.style.display = 'flex';
+        renderSettingsView(state);
     }
 
     // Request chart redraw
@@ -473,43 +581,143 @@ function renderKeywords(keywords) {
     });
 }
 
-// Render Source Chips Bar
-function renderSourceChips(sources, activeFilter) {
-    const bar = document.getElementById('sourcesChipsBar');
-    bar.innerHTML = '';
+// Render Select2 Sources Filter Bar
+function renderSelect2SourceFilterBar(sourcesList, selectedFilters) {
+    const btnLabel = document.getElementById('lblSourcesFilterButton');
+    const chipsContainer = document.getElementById('activeSourceChips');
+    if (!btnLabel || !chipsContainer) return;
 
-    const allChip = document.createElement('div');
-    allChip.className = `source-chip ${activeFilter === 'Wszystkie' || activeFilter === 'All' || activeFilter === 'Alle' ? 'active' : ''}`;
-    allChip.innerText = t('filter_all');
-    allChip.onclick = () => {
-        window.go.main.App.SetSourceFilter('Wszystkie').then(renderState);
-    };
-    bar.appendChild(allChip);
+    const hasAll = !selectedFilters || selectedFilters.length === 0 ||
+        selectedFilters.some(f => f === 'Wszystkie' || f === 'All' || f === 'Alle');
+
+    if (hasAll) {
+        btnLabel.innerText = t('sources_filter_btn_all');
+    } else {
+        btnLabel.innerText = t('sources_filter_btn_selected', selectedFilters.length);
+    }
+
+    chipsContainer.innerHTML = '';
+    if (!hasAll && selectedFilters.length > 0) {
+        selectedFilters.forEach(filterName => {
+            const sourceObj = sourcesList.find(s => s.name === filterName);
+            const color = sourceObj ? sourceObj.colorHex : '#00E5FF';
+            const chip = document.createElement('div');
+            chip.className = 'active-source-chip';
+            chip.innerHTML = `
+                <span class="active-source-chip-dot" style="background: ${color};"></span>
+                <span>${escapeHtml(filterName)}</span>
+                <span class="active-source-chip-remove" title="Usuń filtr">✕</span>
+            `;
+            chip.querySelector('.active-source-chip-remove').onclick = (e) => {
+                e.stopPropagation();
+                window.go.main.App.ToggleSourceFilter(filterName).then(renderState);
+            };
+            chipsContainer.appendChild(chip);
+        });
+
+        if (selectedFilters.length > 1) {
+            const clearAllBtn = document.createElement('button');
+            clearAllBtn.className = 'btn-clear-all-source-filters';
+            clearAllBtn.innerText = t('sources_filter_clear_all');
+            clearAllBtn.onclick = (e) => {
+                e.stopPropagation();
+                window.go.main.App.ClearSourceFilters().then(renderState);
+            };
+            chipsContainer.appendChild(clearAllBtn);
+        }
+    }
+}
+
+// Select2 Multi-Select Sources Dialog Logic
+function openSelect2SourcesModal() {
+    const modal = document.getElementById('modalSelect2Sources');
+    if (!modal || !currentAppState) return;
+
+    document.getElementById('txtSelect2ModalTitle').innerText = t('sources_filter_title');
+    document.getElementById('btnSelectAllSources').innerText = t('sources_filter_select_all');
+    document.getElementById('btnClearSelectedSources').innerText = t('sources_filter_clear');
+    document.getElementById('btnCancelSelect2Sources').innerText = t('btn_cancel');
+    document.getElementById('btnApplySelect2Sources').innerText = t('sources_filter_apply');
+    document.getElementById('inputSourceFilterSearch').placeholder = t('sources_filter_search_placeholder');
+
+    tempSelectedSourceFilters = [...(currentAppState.selectedSourceFilters || ['Wszystkie'])];
+    sourceFilterSearchQuery = '';
+    document.getElementById('inputSourceFilterSearch').value = '';
+    document.getElementById('btnClearSourceFilterSearch').style.display = 'none';
+
+    renderSelect2SourcesList();
+    modal.style.display = 'flex';
+}
+
+function renderSelect2SourcesList() {
+    const container = document.getElementById('select2SourcesListContainer');
+    if (!container || !currentAppState) return;
+    container.innerHTML = '';
+
+    const sources = currentAppState.sourcesList || [];
+    const query = sourceFilterSearchQuery.toLowerCase().trim();
+    const isAllSelected = tempSelectedSourceFilters.some(f => f === 'Wszystkie' || f === 'All' || f === 'Alle');
 
     const sorted = [...sources].sort((a, b) => a.name.localeCompare(b.name));
-    sorted.forEach(src => {
-        const chip = document.createElement('div');
-        const isSel = activeFilter === src.name;
-        chip.className = `source-chip ${isSel ? 'active' : ''}`;
-        chip.innerHTML = `
-            ${!src.isActive ? '<span class="chip-dot" style="background: #6B7280;"></span>' : ''}
-            <span>${escapeHtml(src.name)}</span>
+    const filtered = sorted.filter(s => {
+        if (!query) return true;
+        return s.name.toLowerCase().includes(query) || s.url.toLowerCase().includes(query);
+    });
+
+    filtered.forEach(src => {
+        const isChecked = isAllSelected || tempSelectedSourceFilters.includes(src.name);
+        const item = document.createElement('div');
+        item.className = `select2-source-item ${isChecked ? 'selected' : ''}`;
+        item.innerHTML = `
+            <div class="select2-source-left">
+                <span class="select2-source-color-dot" style="background: ${src.colorHex};"></span>
+                <div class="select2-source-info">
+                    <div class="select2-source-name">${escapeHtml(src.name)}</div>
+                    <div class="select2-source-url">${escapeHtml(src.url)}</div>
+                </div>
+            </div>
+            <input type="checkbox" class="custom-checkbox" ${isChecked ? 'checked' : ''}>
         `;
-        chip.onclick = () => {
-            window.go.main.App.SetSourceFilter(src.name).then(renderState);
+
+        const toggleItem = () => {
+            if (isAllSelected) {
+                tempSelectedSourceFilters = sources.filter(s => s.name !== src.name).map(s => s.name);
+            } else if (tempSelectedSourceFilters.includes(src.name)) {
+                tempSelectedSourceFilters = tempSelectedSourceFilters.filter(f => f !== src.name);
+                if (tempSelectedSourceFilters.length === 0) {
+                    tempSelectedSourceFilters = ['Wszystkie'];
+                }
+            } else {
+                tempSelectedSourceFilters = tempSelectedSourceFilters.filter(f => f !== 'Wszystkie' && f !== 'All' && f !== 'Alle');
+                tempSelectedSourceFilters.push(src.name);
+            }
+            renderSelect2SourcesList();
         };
-        bar.appendChild(chip);
+
+        item.onclick = toggleItem;
+        item.querySelector('input').onclick = (e) => {
+            e.stopPropagation();
+            toggleItem();
+        };
+
+        container.appendChild(item);
     });
 }
 
 // Render News Cards
-function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = false) {
+function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = false, isNewTab = false) {
     container.innerHTML = '';
 
     if (!newsList || newsList.length === 0) {
         const emptyBox = document.createElement('div');
         emptyBox.className = 'empty-state-box';
-        if (isFavoritesTab) {
+        if (isNewTab) {
+            emptyBox.innerHTML = `
+                <div class="empty-icon">🎉</div>
+                <div class="empty-title">${t('new_empty_title')}</div>
+                <div class="empty-sub">${t('new_empty_desc')}</div>
+            `;
+        } else if (isFavoritesTab) {
             emptyBox.innerHTML = `
                 <div class="empty-icon">⭐</div>
                 <div class="empty-title">${t('fav_empty_title')}</div>
@@ -527,7 +735,8 @@ function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = f
     newsList.forEach(news => {
         const card = document.createElement('div');
         const isSelected = news.id === selectedNewsId;
-        card.className = `news-card ${isSelected ? 'selected' : ''}`;
+        const isUnread = !news.isSeen;
+        card.className = `news-card ${isSelected ? 'selected' : ''} ${isUnread ? 'is-unread' : ''}`;
         card.id = `news-card-${news.id}`;
 
         let macroHtml = '';
@@ -557,6 +766,7 @@ function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = f
                     <span>${escapeHtml(news.source)}</span>
                 </div>
                 <div class="card-meta-right">
+                    ${isUnread ? `<span class="card-unread-badge">${t('badge_new')}</span>` : ''}
                     <span class="card-time">${escapeHtml(news.formattedTime)}</span>
                     <button class="btn-fav-star ${news.isFavorite ? 'active' : ''}" title="Ulubione">
                         ${news.isFavorite ? '★' : '☆'}
@@ -602,6 +812,7 @@ function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = f
         if (openBtn) {
             openBtn.onclick = (e) => {
                 e.stopPropagation();
+                window.go.main.App.MarkNewsAsSeen(news.id).then(renderState);
                 openNewsUrl(news.url, news.title);
             };
         }
@@ -891,17 +1102,32 @@ function renderSourcesSubtab(state) {
     document.getElementById('txtTelegramSourcesTitle').innerText = t('telegram_sources_title');
     document.getElementById('btnAddTelegramSource').innerText = t('btn_add_tg');
     document.getElementById('btnAddRssSource').innerText = t('btn_add_rss');
+    const inputManage = document.getElementById('inputSourceManageSearch');
+    if (inputManage) inputManage.placeholder = t('sources_search_manage_placeholder');
 
     const tgContainer = document.getElementById('telegramSourcesManageList');
     const genContainer = document.getElementById('sourcesManageList');
     tgContainer.innerHTML = '';
     genContainer.innerHTML = '';
 
-    const allSources = state.sourcesList || [];
+    const q = sourceManageSearchQuery.toLowerCase().trim();
+    const allSources = (state.sourcesList || []).filter(s => {
+        if (!q) return true;
+        return (s.name && s.name.toLowerCase().includes(q)) ||
+               (s.url && s.url.toLowerCase().includes(q)) ||
+               (s.id && s.id.toLowerCase().includes(q));
+    });
+
     const tgSources = allSources.filter(s => s.id.startsWith('tg_') || s.url.includes('t.me/')).sort((a, b) => a.name.localeCompare(b.name));
     const genSources = allSources.filter(s => !s.id.startsWith('tg_') && !s.url.includes('t.me/')).sort((a, b) => a.name.localeCompare(b.name));
 
-    const defaultIds = ['llama_hacks', 'tg_binance', 'tg_whale', 'tg_unfolded', 'tg_wu', 'cd_rss', 'ct_rss', 'cp_api', 'cs_rss', 'dc_rss', 'iog_news', 'rd_rss', 'ut_rss', 'macro_cal'];
+    const defaultIds = [
+        'llama_hacks', 'macro_cal', 'tg_unfolded', 'tg_wu', 'tg_binance',
+        'tg_whale', 'tg_watcherguru', 'tg_peckshield', 'theblock_rss',
+        'blockworks_rss', 'btc_mag_rss', 'bankless_rss', 'cd_rss', 'ct_rss',
+        'cp_api', 'cs_rss', 'dc_rss', 'beincrypto_pl', 'bithub_pl', 'cryps_pl',
+        'iog_news', 'rd_rss', 'ut_rss'
+    ];
 
     function createSourceCard(src, isTg) {
         const card = document.createElement('div');
@@ -978,8 +1204,19 @@ function renderSourcesSubtab(state) {
         return card;
     }
 
-    tgSources.forEach(src => tgContainer.appendChild(createSourceCard(src, true)));
-    genSources.forEach(src => genContainer.appendChild(createSourceCard(src, false)));
+    if (tgSources.length === 0 && genSources.length === 0 && q) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state-box';
+        empty.style.padding = '20px 10px';
+        empty.innerHTML = `
+            <div class="empty-icon">🔍</div>
+            <div class="empty-title">${t('sources_search_empty')}</div>
+        `;
+        genContainer.appendChild(empty);
+    } else {
+        tgSources.forEach(src => tgContainer.appendChild(createSourceCard(src, true)));
+        genSources.forEach(src => genContainer.appendChild(createSourceCard(src, false)));
+    }
 }
 
 // 3. App & Night Subtab
@@ -1186,6 +1423,134 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(err => console.error("Import news error:", err));
         }
     };
+
+    // Select2 Sources Filter Modal
+    const btnOpenSources = document.getElementById('btnOpenSourcesFilter');
+    if (btnOpenSources) {
+        btnOpenSources.onclick = () => openSelect2SourcesModal();
+    }
+    const btnSelectAll = document.getElementById('btnSelectAllSources');
+    if (btnSelectAll) {
+        btnSelectAll.onclick = () => {
+            tempSelectedSourceFilters = ['Wszystkie'];
+            renderSelect2SourcesList();
+        };
+    }
+    const btnClearSel = document.getElementById('btnClearSelectedSources');
+    if (btnClearSel) {
+        btnClearSel.onclick = () => {
+            tempSelectedSourceFilters = [];
+            renderSelect2SourcesList();
+        };
+    }
+    const btnCancelSel2 = document.getElementById('btnCancelSelect2Sources');
+    if (btnCancelSel2) {
+        btnCancelSel2.onclick = () => {
+            document.getElementById('modalSelect2Sources').style.display = 'none';
+        };
+    }
+    const btnApplySel2 = document.getElementById('btnApplySelect2Sources');
+    if (btnApplySel2) {
+        btnApplySel2.onclick = () => {
+            if (!tempSelectedSourceFilters || tempSelectedSourceFilters.length === 0) {
+                tempSelectedSourceFilters = ['Wszystkie'];
+            }
+            window.go.main.App.SetSourceFilters(tempSelectedSourceFilters).then(renderState);
+            document.getElementById('modalSelect2Sources').style.display = 'none';
+        };
+    }
+
+    const sourceSearchInput = document.getElementById('inputSourceFilterSearch');
+    const sourceSearchClear = document.getElementById('btnClearSourceFilterSearch');
+    if (sourceSearchInput && sourceSearchClear) {
+        sourceSearchInput.oninput = (e) => {
+            sourceFilterSearchQuery = e.target.value;
+            sourceSearchClear.style.display = sourceFilterSearchQuery ? 'block' : 'none';
+            renderSelect2SourcesList();
+        };
+        sourceSearchClear.onclick = () => {
+            sourceFilterSearchQuery = '';
+            sourceSearchInput.value = '';
+            sourceSearchClear.style.display = 'none';
+            renderSelect2SourcesList();
+        };
+    }
+
+    // Mark All As Seen (New tab)
+    const btnMarkAllSeen = document.getElementById('btnMarkAllSeen');
+    if (btnMarkAllSeen) {
+        btnMarkAllSeen.onclick = () => {
+            window.go.main.App.MarkAllNewsAsSeen().then(renderState);
+        };
+    }
+
+    // News Feed Search
+    const inputNewsSearch = document.getElementById('inputNewsSearch');
+    const btnClearNewsSearch = document.getElementById('btnClearNewsSearch');
+    if (inputNewsSearch && btnClearNewsSearch) {
+        inputNewsSearch.oninput = (e) => {
+            newsSearchQuery = e.target.value;
+            btnClearNewsSearch.style.display = newsSearchQuery ? 'block' : 'none';
+            if (currentAppState) renderState(currentAppState);
+        };
+        btnClearNewsSearch.onclick = () => {
+            newsSearchQuery = '';
+            inputNewsSearch.value = '';
+            btnClearNewsSearch.style.display = 'none';
+            if (currentAppState) renderState(currentAppState);
+        };
+    }
+
+    // New News Search
+    const inputNewNewsSearch = document.getElementById('inputNewNewsSearch');
+    const btnClearNewNewsSearch = document.getElementById('btnClearNewNewsSearch');
+    if (inputNewNewsSearch && btnClearNewNewsSearch) {
+        inputNewNewsSearch.oninput = (e) => {
+            newNewsSearchQuery = e.target.value;
+            btnClearNewNewsSearch.style.display = newNewsSearchQuery ? 'block' : 'none';
+            if (currentAppState) renderState(currentAppState);
+        };
+        btnClearNewNewsSearch.onclick = () => {
+            newNewsSearchQuery = '';
+            inputNewNewsSearch.value = '';
+            btnClearNewNewsSearch.style.display = 'none';
+            if (currentAppState) renderState(currentAppState);
+        };
+    }
+
+    // Favorites News Search
+    const inputFavNewsSearch = document.getElementById('inputFavNewsSearch');
+    const btnClearFavNewsSearch = document.getElementById('btnClearFavNewsSearch');
+    if (inputFavNewsSearch && btnClearFavNewsSearch) {
+        inputFavNewsSearch.oninput = (e) => {
+            favNewsSearchQuery = e.target.value;
+            btnClearFavNewsSearch.style.display = favNewsSearchQuery ? 'block' : 'none';
+            if (currentAppState) renderState(currentAppState);
+        };
+        btnClearFavNewsSearch.onclick = () => {
+            favNewsSearchQuery = '';
+            inputFavNewsSearch.value = '';
+            btnClearFavNewsSearch.style.display = 'none';
+            if (currentAppState) renderState(currentAppState);
+        };
+    }
+
+    // Settings Sources Search
+    const inputSourceManageSearch = document.getElementById('inputSourceManageSearch');
+    const btnClearSourceManageSearch = document.getElementById('btnClearSourceManageSearch');
+    if (inputSourceManageSearch && btnClearSourceManageSearch) {
+        inputSourceManageSearch.oninput = (e) => {
+            sourceManageSearchQuery = e.target.value;
+            btnClearSourceManageSearch.style.display = sourceManageSearchQuery ? 'block' : 'none';
+            if (currentAppState) renderSourcesSubtab(currentAppState);
+        };
+        btnClearSourceManageSearch.onclick = () => {
+            sourceManageSearchQuery = '';
+            inputSourceManageSearch.value = '';
+            btnClearSourceManageSearch.style.display = 'none';
+            if (currentAppState) renderSourcesSubtab(currentAppState);
+        };
+    }
 
     // 9. Modals Open / Close
     // Add Keyword

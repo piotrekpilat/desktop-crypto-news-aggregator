@@ -36,6 +36,7 @@ type CryptoNewsItem struct {
 	ColorHex          string  `json:"colorHex"`
 	AssociatedPrice   float64 `json:"associatedPrice"`
 	IsFavorite        bool    `json:"isFavorite"`
+	IsSeen            bool    `json:"isSeen"`
 }
 
 type AlarmCycleState struct {
@@ -52,6 +53,7 @@ type AppTab string
 const (
 	TabChartAndFeed AppTab = "CHART_AND_FEED"
 	TabFeedOnly     AppTab = "FEED_ONLY"
+	TabNew          AppTab = "NEW"
 	TabFavorites    AppTab = "FAVORITES"
 	TabSettings     AppTab = "SETTINGS"
 )
@@ -76,6 +78,7 @@ type FullAppState struct {
 	PriceChangePercent         float64          `json:"priceChangePercent"`
 	SelectedNewsID             string           `json:"selectedNewsId"`
 	ActiveSourceFilter         string           `json:"activeSourceFilter"`
+	SelectedSourceFilters      []string         `json:"selectedSourceFilters"`
 	CurrentTab                 AppTab           `json:"currentTab"`
 	SettingsSubTab             SettingsSubTab   `json:"settingsSubTab"`
 	IsOffline                  bool             `json:"isOffline"`
@@ -91,6 +94,7 @@ type FullAppState struct {
 	AlarmCycle                 AlarmCycleState  `json:"alarmCycle"`
 	MaxStoredNews              int              `json:"maxStoredNews"`
 	TotalStoredNewsCount       int              `json:"totalStoredNewsCount"`
+	UnreadNewsCount            int              `json:"unreadNewsCount"`
 	UseInternalBrowser         bool             `json:"useInternalBrowser"`
 	AlwaysOnTop                bool             `json:"alwaysOnTop"`
 	Autostart                  bool             `json:"autostart"`
@@ -113,19 +117,28 @@ var DefaultInitialCoins = []CoinInfo{
 
 func GetDefaultSources() []FeedSource {
 	return []FeedSource{
+		{ID: "llama_hacks", Name: "DefiLlama (Hacks & Exploits)", URL: "https://api.llama.fi/hacks", ColorHex: "#FF3366", IsActive: false},
 		{ID: "macro_cal", Name: "Makro Kalendarz (FED/CPI)", URL: "https://nfs.faireconomy.media/ff_calendar_thisweek.json", ColorHex: "#F59E0B", IsActive: false},
-		{ID: "llama_hacks", Name: "DefiLlama (Hacks & Exploits)", URL: "https://api.llama.fi/hacks", ColorHex: "#FF3366", IsActive: true},
-		{ID: "tg_unfolded", Name: "Unfolded (TG)", URL: "https://t.me/s/unfolded", ColorHex: "#00E5FF", IsActive: true},
-		{ID: "tg_wu", Name: "Wu Blockchain (TG)", URL: "https://t.me/s/wublockchainenglish", ColorHex: "#FF9900", IsActive: true},
-		{ID: "tg_binance", Name: "Binance News (TG)", URL: "https://t.me/s/binance_announcements", ColorHex: "#F3BA2F", IsActive: true},
-		{ID: "tg_whale", Name: "Whale Alert (TG)", URL: "https://t.me/s/whale_alert_io", ColorHex: "#2AABEE", IsActive: true},
-		{ID: "cd_rss", Name: "CoinDesk", URL: "https://www.coindesk.com/arc/outboundfeeds/rss/", ColorHex: "#A855F7", IsActive: true},
-		{ID: "ct_rss", Name: "Cointelegraph", URL: "https://cointelegraph.com/rss", ColorHex: "#F59E0B", IsActive: true},
+		{ID: "tg_unfolded", Name: "Unfolded (TG)", URL: "https://t.me/s/unfolded", ColorHex: "#00E5FF", IsActive: false},
+		{ID: "tg_wu", Name: "Wu Blockchain (TG)", URL: "https://t.me/s/wublockchainenglish", ColorHex: "#FF9900", IsActive: false},
+		{ID: "tg_binance", Name: "Binance News (TG)", URL: "https://t.me/s/binance_announcements", ColorHex: "#F3BA2F", IsActive: false},
+		{ID: "tg_whale", Name: "Whale Alert (TG)", URL: "https://t.me/s/whale_alert_io", ColorHex: "#2AABEE", IsActive: false},
+		{ID: "tg_watcherguru", Name: "Watcher Guru (TG)", URL: "https://t.me/s/WatcherGuru", ColorHex: "#10B981", IsActive: false},
+		{ID: "tg_peckshield", Name: "PeckShield Alert (TG)", URL: "https://t.me/s/PeckShieldAlert", ColorHex: "#EF4444", IsActive: false},
+		{ID: "theblock_rss", Name: "The Block", URL: "https://www.theblock.co/rss.xml", ColorHex: "#6366F1", IsActive: false},
+		{ID: "blockworks_rss", Name: "Blockworks", URL: "https://blockworks.co/feed", ColorHex: "#EC4899", IsActive: false},
+		{ID: "btc_mag_rss", Name: "Bitcoin Magazine", URL: "https://bitcoinmagazine.com/feed", ColorHex: "#F7931A", IsActive: false},
+		{ID: "bankless_rss", Name: "Bankless", URL: "https://www.bankless.com/rss/feed", ColorHex: "#E11D48", IsActive: false},
+		{ID: "cd_rss", Name: "CoinDesk", URL: "https://www.coindesk.com/arc/outboundfeeds/rss/", ColorHex: "#A855F7", IsActive: false},
+		{ID: "ct_rss", Name: "Cointelegraph", URL: "https://cointelegraph.com/rss", ColorHex: "#F59E0B", IsActive: false},
 		{ID: "cp_api", Name: "CryptoPanic", URL: "https://cryptopanic.com/developers/api/", ColorHex: "#00E5FF", IsActive: false},
-		{ID: "cs_rss", Name: "CryptoSlate", URL: "https://cryptoslate.com/feed/", ColorHex: "#38BDF8", IsActive: true},
-		{ID: "dc_rss", Name: "Decrypt", URL: "https://decrypt.co/feed", ColorHex: "#34D399", IsActive: true},
-		{ID: "iog_news", Name: "IOG News", URL: "https://www.iog.io/feed.xml", ColorHex: "#0033AD", IsActive: true},
-		{ID: "rd_rss", Name: "Reddit", URL: "https://www.reddit.com/r/CryptoCurrency/new/.rss", ColorHex: "#FF4500", IsActive: true},
-		{ID: "ut_rss", Name: "U.Today", URL: "https://u.today/rss", ColorHex: "#FF3366", IsActive: true},
+		{ID: "cs_rss", Name: "CryptoSlate", URL: "https://cryptoslate.com/feed/", ColorHex: "#38BDF8", IsActive: false},
+		{ID: "dc_rss", Name: "Decrypt", URL: "https://decrypt.co/feed", ColorHex: "#34D399", IsActive: false},
+		{ID: "beincrypto_pl", Name: "BeInCrypto (PL)", URL: "https://pl.beincrypto.com/feed/", ColorHex: "#3B82F6", IsActive: false},
+		{ID: "bithub_pl", Name: "BitHub (PL)", URL: "https://bithub.pl/feed/", ColorHex: "#14B8A6", IsActive: false},
+		{ID: "cryps_pl", Name: "CrypS (PL)", URL: "https://cryps.pl/feed/", ColorHex: "#8B5CF6", IsActive: false},
+		{ID: "iog_news", Name: "IOG News", URL: "https://www.iog.io/feed.xml", ColorHex: "#0033AD", IsActive: false},
+		{ID: "rd_rss", Name: "Reddit", URL: "https://www.reddit.com/r/CryptoCurrency/new/.rss", ColorHex: "#FF4500", IsActive: false},
+		{ID: "ut_rss", Name: "U.Today", URL: "https://u.today/rss", ColorHex: "#FF3366", IsActive: false},
 	}
 }

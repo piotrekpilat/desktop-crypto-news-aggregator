@@ -26,6 +26,10 @@ export function ClearNewsHistory() {
   return window['go']['main']['App']['ClearNewsHistory']();
 }
 
+export function ClearSourceFilters() {
+  return window['go']['main']['App']['ClearSourceFilters']();
+}
+
 export function CloseWindow() {
   return window['go']['main']['App']['CloseWindow']();
 }
@@ -72,6 +76,14 @@ export function ImportSettingsDialog() {
 
 export function ImportSettingsJSON(arg1) {
   return window['go']['main']['App']['ImportSettingsJSON'](arg1);
+}
+
+export function MarkAllNewsAsSeen() {
+  return window['go']['main']['App']['MarkAllNewsAsSeen']();
+}
+
+export function MarkNewsAsSeen(arg1) {
+  return window['go']['main']['App']['MarkNewsAsSeen'](arg1);
 }
 
 export function MinimizeWindow() {
@@ -142,6 +154,10 @@ export function SetSourceFilter(arg1) {
   return window['go']['main']['App']['SetSourceFilter'](arg1);
 }
 
+export function SetSourceFilters(arg1) {
+  return window['go']['main']['App']['SetSourceFilters'](arg1);
+}
+
 export function SetUseInternalBrowser(arg1) {
   return window['go']['main']['App']['SetUseInternalBrowser'](arg1);
 }
@@ -172,6 +188,10 @@ export function ToggleObservedCoin(arg1) {
 
 export function ToggleSource(arg1, arg2) {
   return window['go']['main']['App']['ToggleSource'](arg1, arg2);
+}
+
+export function ToggleSourceFilter(arg1) {
+  return window['go']['main']['App']['ToggleSourceFilter'](arg1);
 }
 
 export function ToggleWindowVisibility() {

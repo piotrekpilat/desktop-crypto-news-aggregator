@@ -56,6 +56,7 @@ export namespace main {
 	    colorHex: string;
 	    associatedPrice: number;
 	    isFavorite: boolean;
+	    isSeen: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new CryptoNewsItem(source);
@@ -74,6 +75,7 @@ export namespace main {
 	        this.colorHex = source["colorHex"];
 	        this.associatedPrice = source["associatedPrice"];
 	        this.isFavorite = source["isFavorite"];
+	        this.isSeen = source["isSeen"];
 	    }
 	}
 	export class FeedSource {
@@ -126,6 +128,7 @@ export namespace main {
 	    priceChangePercent: number;
 	    selectedNewsId: string;
 	    activeSourceFilter: string;
+	    selectedSourceFilters: string[];
 	    currentTab: string;
 	    settingsSubTab: string;
 	    isOffline: boolean;
@@ -141,6 +144,7 @@ export namespace main {
 	    alarmCycle: AlarmCycleState;
 	    maxStoredNews: number;
 	    totalStoredNewsCount: number;
+	    unreadNewsCount: number;
 	    useInternalBrowser: boolean;
 	    alwaysOnTop: boolean;
 	    autostart: boolean;
@@ -162,6 +166,7 @@ export namespace main {
 	        this.priceChangePercent = source["priceChangePercent"];
 	        this.selectedNewsId = source["selectedNewsId"];
 	        this.activeSourceFilter = source["activeSourceFilter"];
+	        this.selectedSourceFilters = source["selectedSourceFilters"];
 	        this.currentTab = source["currentTab"];
 	        this.settingsSubTab = source["settingsSubTab"];
 	        this.isOffline = source["isOffline"];
@@ -177,6 +182,7 @@ export namespace main {
 	        this.alarmCycle = this.convertValues(source["alarmCycle"], AlarmCycleState);
 	        this.maxStoredNews = source["maxStoredNews"];
 	        this.totalStoredNewsCount = source["totalStoredNewsCount"];
+	        this.unreadNewsCount = source["unreadNewsCount"];
 	        this.useInternalBrowser = source["useInternalBrowser"];
 	        this.alwaysOnTop = source["alwaysOnTop"];
 	        this.autostart = source["autostart"];
