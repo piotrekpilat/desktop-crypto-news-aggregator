@@ -26,6 +26,8 @@ type SavedSettings struct {
 	AlwaysOnTop           bool             `json:"alwaysOnTop"`
 	Autostart             bool             `json:"autostart"`
 	CryptoPanicToken      string           `json:"cryptoPanicToken"`
+	XAuthToken            string           `json:"xAuthToken,omitempty"`
+	XCT0                  string           `json:"xCt0,omitempty"`
 	Sources               []FeedSource     `json:"sources"`
 	NewsHistory           []CryptoNewsItem `json:"newsHistory"`
 	HistoryClearedAt      int64            `json:"historyClearedAt"`
@@ -35,6 +37,17 @@ type StorageManager struct {
 	mu           sync.Mutex
 	filePath     string
 	autostartDir string
+}
+
+func (sm *StorageManager) GetSessionPath() string {
+	// First check if session.json exists in working directory
+	if _, err := os.Stat("session.json"); err == nil {
+		return "session.json"
+	}
+	if sm.filePath != "" && filepath.Dir(sm.filePath) != "." {
+		return filepath.Join(filepath.Dir(sm.filePath), "session.json")
+	}
+	return "session.json"
 }
 
 func NewStorageManager() *StorageManager {

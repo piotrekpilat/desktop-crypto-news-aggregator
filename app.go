@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math"
+	"math/rand"
 	"os"
 	"os/exec"
 	"sort"
@@ -11,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"desktop-widget/xscraper"
 
 	"github.com/pkg/browser"
 	wailsRuntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -27,6 +30,8 @@ type App struct {
 	allNews               []CryptoNewsItem
 	sources               []FeedSource
 	cryptoPanicToken      string
+	xAuthToken            string
+	xCt0                  string
 	pricePoints           []PricePoint
 	favoriteIDs           map[string]bool
 	seenNewsIDs           map[string]bool
@@ -35,6 +40,11 @@ type App struct {
 	currentCoinSymbol     string
 	activeKeywords        []string
 	selectedSourceFilters []string
+
+	// X (Twitter) Rate Limiting & Anti-Ban Throttling
+	xLastFetchTimes map[string]time.Time
+	xNextIntervals  map[string]time.Duration
+	xFetchMu        sync.Mutex
 
 	alarmEnabled       bool
 	maxVibrations      int
@@ -74,6 +84,8 @@ func NewApp() *App {
 		seenNewsIDs:           make(map[string]bool),
 		observedSymbols:       make(map[string]bool),
 		knownNewsIDs:          make(map[string]bool),
+		xLastFetchTimes:       make(map[string]time.Time),
+		xNextIntervals:        make(map[string]time.Duration),
 		currentCoinSymbol:     "ADAUSDT",
 		activeSourceFilter:    "Wszystkie",
 		selectedSourceFilters: []string{"Wszystkie"},
@@ -154,6 +166,26 @@ func (a *App) loadSettings() {
 	a.alwaysOnTop = s.AlwaysOnTop
 	a.autostart = s.Autostart
 	a.cryptoPanicToken = s.CryptoPanicToken
+	a.xAuthToken = s.XAuthToken
+	a.xCt0 = s.XCT0
+	if a.xAuthToken == "" {
+		if scraper, err := xscraper.New(); err == nil {
+			sessionPath := a.storage.GetSessionPath()
+			if err := scraper.LoadSessionFromFile(sessionPath); err == nil {
+				sess := scraper.GetSession()
+				if sess.AuthToken != "" {
+					a.xAuthToken = sess.AuthToken
+					a.xCt0 = sess.CT0
+				}
+			}
+		}
+	}
+	if a.xAuthToken != "" {
+		a.feedCli.SetXSession(xscraper.Session{
+			AuthToken: a.xAuthToken,
+			CT0:       a.xCt0,
+		}, a.storage.GetSessionPath())
+	}
 	a.sources = s.Sources
 	a.historyClearedAt = s.HistoryClearedAt
 
@@ -210,6 +242,8 @@ func (a *App) saveSettingsLocked() {
 		AlwaysOnTop:           a.alwaysOnTop,
 		Autostart:             a.autostart,
 		CryptoPanicToken:      a.cryptoPanicToken,
+		XAuthToken:            a.xAuthToken,
+		XCT0:                  a.xCt0,
 		Sources:               a.sources,
 		NewsHistory:           history,
 		HistoryClearedAt:      a.historyClearedAt,
@@ -282,6 +316,44 @@ func (a *App) loadDataSync() {
 	a.fetchFeedsDirect(false)
 }
 
+func (a *App) isXSource(s FeedSource) bool {
+	return strings.HasPrefix(s.ID, "x_") || strings.Contains(s.URL, "x.com") || strings.Contains(s.URL, "twitter.com")
+}
+
+func (a *App) shouldFetchXSource(sourceID string, force bool) bool {
+	if force {
+		return true
+	}
+	a.xFetchMu.Lock()
+	defer a.xFetchMu.Unlock()
+
+	last, exists := a.xLastFetchTimes[sourceID]
+	if !exists || last.IsZero() {
+		// First fetch: fetch now and set random interval for next time (5-10 min)
+		a.xLastFetchTimes[sourceID] = time.Now()
+		randSec := 300 + rand.Intn(300) // 300s (5m) to 600s (10m)
+		a.xNextIntervals[sourceID] = time.Duration(randSec) * time.Second
+		return true
+	}
+
+	interval := a.xNextIntervals[sourceID]
+	if interval <= 0 {
+		randSec := 300 + rand.Intn(300)
+		interval = time.Duration(randSec) * time.Second
+		a.xNextIntervals[sourceID] = interval
+	}
+
+	if time.Since(last) >= interval {
+		a.xLastFetchTimes[sourceID] = time.Now()
+		// Assign next random interval (5 to 10 minutes)
+		randSec := 300 + rand.Intn(300)
+		a.xNextIntervals[sourceID] = time.Duration(randSec) * time.Second
+		return true
+	}
+
+	return false
+}
+
 func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 	a.mu.Lock()
 	sourcesToFetch := make([]FeedSource, len(a.sources))
@@ -302,9 +374,21 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 			continue
 		}
 
+		// Anti-Ban & Rate-Limit protection: Only poll X sources every 5-10 minutes randomly
+		if a.isXSource(src) && !a.shouldFetchXSource(src.ID, false) {
+			modifiedSources = append(modifiedSources, src)
+			continue
+		}
+
 		wg.Add(1)
 		go func(s FeedSource) {
 			defer wg.Done()
+
+			// Human jitter delay (1-3s) for X requests
+			if a.isXSource(s) {
+				time.Sleep(time.Duration(1000+rand.Intn(2000)) * time.Millisecond)
+			}
+
 			items, err := a.feedCli.FetchSource(s, token)
 			fetchedLock.Lock()
 			defer fetchedLock.Unlock()
@@ -318,11 +402,14 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 				}
 				modifiedSources = append(modifiedSources, s)
 			} else {
-				s.FailureCount++
-				hasSourceModifications = true
-				if s.FailureCount >= 2 {
-					s.IsActive = false
-					s.AutoDisabledAfterFailure = true
+				// Don't auto-disable X sources quickly due to headless browser retries
+				if !a.isXSource(s) {
+					s.FailureCount++
+					hasSourceModifications = true
+					if s.FailureCount >= 2 {
+						s.IsActive = false
+						s.AutoDisabledAfterFailure = true
+					}
 				}
 				modifiedSources = append(modifiedSources, s)
 			}
@@ -772,6 +859,7 @@ func (a *App) GetState() FullAppState {
 		UseInternalBrowser:         a.useInternalBrowser,
 		AlwaysOnTop:                a.alwaysOnTop,
 		Autostart:                  a.autostart,
+		IsXLoggedIn:                a.xAuthToken != "",
 	}
 }
 
@@ -1020,6 +1108,11 @@ func (a *App) ToggleSource(sourceID string, active bool) FullAppState {
 			a.sources[i].AutoDisabledAfterFailure = false
 		}
 	}
+	if active {
+		a.xFetchMu.Lock()
+		delete(a.xLastFetchTimes, sourceID)
+		a.xFetchMu.Unlock()
+	}
 	a.saveSettingsLocked()
 	a.mu.Unlock()
 
@@ -1102,6 +1195,108 @@ func (a *App) AddRssSource(urlInput string, customName string) FullAppState {
 	}
 
 	a.sources = append(a.sources, newSource)
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.fetchFeedsDirect(false)
+	return a.GetState()
+}
+
+func (a *App) AddXSource(handleOrUrl string, customName string) FullAppState {
+	cleanHandle := strings.TrimSpace(handleOrUrl)
+	cleanHandle = strings.TrimPrefix(cleanHandle, "https://x.com/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "http://x.com/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "https://twitter.com/")
+	cleanHandle = strings.TrimPrefix(handleOrUrl, "http://twitter.com/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "x.com/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "twitter.com/")
+	cleanHandle = strings.TrimPrefix(cleanHandle, "@")
+	cleanHandle = strings.Split(cleanHandle, "/")[0]
+	cleanHandle = strings.Split(cleanHandle, "?")[0]
+	cleanHandle = strings.TrimSpace(cleanHandle)
+
+	if cleanHandle == "" {
+		return a.GetState()
+	}
+
+	sourceID := "x_" + strings.ToLower(cleanHandle)
+	a.mu.Lock()
+	for _, s := range a.sources {
+		if s.ID == sourceID {
+			a.mu.Unlock()
+			return a.GetState()
+		}
+	}
+
+	displayName := strings.TrimSpace(customName)
+	if displayName == "" {
+		displayName = "@" + cleanHandle + " (X)"
+	}
+
+	newSource := FeedSource{
+		ID:       sourceID,
+		Name:     displayName,
+		URL:      "https://x.com/" + cleanHandle,
+		ColorHex: "#1D9BF0",
+		IsActive: true,
+	}
+
+	a.sources = append(a.sources, newSource)
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.fetchFeedsDirect(false)
+	return a.GetState()
+}
+
+func (a *App) LoginX() (FullAppState, error) {
+	sessionPath := a.storage.GetSessionPath()
+	session, err := xscraper.LoginInteractive(sessionPath)
+	if err != nil {
+		return a.GetState(), err
+	}
+
+	a.mu.Lock()
+	a.xAuthToken = session.AuthToken
+	a.xCt0 = session.CT0
+	a.feedCli.SetXSession(*session, sessionPath)
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.fetchFeedsDirect(false)
+	return a.GetState(), nil
+}
+
+func (a *App) LogoutX() FullAppState {
+	a.mu.Lock()
+	a.xAuthToken = ""
+	a.xCt0 = ""
+	a.feedCli.SetXSession(xscraper.Session{}, "")
+	sessionPath := a.storage.GetSessionPath()
+	_ = os.Remove(sessionPath)
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	return a.GetState()
+}
+
+func (a *App) SaveXSession(authToken, ct0 string) FullAppState {
+	a.mu.Lock()
+	a.xAuthToken = strings.TrimSpace(authToken)
+	a.xCt0 = strings.TrimSpace(ct0)
+
+	session := xscraper.Session{
+		AuthToken: a.xAuthToken,
+		CT0:       a.xCt0,
+		UpdatedAt: time.Now(),
+	}
+	sessionPath := a.storage.GetSessionPath()
+	a.feedCli.SetXSession(session, sessionPath)
+
+	if scraper, err := xscraper.New(xscraper.WithSession(session)); err == nil {
+		_ = scraper.SaveSessionToFile(sessionPath)
+	}
+
 	a.saveSettingsLocked()
 	a.mu.Unlock()
 

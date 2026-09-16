@@ -14,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"desktop-widget/xscraper"
 )
 
 var (
@@ -153,7 +155,9 @@ func Md5Hash(text string) string {
 }
 
 type FeedClient struct {
-	httpCli *http.Client
+	httpCli      *http.Client
+	xSession     xscraper.Session
+	xSessionPath string
 }
 
 func NewFeedClient() *FeedClient {
@@ -164,8 +168,16 @@ func NewFeedClient() *FeedClient {
 	}
 }
 
+func (fc *FeedClient) SetXSession(session xscraper.Session, path string) {
+	fc.xSession = session
+	fc.xSessionPath = path
+}
+
 // FetchSource fetches news for a single source
 func (fc *FeedClient) FetchSource(source FeedSource, cryptoPanicToken string) ([]CryptoNewsItem, error) {
+	if strings.HasPrefix(source.ID, "x_") || strings.Contains(source.URL, "x.com") || strings.Contains(source.URL, "twitter.com") {
+		return fc.fetchX(source)
+	}
 	if source.ID == "llama_hacks" || strings.Contains(strings.ToLower(source.URL), "api.llama.fi/hacks") {
 		return fc.fetchDefiLlamaHacks(source)
 	}
@@ -182,6 +194,77 @@ func (fc *FeedClient) FetchSource(source FeedSource, cryptoPanicToken string) ([
 		return fc.fetchReddit(source)
 	}
 	return fc.fetchGenericRss(source)
+}
+
+func (fc *FeedClient) fetchX(source FeedSource) ([]CryptoNewsItem, error) {
+	handle := strings.TrimSpace(source.URL)
+	handle = strings.TrimPrefix(handle, "https://x.com/")
+	handle = strings.TrimPrefix(handle, "http://x.com/")
+	handle = strings.TrimPrefix(handle, "https://twitter.com/")
+	handle = strings.TrimPrefix(handle, "http://twitter.com/")
+	handle = strings.TrimPrefix(handle, "x.com/")
+	handle = strings.TrimPrefix(handle, "twitter.com/")
+	handle = strings.TrimPrefix(handle, "@")
+	handle = strings.TrimPrefix(handle, "x_")
+	handle = strings.Split(handle, "/")[0]
+	handle = strings.Split(handle, "?")[0]
+
+	if handle == "" {
+		return nil, fmt.Errorf("nieprawidłowy profil X dla źródła %s", source.Name)
+	}
+
+	session := fc.xSession
+	if session.AuthToken == "" && fc.xSessionPath != "" {
+		if s, err := xscraper.New(); err == nil {
+			if err := s.LoadSessionFromFile(fc.xSessionPath); err == nil {
+				session = s.GetSession()
+			}
+		}
+	}
+	if session.AuthToken == "" {
+		if s, err := xscraper.New(); err == nil {
+			if err := s.LoadSessionFromFile("session.json"); err == nil {
+				session = s.GetSession()
+			}
+		}
+	}
+
+	tweets, err := xscraper.ScrapeUserTweetsBrowser(handle, 10, session)
+	if err != nil {
+		return nil, err
+	}
+
+	var items []CryptoNewsItem
+	for _, t := range tweets {
+		pubMillis := t.CreatedAt.UnixMilli()
+		if pubMillis <= 0 {
+			pubMillis = time.Now().UnixMilli()
+		}
+
+		title := t.Text
+		if len(title) > 120 {
+			title = title[:117] + "..."
+		}
+
+		desc := t.Text
+		if len(t.MediaURLs) > 0 {
+			desc += fmt.Sprintf("\n\nZałączone zdjęcia/media: %d", len(t.MediaURLs))
+		}
+
+		items = append(items, CryptoNewsItem{
+			ID:                fmt.Sprintf("x-%s-%s", handle, t.ID),
+			Title:             title,
+			Description:       desc,
+			Source:            source.Name,
+			URL:               t.PermanentURL,
+			PublishedAtMillis: pubMillis,
+			FormattedTime:     FormatTimeAgo(pubMillis, "pl"),
+			Tag:               "#" + handle + " #X",
+			ColorHex:          source.ColorHex,
+		})
+	}
+
+	return items, nil
 }
 
 // 0. DefiLlama Hacks & Exploits

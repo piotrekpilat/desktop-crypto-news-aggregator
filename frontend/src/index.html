@@ -199,7 +199,23 @@
                             <input type="text" class="search-input" id="inputSourceManageSearch" placeholder="Szukaj źródła (np. telegram, coindesk, btc)...">
                             <button class="search-clear-btn" id="btnClearSourceManageSearch" style="display: none;">✕</button>
                         </div>
-                        <div class="subtab-section-header" style="margin-bottom: 2px;">
+                        <div class="subtab-section-header" style="margin-bottom: 4px;">
+                            <div class="sources-list-header-txt" id="txtXSourcesTitle" style="color: #1D9BF0;">PROFILE X / TWITTER</div>
+                            <div style="display: flex; gap: 6px; align-items: center;">
+                                <button class="btn-add-source-header" id="btnQuickLoginX" style="border-color: #1D9BF0; color: #1D9BF0; background: rgba(29, 155, 240, 0.1);">🌐 Logowanie X</button>
+                                <button class="btn-add-source-header" id="btnAddXSource" style="border-color: #1D9BF0; color: #1D9BF0;">+ Dodaj profil</button>
+                            </div>
+                        </div>
+                        <div id="xSessionNoticeBanner" style="background: rgba(29, 155, 240, 0.08); border: 1px solid rgba(29, 155, 240, 0.2); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;">
+                            <span id="xSessionBannerTxt" style="color: #bbb;">Status: sprawdzanie...</span>
+                            <div style="display: flex; gap: 6px;">
+                                <button id="btnBannerLoginX" style="background: #1D9BF0; border: none; color: #fff; padding: 3px 8px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px;">Zaloguj</button>
+                                <button id="btnBannerLogoutX" style="background: rgba(255,255,255,0.1); border: none; color: #ff6b6b; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; display: none;">Wyloguj</button>
+                            </div>
+                        </div>
+                        <div class="sources-manage-list" id="xSourcesManageList"></div>
+
+                        <div class="subtab-section-header" style="margin-top: 12px; margin-bottom: 2px;">
                             <div class="sources-list-header-txt" id="txtTelegramSourcesTitle" style="color: #00E5FF;">KANAŁY TELEGRAM (PUBLICZNE)</div>
                             <button class="btn-add-source-header" id="btnAddTelegramSource">+ Dodaj kanał</button>
                         </div>
@@ -215,6 +231,23 @@
                     <!-- Subtab Content: APP_CONFIG -->
                     <div class="subtab-content" id="subtabContentAppConfig" style="display: none;">
                         
+                        <!-- Card 0: Konto X (Twitter) -->
+                        <div class="settings-card">
+                            <div class="card-section-title cyan" id="txtCardXHeader" style="color: #1D9BF0;">KONTO X (TWITTER) &amp; SESJA</div>
+                            <div class="setting-row">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowXStatus">Status konta X</div>
+                                    <div class="setting-desc" id="txtRowXDesc">Wymagane do scrapowania profili (np. @saylor, @elonmusk)</div>
+                                </div>
+                                <div id="badgeXStatus" style="font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: bold; background: rgba(255,255,255,0.06); color: #888;">Niepołączono</div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn-token-save" id="btnLoginX" style="background: #1D9BF0; flex: 1; min-width: 140px;">🌐 Zaloguj do X</button>
+                                <button class="btn-token-remove" id="btnLogoutX" style="display: none;">Wyloguj</button>
+                            </div>
+                        </div>
+
                         <!-- Card 1: Alarm wibracyjny -->
                         <div class="settings-card">
                             <div class="card-section-title cyan" id="txtCardAlarmHeader">ALARM WIBRACYJNY &amp; CYKLE</div>
@@ -510,6 +543,20 @@
                 <div class="modal-actions">
                     <button class="modal-btn-cancel" id="btnCancelClearHistory">Anuluj</button>
                     <button class="modal-btn-danger" id="btnConfirmClearHistory">Wyczyść</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5.5. Add X / Twitter Source Modal -->
+        <div class="modal-backdrop" id="modalAddX" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalXTitle" style="color: #1D9BF0;">Dodaj profil X (Twitter)</div>
+                <div class="modal-hint" id="txtModalXHint">np. @saylor, @elonmusk lub https://x.com/saylor</div>
+                <input type="text" class="modal-input" id="inputXHandle" placeholder="@saylor / URL profilu">
+                <input type="text" class="modal-input" id="inputXName" placeholder="Nazwa wyświetlana (opcjonalna)" style="margin-top: 8px;">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelX">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmX" style="background: #1D9BF0;">Dodaj profil</button>
                 </div>
             </div>
         </div>

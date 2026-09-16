@@ -39,8 +39,22 @@ const I18N = {
         pairs_search_placeholder: "Szukaj pary (np. BTC, ADA, SOL, PEPE)...",
         sources_title: "GŁÓWNE ŹRÓDŁA NEWSÓW & RSS / ATOM",
         telegram_sources_title: "KANAŁY TELEGRAM (PUBLICZNE)",
+        x_sources_title: "PROFILE X / TWITTER",
+        btn_add_x: "+ Dodaj profil X",
         btn_add_tg: "+ Dodaj kanał",
         btn_add_rss: "+ Dodaj RSS / Atom",
+        section_x: "KONTO X (TWITTER) & SESJA",
+        x_status_title: "Status konta X",
+        x_status_desc: "Wymagane do scrapowania profili (np. @saylor, @elonmusk)",
+        x_connected: "🟢 Zalogowano",
+        x_disconnected: "⚪ Niepołączono",
+        btn_login_x: "🌐 Zaloguj do X",
+        btn_logging_in_x: "⏳ Otwieranie przeglądarki...",
+        btn_logout_x: "Wyloguj",
+        modal_x_title: "Dodaj profil X (Twitter)",
+        modal_x_hint: "np. @saylor, @elonmusk lub https://x.com/saylor",
+        input_x_placeholder: "@saylor / URL profilu",
+        input_x_name_placeholder: "Nazwa wyświetlana (opcjonalna)",
         cp_token_title: "Token API CryptoPanic",
         cp_token_desc: "Token jest bezpiecznie zapisany. Zapis aktywuje źródło CryptoPanic.",
         cp_token_placeholder: "Wklej token API",
@@ -142,8 +156,22 @@ const I18N = {
         pairs_search_placeholder: "Search crypto pair (e.g. BTC, ADA, SOL)...",
         sources_title: "MAIN NEWS & RSS / ATOM SOURCES",
         telegram_sources_title: "TELEGRAM CHANNELS (PUBLIC)",
+        x_sources_title: "X / TWITTER PROFILES",
+        btn_add_x: "+ Add X profile",
         btn_add_tg: "+ Add channel",
         btn_add_rss: "+ Add RSS / Atom",
+        section_x: "X (TWITTER) ACCOUNT & SESSION",
+        x_status_title: "X account status",
+        x_status_desc: "Required to scrape profiles (e.g. @saylor, @elonmusk)",
+        x_connected: "🟢 Connected",
+        x_disconnected: "⚪ Disconnected",
+        btn_login_x: "🌐 Log in to X",
+        btn_logging_in_x: "⏳ Opening browser...",
+        btn_logout_x: "Log out",
+        modal_x_title: "Add X (Twitter) Profile",
+        modal_x_hint: "e.g. @saylor, @elonmusk or https://x.com/saylor",
+        input_x_placeholder: "@saylor / Profile URL",
+        input_x_name_placeholder: "Display name (optional)",
         cp_token_title: "CryptoPanic API token",
         cp_token_desc: "Token is securely saved on this device. Saving activates CryptoPanic.",
         cp_token_placeholder: "Paste API token",
@@ -245,8 +273,22 @@ const I18N = {
         pairs_search_placeholder: "Kryptopaar suchen (z.B. BTC, ADA, SOL)...",
         sources_title: "HAUPTNACHRICHTEN & RSS / ATOM-QUELLEN",
         telegram_sources_title: "TELEGRAM-KANÄLE (ÖFFENTLICH)",
+        x_sources_title: "X / TWITTER PROFILE",
+        btn_add_x: "+ X-Profil hinzufügen",
         btn_add_tg: "+ Kanal hinzufügen",
         btn_add_rss: "+ RSS / Atom hinzufügen",
+        section_x: "X (TWITTER) KONTO & SITZUNG",
+        x_status_title: "X-Kontostatus",
+        x_status_desc: "Erforderlich zum Scrapen von Profilen (z.B. @saylor, @elonmusk)",
+        x_connected: "🟢 Verbunden",
+        x_disconnected: "⚪ Nicht verbunden",
+        btn_login_x: "🌐 Bei X anmelden",
+        btn_logging_in_x: "⏳ Browser wird geöffnet...",
+        btn_logout_x: "Abmelden",
+        modal_x_title: "X-Profil hinzufügen",
+        modal_x_hint: "z.B. @saylor, @elonmusk oder https://x.com/saylor",
+        input_x_placeholder: "@saylor / Profil-URL",
+        input_x_name_placeholder: "Anzeigename (optional)",
         cp_token_title: "CryptoPanic API Token",
         cp_token_desc: "Token wird sicher gespeichert. Speichern aktiviert CryptoPanic.",
         cp_token_placeholder: "API-Token einfügen",
@@ -1100,13 +1142,35 @@ function renderPairsSubtab(state) {
 function renderSourcesSubtab(state) {
     document.getElementById('txtSourcesTitle').innerText = t('sources_title');
     document.getElementById('txtTelegramSourcesTitle').innerText = t('telegram_sources_title');
+    const txtXSources = document.getElementById('txtXSourcesTitle');
+    if (txtXSources) txtXSources.innerText = t('x_sources_title');
+    const btnAddX = document.getElementById('btnAddXSource');
+    if (btnAddX) btnAddX.innerText = t('btn_add_x');
     document.getElementById('btnAddTelegramSource').innerText = t('btn_add_tg');
     document.getElementById('btnAddRssSource').innerText = t('btn_add_rss');
     const inputManage = document.getElementById('inputSourceManageSearch');
     if (inputManage) inputManage.placeholder = t('sources_search_manage_placeholder');
 
+    // X session banner in Sources tab
+    const bannerTxt = document.getElementById('xSessionBannerTxt');
+    const bannerLoginBtn = document.getElementById('btnBannerLoginX');
+    const bannerLogoutBtn = document.getElementById('btnBannerLogoutX');
+    if (bannerTxt && bannerLoginBtn && bannerLogoutBtn) {
+        if (state.isXLoggedIn) {
+            bannerTxt.innerHTML = `<span style="color: #00FF88; font-weight: bold;">🟢 Zalogowano do X (Twitter)</span> — tweety są aktywnie pobierane`;
+            bannerLoginBtn.style.display = 'none';
+            bannerLogoutBtn.style.display = 'inline-block';
+        } else {
+            bannerTxt.innerHTML = `<span style="color: #F59E0B; font-weight: bold;">⚠️ Wymagane logowanie do X</span> — zaloguj się, aby odblokować tweety`;
+            bannerLoginBtn.style.display = 'inline-block';
+            bannerLogoutBtn.style.display = 'none';
+        }
+    }
+
+    const xContainer = document.getElementById('xSourcesManageList');
     const tgContainer = document.getElementById('telegramSourcesManageList');
     const genContainer = document.getElementById('sourcesManageList');
+    if (xContainer) xContainer.innerHTML = '';
     tgContainer.innerHTML = '';
     genContainer.innerHTML = '';
 
@@ -1118,15 +1182,20 @@ function renderSourcesSubtab(state) {
                (s.id && s.id.toLowerCase().includes(q));
     });
 
-    const tgSources = allSources.filter(s => s.id.startsWith('tg_') || s.url.includes('t.me/')).sort((a, b) => a.name.localeCompare(b.name));
-    const genSources = allSources.filter(s => !s.id.startsWith('tg_') && !s.url.includes('t.me/')).sort((a, b) => a.name.localeCompare(b.name));
+    const isX = s => s.id.startsWith('x_') || s.url.includes('x.com') || s.url.includes('twitter.com');
+    const isTg = s => (s.id.startsWith('tg_') || s.url.includes('t.me/')) && !isX(s);
+
+    const xSources = allSources.filter(isX).sort((a, b) => a.name.localeCompare(b.name));
+    const tgSources = allSources.filter(isTg).sort((a, b) => a.name.localeCompare(b.name));
+    const genSources = allSources.filter(s => !isX(s) && !isTg(s)).sort((a, b) => a.name.localeCompare(b.name));
 
     const defaultIds = [
+        'x_saylor', 'x_elonmusk', 'x_vitalik',
         'llama_hacks', 'macro_cal', 'tg_unfolded', 'tg_wu', 'tg_binance',
         'tg_whale', 'tg_watcherguru', 'tg_peckshield', 'theblock_rss',
         'blockworks_rss', 'btc_mag_rss', 'bankless_rss', 'cd_rss', 'ct_rss',
         'cp_api', 'cs_rss', 'dc_rss', 'beincrypto_pl', 'bithub_pl', 'cryps_pl',
-        'iog_news', 'rd_rss', 'ut_rss'
+        'iog_news', 'dailycoin_rss', 'rd_rss', 'ut_rss'
     ];
 
     function createSourceCard(src, isTg) {
@@ -1204,7 +1273,7 @@ function renderSourcesSubtab(state) {
         return card;
     }
 
-    if (tgSources.length === 0 && genSources.length === 0 && q) {
+    if (xSources.length === 0 && tgSources.length === 0 && genSources.length === 0 && q) {
         const empty = document.createElement('div');
         empty.className = 'empty-state-box';
         empty.style.padding = '20px 10px';
@@ -1214,6 +1283,9 @@ function renderSourcesSubtab(state) {
         `;
         genContainer.appendChild(empty);
     } else {
+        if (xContainer) {
+            xSources.forEach(src => xContainer.appendChild(createSourceCard(src, false)));
+        }
         tgSources.forEach(src => tgContainer.appendChild(createSourceCard(src, true)));
         genSources.forEach(src => genContainer.appendChild(createSourceCard(src, false)));
     }
@@ -1221,6 +1293,36 @@ function renderSourcesSubtab(state) {
 
 // 3. App & Night Subtab
 function renderAppConfigSubtab(state) {
+    // X Session Status Card
+    const txtCardX = document.getElementById('txtCardXHeader');
+    if (txtCardX) txtCardX.innerText = t('section_x');
+    const txtRowX = document.getElementById('txtRowXStatus');
+    if (txtRowX) txtRowX.innerText = t('x_status_title');
+    const txtRowXDesc = document.getElementById('txtRowXDesc');
+    if (txtRowXDesc) txtRowXDesc.innerText = t('x_status_desc');
+
+    const badgeX = document.getElementById('badgeXStatus');
+    const btnLoginX = document.getElementById('btnLoginX');
+    const btnLogoutX = document.getElementById('btnLogoutX');
+
+    if (badgeX && btnLoginX && btnLogoutX) {
+        if (state.isXLoggedIn) {
+            badgeX.innerText = t('x_connected');
+            badgeX.style.background = 'rgba(0, 255, 136, 0.15)';
+            badgeX.style.color = '#00FF88';
+            btnLoginX.style.display = 'none';
+            btnLogoutX.style.display = 'inline-block';
+            btnLogoutX.innerText = t('btn_logout_x');
+        } else {
+            badgeX.innerText = t('x_disconnected');
+            badgeX.style.background = 'rgba(255, 255, 255, 0.06)';
+            badgeX.style.color = '#888';
+            btnLoginX.style.display = 'inline-block';
+            btnLoginX.innerText = t('btn_login_x');
+            btnLoginX.disabled = false;
+            btnLogoutX.style.display = 'none';
+        }
+    }
     document.getElementById('txtCardAlarmHeader').innerText = t('section_alarm');
     document.getElementById('txtRowAlarmToggle').innerText = t('alarm_row_title');
     document.getElementById('txtRowAlarmDesc').innerText = t('alarm_row_desc');
@@ -1629,6 +1731,61 @@ document.addEventListener('DOMContentLoaded', () => {
         window.go.main.App.ClearNewsHistory().then(renderState);
         document.getElementById('modalClearHistory').style.display = 'none';
     };
+
+    // X Login & Logout
+    const handleLoginXClick = () => {
+        if (btnLoginX) {
+            btnLoginX.disabled = true;
+            btnLoginX.innerText = t('btn_logging_in_x');
+        }
+        window.go.main.App.LoginX().then(renderState).catch(err => {
+            alert('Błąd logowania X: ' + err);
+            if (currentAppState) renderState(currentAppState);
+        });
+    };
+
+    if (btnLoginX) btnLoginX.onclick = handleLoginXClick;
+    const btnQuickLoginX = document.getElementById('btnQuickLoginX');
+    if (btnQuickLoginX) btnQuickLoginX.onclick = handleLoginXClick;
+    const btnBannerLoginX = document.getElementById('btnBannerLoginX');
+    if (btnBannerLoginX) btnBannerLoginX.onclick = handleLoginXClick;
+
+    const handleLogoutXClick = () => {
+        window.go.main.App.LogoutX().then(renderState);
+    };
+
+    const btnLogoutX = document.getElementById('btnLogoutX');
+    if (btnLogoutX) btnLogoutX.onclick = handleLogoutXClick;
+    const btnBannerLogoutX = document.getElementById('btnBannerLogoutX');
+    if (btnBannerLogoutX) btnBannerLogoutX.onclick = handleLogoutXClick;
+
+    // Add X Source Modal
+    const btnAddXSource = document.getElementById('btnAddXSource');
+    const modalAddX = document.getElementById('modalAddX');
+    const inputXHandle = document.getElementById('inputXHandle');
+    const inputXName = document.getElementById('inputXName');
+    const btnCancelX = document.getElementById('btnCancelX');
+    const btnConfirmX = document.getElementById('btnConfirmX');
+
+    if (btnAddXSource && modalAddX) {
+        btnAddXSource.onclick = () => {
+            modalAddX.style.display = 'flex';
+            inputXHandle.value = '';
+            inputXName.value = '';
+            inputXHandle.focus();
+        };
+        btnCancelX.onclick = () => {
+            modalAddX.style.display = 'none';
+        };
+        btnConfirmX.onclick = () => {
+            const handle = inputXHandle.value.trim();
+            const name = inputXName.value.trim();
+            if (handle) {
+                window.go.main.App.AddXSource(handle, name).then(renderState);
+            }
+            modalAddX.style.display = 'none';
+        };
+    }
 
     // Add Telegram Source
     document.getElementById('btnAddTelegramSource').onclick = () => {

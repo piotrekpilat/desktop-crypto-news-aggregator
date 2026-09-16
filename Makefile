@@ -1,4 +1,4 @@
-.PHONY: all build run dev clean
+.PHONY: all build run start dev clean
 
 BINARY_NAME=desktop-widget
 BIN_PATH=build/bin/$(BINARY_NAME)
@@ -8,6 +8,8 @@ all: build
 build:
 	@export PATH=$$PATH:$$(go env GOPATH)/bin; \
 	wails build -tags webkit2_41
+
+start: run
 
 run: build
 	@./$(BIN_PATH)

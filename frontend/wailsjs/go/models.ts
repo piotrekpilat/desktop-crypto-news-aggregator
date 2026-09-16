@@ -148,6 +148,7 @@ export namespace main {
 	    useInternalBrowser: boolean;
 	    alwaysOnTop: boolean;
 	    autostart: boolean;
+	    isXLoggedIn: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new FullAppState(source);
@@ -186,6 +187,7 @@ export namespace main {
 	        this.useInternalBrowser = source["useInternalBrowser"];
 	        this.alwaysOnTop = source["alwaysOnTop"];
 	        this.autostart = source["autostart"];
+	        this.isXLoggedIn = source["isXLoggedIn"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

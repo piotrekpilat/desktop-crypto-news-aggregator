@@ -10,6 +10,8 @@ export function AddRssSource(arg1:string,arg2:string):Promise<main.FullAppState>
 
 export function AddTelegramSource(arg1:string,arg2:string):Promise<main.FullAppState>;
 
+export function AddXSource(arg1:string,arg2:string):Promise<main.FullAppState>;
+
 export function ClearKeywords():Promise<main.FullAppState>;
 
 export function ClearNewsHistory():Promise<main.FullAppState>;
@@ -40,6 +42,10 @@ export function ImportSettingsDialog():Promise<main.FullAppState>;
 
 export function ImportSettingsJSON(arg1:string):Promise<main.FullAppState>;
 
+export function LoginX():Promise<main.FullAppState>;
+
+export function LogoutX():Promise<main.FullAppState>;
+
 export function MarkAllNewsAsSeen():Promise<main.FullAppState>;
 
 export function MarkNewsAsSeen(arg1:string):Promise<main.FullAppState>;
@@ -55,6 +61,8 @@ export function RemoveKeyword(arg1:string):Promise<main.FullAppState>;
 export function RemoveSource(arg1:string):Promise<main.FullAppState>;
 
 export function SaveCryptoPanicToken(arg1:string):Promise<main.FullAppState>;
+
+export function SaveXSession(arg1:string,arg2:string):Promise<main.FullAppState>;
 
 export function SelectCoin(arg1:string):Promise<main.FullAppState>;
 

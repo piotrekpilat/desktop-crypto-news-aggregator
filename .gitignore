@@ -27,3 +27,5 @@ Thumbs.db
 # Logs & temp files
 *.log
 tmp/
+session.json
+*.session.json

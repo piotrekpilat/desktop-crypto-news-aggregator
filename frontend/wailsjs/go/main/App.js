@@ -18,6 +18,10 @@ export function AddTelegramSource(arg1, arg2) {
   return window['go']['main']['App']['AddTelegramSource'](arg1, arg2);
 }
 
+export function AddXSource(arg1, arg2) {
+  return window['go']['main']['App']['AddXSource'](arg1, arg2);
+}
+
 export function ClearKeywords() {
   return window['go']['main']['App']['ClearKeywords']();
 }
@@ -78,6 +82,14 @@ export function ImportSettingsJSON(arg1) {
   return window['go']['main']['App']['ImportSettingsJSON'](arg1);
 }
 
+export function LoginX() {
+  return window['go']['main']['App']['LoginX']();
+}
+
+export function LogoutX() {
+  return window['go']['main']['App']['LogoutX']();
+}
+
 export function MarkAllNewsAsSeen() {
   return window['go']['main']['App']['MarkAllNewsAsSeen']();
 }
@@ -108,6 +120,10 @@ export function RemoveSource(arg1) {
 
 export function SaveCryptoPanicToken(arg1) {
   return window['go']['main']['App']['SaveCryptoPanicToken'](arg1);
+}
+
+export function SaveXSession(arg1, arg2) {
+  return window['go']['main']['App']['SaveXSession'](arg1, arg2);
 }
 
 export function SelectCoin(arg1) {

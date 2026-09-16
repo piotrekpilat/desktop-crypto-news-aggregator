@@ -98,6 +98,7 @@ type FullAppState struct {
 	UseInternalBrowser         bool             `json:"useInternalBrowser"`
 	AlwaysOnTop                bool             `json:"alwaysOnTop"`
 	Autostart                  bool             `json:"autostart"`
+	IsXLoggedIn                bool             `json:"isXLoggedIn"`
 }
 
 var DefaultInitialCoins = []CoinInfo{
@@ -117,6 +118,9 @@ var DefaultInitialCoins = []CoinInfo{
 
 func GetDefaultSources() []FeedSource {
 	return []FeedSource{
+		{ID: "x_saylor", Name: "Michael Saylor (X)", URL: "https://x.com/saylor", ColorHex: "#1D9BF0", IsActive: false},
+		{ID: "x_elonmusk", Name: "Elon Musk (X)", URL: "https://x.com/elonmusk", ColorHex: "#E7E9EA", IsActive: false},
+		{ID: "x_vitalik", Name: "Vitalik Buterin (X)", URL: "https://x.com/VitalikButerin", ColorHex: "#627EEA", IsActive: false},
 		{ID: "llama_hacks", Name: "DefiLlama (Hacks & Exploits)", URL: "https://api.llama.fi/hacks", ColorHex: "#FF3366", IsActive: false},
 		{ID: "macro_cal", Name: "Makro Kalendarz (FED/CPI)", URL: "https://nfs.faireconomy.media/ff_calendar_thisweek.json", ColorHex: "#F59E0B", IsActive: false},
 		{ID: "tg_unfolded", Name: "Unfolded (TG)", URL: "https://t.me/s/unfolded", ColorHex: "#00E5FF", IsActive: false},
@@ -138,6 +142,7 @@ func GetDefaultSources() []FeedSource {
 		{ID: "bithub_pl", Name: "BitHub (PL)", URL: "https://bithub.pl/feed/", ColorHex: "#14B8A6", IsActive: false},
 		{ID: "cryps_pl", Name: "CrypS (PL)", URL: "https://cryps.pl/feed/", ColorHex: "#8B5CF6", IsActive: false},
 		{ID: "iog_news", Name: "IOG News", URL: "https://www.iog.io/feed.xml", ColorHex: "#0033AD", IsActive: false},
+		{ID: "dailycoin_rss", Name: "DailyCoin", URL: "https://dailycoin.com/feed/", ColorHex: "#06B6D4", IsActive: false},
 		{ID: "rd_rss", Name: "Reddit", URL: "https://www.reddit.com/r/CryptoCurrency/new/.rss", ColorHex: "#FF4500", IsActive: false},
 		{ID: "ut_rss", Name: "U.Today", URL: "https://u.today/rss", ColorHex: "#FF3366", IsActive: false},
 	}
