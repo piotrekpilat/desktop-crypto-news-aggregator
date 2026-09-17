@@ -40,6 +40,7 @@ const I18N = {
         sources_title: "GŁÓWNE ŹRÓDŁA NEWSÓW & RSS / ATOM",
         telegram_sources_title: "KANAŁY TELEGRAM (PUBLICZNE)",
         x_sources_title: "PROFILE X / TWITTER",
+        sources_manage_select_all: "Zaznacz wszystkie",
         btn_add_x: "+ Dodaj profil X",
         btn_add_tg: "+ Dodaj kanał",
         btn_add_rss: "+ Dodaj RSS / Atom",
@@ -157,6 +158,7 @@ const I18N = {
         sources_title: "MAIN NEWS & RSS / ATOM SOURCES",
         telegram_sources_title: "TELEGRAM CHANNELS (PUBLIC)",
         x_sources_title: "X / TWITTER PROFILES",
+        sources_manage_select_all: "Select all",
         btn_add_x: "+ Add X profile",
         btn_add_tg: "+ Add channel",
         btn_add_rss: "+ Add RSS / Atom",
@@ -274,6 +276,7 @@ const I18N = {
         sources_title: "HAUPTNACHRICHTEN & RSS / ATOM-QUELLEN",
         telegram_sources_title: "TELEGRAM-KANÄLE (ÖFFENTLICH)",
         x_sources_title: "X / TWITTER PROFILE",
+        sources_manage_select_all: "Alle auswählen",
         btn_add_x: "+ X-Profil hinzufügen",
         btn_add_tg: "+ Kanal hinzufügen",
         btn_add_rss: "+ RSS / Atom hinzufügen",
@@ -1182,15 +1185,48 @@ function renderSourcesSubtab(state) {
                (s.id && s.id.toLowerCase().includes(q));
     });
 
-    const isX = s => s.id.startsWith('x_') || s.url.includes('x.com') || s.url.includes('twitter.com');
-    const isTg = s => (s.id.startsWith('tg_') || s.url.includes('t.me/')) && !isX(s);
+    // Master Select All checkbox logic
+    const chkToggleAll = document.getElementById('chkToggleAllSources');
+    const lblToggleAll = document.getElementById('lblToggleAllSources');
+    const txtCounter = document.getElementById('txtSourcesActiveCounter');
+    if (lblToggleAll) lblToggleAll.innerText = t('sources_manage_select_all');
+
+    const totalVisibleCount = allSources.length;
+    const activeVisibleCount = allSources.filter(s => s.isActive).length;
+
+    if (chkToggleAll && txtCounter) {
+        txtCounter.innerText = `${activeVisibleCount} / ${totalVisibleCount}`;
+        chkToggleAll.disabled = totalVisibleCount === 0;
+        if (totalVisibleCount === 0) {
+            chkToggleAll.checked = false;
+            chkToggleAll.indeterminate = false;
+        } else if (activeVisibleCount === totalVisibleCount) {
+            chkToggleAll.checked = true;
+            chkToggleAll.indeterminate = false;
+        } else if (activeVisibleCount === 0) {
+            chkToggleAll.checked = false;
+            chkToggleAll.indeterminate = false;
+        } else {
+            chkToggleAll.checked = false;
+            chkToggleAll.indeterminate = true;
+        }
+
+        chkToggleAll.onclick = () => {
+            const shouldActivate = activeVisibleCount < totalVisibleCount;
+            const targetIDs = q ? allSources.map(s => s.id) : [];
+            window.go.main.App.ToggleAllSources(shouldActivate, targetIDs).then(renderState);
+        };
+    }
+
+    const isX = s => s.type === 'X' || s.id.startsWith('x_') || s.url.includes('x.com') || s.url.includes('twitter.com');
+    const isTg = s => (s.type === 'TELEGRAM' || s.id.startsWith('tg_') || s.url.includes('t.me/')) && !isX(s);
 
     const xSources = allSources.filter(isX).sort((a, b) => a.name.localeCompare(b.name));
     const tgSources = allSources.filter(isTg).sort((a, b) => a.name.localeCompare(b.name));
     const genSources = allSources.filter(s => !isX(s) && !isTg(s)).sort((a, b) => a.name.localeCompare(b.name));
 
     const defaultIds = [
-        'x_saylor', 'x_elonmusk', 'x_vitalik',
+        'x_saylor', 'x_elonmusk', 'x_vitalik', 'x_realdonaldtrump', 'x_erictrump',
         'llama_hacks', 'macro_cal', 'tg_unfolded', 'tg_wu', 'tg_binance',
         'tg_whale', 'tg_watcherguru', 'tg_peckshield', 'theblock_rss',
         'blockworks_rss', 'btc_mag_rss', 'bankless_rss', 'cd_rss', 'ct_rss',
@@ -1321,6 +1357,11 @@ function renderAppConfigSubtab(state) {
             btnLoginX.innerText = t('btn_login_x');
             btnLoginX.disabled = false;
             btnLogoutX.style.display = 'none';
+        }
+
+        const btnShareXQR = document.getElementById('btnShareXQR');
+        if (btnShareXQR) {
+            btnShareXQR.style.display = state.isXLoggedIn ? 'inline-block' : 'none';
         }
     }
     document.getElementById('txtCardAlarmHeader').innerText = t('section_alarm');
@@ -1758,6 +1799,32 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnLogoutX) btnLogoutX.onclick = handleLogoutXClick;
     const btnBannerLogoutX = document.getElementById('btnBannerLogoutX');
     if (btnBannerLogoutX) btnBannerLogoutX.onclick = handleLogoutXClick;
+
+    // X Session QR Code Modal
+    const btnShareXQR = document.getElementById('btnShareXQR');
+    const modalXSessionQR = document.getElementById('modalXSessionQR');
+    const imgXSessionQR = document.getElementById('imgXSessionQR');
+    const btnCloseXSessionQR = document.getElementById('btnCloseXSessionQR');
+
+    if (btnShareXQR) {
+        btnShareXQR.onclick = () => {
+            if (window.go && window.go.main && window.go.main.App && window.go.main.App.GetXSessionQR) {
+                window.go.main.App.GetXSessionQR().then(dataUrl => {
+                    if (imgXSessionQR) imgXSessionQR.src = dataUrl;
+                    if (modalXSessionQR) modalXSessionQR.style.display = 'flex';
+                }).catch(err => {
+                    alert('Błąd pobierania kodu QR sesji X: ' + err);
+                });
+            } else {
+                alert('Brak wsparcia generowania kodu QR sesji');
+            }
+        };
+    }
+    if (btnCloseXSessionQR && modalXSessionQR) {
+        btnCloseXSessionQR.onclick = () => {
+            modalXSessionQR.style.display = 'none';
+        };
+    }
 
     // Add X Source Modal
     const btnAddXSource = document.getElementById('btnAddXSource');

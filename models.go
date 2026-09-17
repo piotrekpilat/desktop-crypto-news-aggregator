@@ -1,5 +1,23 @@
 package main
 
+import (
+	_ "embed"
+	"encoding/json"
+	"strings"
+)
+
+type FeedSourceType string
+
+const (
+	FeedSourceTypeX           FeedSourceType = "X"
+	FeedSourceTypeTelegram    FeedSourceType = "TELEGRAM"
+	FeedSourceTypeRSS         FeedSourceType = "RSS"
+	FeedSourceTypeReddit      FeedSourceType = "REDDIT"
+	FeedSourceTypeDefiLlama   FeedSourceType = "DEFILLAMA"
+	FeedSourceTypeMacro       FeedSourceType = "MACRO"
+	FeedSourceTypeCryptoPanic FeedSourceType = "CRYPTOPANIC"
+)
+
 type PricePoint struct {
 	Timestamp int64   `json:"timestamp"`
 	Price     float64 `json:"price"`
@@ -15,13 +33,14 @@ type CoinInfo struct {
 }
 
 type FeedSource struct {
-	ID                       string `json:"id"`
-	Name                     string `json:"name"`
-	URL                      string `json:"url"`
-	ColorHex                 string `json:"colorHex"`
-	IsActive                 bool   `json:"isActive"`
-	FailureCount             int    `json:"failureCount"`
-	AutoDisabledAfterFailure bool   `json:"autoDisabledAfterFailure"`
+	ID                       string         `json:"id"`
+	Name                     string         `json:"name"`
+	URL                      string         `json:"url"`
+	ColorHex                 string         `json:"colorHex"`
+	Type                     FeedSourceType `json:"type"`
+	IsActive                 bool           `json:"isActive"`
+	FailureCount             int            `json:"failureCount"`
+	AutoDisabledAfterFailure bool           `json:"autoDisabledAfterFailure"`
 }
 
 type CryptoNewsItem struct {
@@ -116,34 +135,109 @@ var DefaultInitialCoins = []CoinInfo{
 	{Symbol: "PEPEUSDT", BaseAsset: "PEPE", QuoteAsset: "USDT", Name: "Pepe", IconSymbol: "🐸", ColorHex: "#4B8B3B"},
 }
 
-func GetDefaultSources() []FeedSource {
-	return []FeedSource{
-		{ID: "x_saylor", Name: "Michael Saylor (X)", URL: "https://x.com/saylor", ColorHex: "#1D9BF0", IsActive: false},
-		{ID: "x_elonmusk", Name: "Elon Musk (X)", URL: "https://x.com/elonmusk", ColorHex: "#E7E9EA", IsActive: false},
-		{ID: "x_vitalik", Name: "Vitalik Buterin (X)", URL: "https://x.com/VitalikButerin", ColorHex: "#627EEA", IsActive: false},
-		{ID: "llama_hacks", Name: "DefiLlama (Hacks & Exploits)", URL: "https://api.llama.fi/hacks", ColorHex: "#FF3366", IsActive: false},
-		{ID: "macro_cal", Name: "Makro Kalendarz (FED/CPI)", URL: "https://nfs.faireconomy.media/ff_calendar_thisweek.json", ColorHex: "#F59E0B", IsActive: false},
-		{ID: "tg_unfolded", Name: "Unfolded (TG)", URL: "https://t.me/s/unfolded", ColorHex: "#00E5FF", IsActive: false},
-		{ID: "tg_wu", Name: "Wu Blockchain (TG)", URL: "https://t.me/s/wublockchainenglish", ColorHex: "#FF9900", IsActive: false},
-		{ID: "tg_binance", Name: "Binance News (TG)", URL: "https://t.me/s/binance_announcements", ColorHex: "#F3BA2F", IsActive: false},
-		{ID: "tg_whale", Name: "Whale Alert (TG)", URL: "https://t.me/s/whale_alert_io", ColorHex: "#2AABEE", IsActive: false},
-		{ID: "tg_watcherguru", Name: "Watcher Guru (TG)", URL: "https://t.me/s/WatcherGuru", ColorHex: "#10B981", IsActive: false},
-		{ID: "tg_peckshield", Name: "PeckShield Alert (TG)", URL: "https://t.me/s/PeckShieldAlert", ColorHex: "#EF4444", IsActive: false},
-		{ID: "theblock_rss", Name: "The Block", URL: "https://www.theblock.co/rss.xml", ColorHex: "#6366F1", IsActive: false},
-		{ID: "blockworks_rss", Name: "Blockworks", URL: "https://blockworks.co/feed", ColorHex: "#EC4899", IsActive: false},
-		{ID: "btc_mag_rss", Name: "Bitcoin Magazine", URL: "https://bitcoinmagazine.com/feed", ColorHex: "#F7931A", IsActive: false},
-		{ID: "bankless_rss", Name: "Bankless", URL: "https://www.bankless.com/rss/feed", ColorHex: "#E11D48", IsActive: false},
-		{ID: "cd_rss", Name: "CoinDesk", URL: "https://www.coindesk.com/arc/outboundfeeds/rss/", ColorHex: "#A855F7", IsActive: false},
-		{ID: "ct_rss", Name: "Cointelegraph", URL: "https://cointelegraph.com/rss", ColorHex: "#F59E0B", IsActive: false},
-		{ID: "cp_api", Name: "CryptoPanic", URL: "https://cryptopanic.com/developers/api/", ColorHex: "#00E5FF", IsActive: false},
-		{ID: "cs_rss", Name: "CryptoSlate", URL: "https://cryptoslate.com/feed/", ColorHex: "#38BDF8", IsActive: false},
-		{ID: "dc_rss", Name: "Decrypt", URL: "https://decrypt.co/feed", ColorHex: "#34D399", IsActive: false},
-		{ID: "beincrypto_pl", Name: "BeInCrypto (PL)", URL: "https://pl.beincrypto.com/feed/", ColorHex: "#3B82F6", IsActive: false},
-		{ID: "bithub_pl", Name: "BitHub (PL)", URL: "https://bithub.pl/feed/", ColorHex: "#14B8A6", IsActive: false},
-		{ID: "cryps_pl", Name: "CrypS (PL)", URL: "https://cryps.pl/feed/", ColorHex: "#8B5CF6", IsActive: false},
-		{ID: "iog_news", Name: "IOG News", URL: "https://www.iog.io/feed.xml", ColorHex: "#0033AD", IsActive: false},
-		{ID: "dailycoin_rss", Name: "DailyCoin", URL: "https://dailycoin.com/feed/", ColorHex: "#06B6D4", IsActive: false},
-		{ID: "rd_rss", Name: "Reddit", URL: "https://www.reddit.com/r/CryptoCurrency/new/.rss", ColorHex: "#FF4500", IsActive: false},
-		{ID: "ut_rss", Name: "U.Today", URL: "https://u.today/rss", ColorHex: "#FF3366", IsActive: false},
+//go:embed default_sources.json
+var defaultSourcesJSON []byte
+
+type rawDefaultSourceItem struct {
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	URL      string `json:"url"`
+	ColorHex string `json:"colorHex"`
+	Type     string `json:"type,omitempty"`
+}
+
+type defaultSourcesConfig struct {
+	Twitter  []rawDefaultSourceItem `json:"twitter"`
+	Telegram []rawDefaultSourceItem `json:"telegram"`
+	RSS      []rawDefaultSourceItem `json:"rss"`
+	Reddit   []rawDefaultSourceItem `json:"reddit"`
+	Special  []rawDefaultSourceItem `json:"special"`
+}
+
+func GuessFeedSourceType(url, id string) FeedSourceType {
+	lowerURL := strings.ToLower(url)
+	lowerID := strings.ToLower(id)
+	if strings.HasPrefix(lowerID, "x_") || strings.Contains(lowerURL, "x.com") || strings.Contains(lowerURL, "twitter.com") {
+		return FeedSourceTypeX
 	}
+	if strings.HasPrefix(lowerID, "tg_") || strings.Contains(lowerURL, "t.me/") {
+		return FeedSourceTypeTelegram
+	}
+	if strings.HasPrefix(lowerID, "rd_") || strings.Contains(lowerURL, "reddit.com") {
+		return FeedSourceTypeReddit
+	}
+	if lowerID == "llama_hacks" || strings.Contains(lowerURL, "api.llama.fi/hacks") {
+		return FeedSourceTypeDefiLlama
+	}
+	if lowerID == "macro_cal" || strings.Contains(lowerURL, "ff_calendar") {
+		return FeedSourceTypeMacro
+	}
+	if lowerID == "cp_api" || strings.Contains(lowerURL, "cryptopanic.com") {
+		return FeedSourceTypeCryptoPanic
+	}
+	return FeedSourceTypeRSS
+}
+
+func GetDefaultSources() []FeedSource {
+	var cfg defaultSourcesConfig
+	if err := json.Unmarshal(defaultSourcesJSON, &cfg); err != nil {
+		return nil
+	}
+
+	var sources []FeedSource
+	for _, item := range cfg.Twitter {
+		sources = append(sources, FeedSource{
+			ID:       item.ID,
+			Name:     item.Name,
+			URL:      item.URL,
+			ColorHex: item.ColorHex,
+			Type:     FeedSourceTypeX,
+			IsActive: false,
+		})
+	}
+	for _, item := range cfg.Telegram {
+		sources = append(sources, FeedSource{
+			ID:       item.ID,
+			Name:     item.Name,
+			URL:      item.URL,
+			ColorHex: item.ColorHex,
+			Type:     FeedSourceTypeTelegram,
+			IsActive: false,
+		})
+	}
+	for _, item := range cfg.RSS {
+		sources = append(sources, FeedSource{
+			ID:       item.ID,
+			Name:     item.Name,
+			URL:      item.URL,
+			ColorHex: item.ColorHex,
+			Type:     FeedSourceTypeRSS,
+			IsActive: false,
+		})
+	}
+	for _, item := range cfg.Reddit {
+		sources = append(sources, FeedSource{
+			ID:       item.ID,
+			Name:     item.Name,
+			URL:      item.URL,
+			ColorHex: item.ColorHex,
+			Type:     FeedSourceTypeReddit,
+			IsActive: false,
+		})
+	}
+	for _, item := range cfg.Special {
+		st := FeedSourceType(strings.ToUpper(strings.TrimSpace(item.Type)))
+		if st == "" {
+			st = GuessFeedSourceType(item.URL, item.ID)
+		}
+		sources = append(sources, FeedSource{
+			ID:       item.ID,
+			Name:     item.Name,
+			URL:      item.URL,
+			ColorHex: item.ColorHex,
+			Type:     st,
+			IsActive: false,
+		})
+	}
+	return sources
 }

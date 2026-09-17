@@ -100,17 +100,26 @@ func (c *Client) SaveSessionToFile(path string) error {
 	return os.WriteFile(path, data, 0600)
 }
 
-// LoadSessionFromFile reads session credentials from a JSON file.
-func (c *Client) LoadSessionFromFile(path string) error {
+// LoadSessionFromFile reads session credentials from a JSON file and returns *Session.
+func LoadSessionFromFile(path string) (*Session, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	var session Session
 	if err := json.Unmarshal(data, &session); err != nil {
+		return nil, err
+	}
+	return &session, nil
+}
+
+// LoadSessionFromFile reads session credentials from a JSON file into Client.
+func (c *Client) LoadSessionFromFile(path string) error {
+	sess, err := LoadSessionFromFile(path)
+	if err != nil {
 		return err
 	}
-	c.session = session
+	c.session = *sess
 	return nil
 }
 

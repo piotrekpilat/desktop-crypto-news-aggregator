@@ -9,6 +9,7 @@ import (
 
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
+	"github.com/skip2/go-qrcode"
 )
 
 // LoginInteractive opens a stealth Chrome browser window for user login on X.com
@@ -152,5 +153,21 @@ Captured:
 		}
 	}
 
+	// Wyświetl kod QR w terminalu do łatwego sparowania z telefonem
+	qrPayload := fmt.Sprintf(`{"auth_token":"%s","ct0":"%s"}`, session.AuthToken, session.CT0)
+	if qrObj, err := qrcode.New(qrPayload, qrcode.Medium); err == nil {
+		fmt.Println("📱 ========================================================")
+		fmt.Println("📱 ZESKANUJ TEN KOD QR W APLIKACJI MOBILNEJ (ZESTAWIANIE SESJI):")
+		fmt.Println("📱 ========================================================")
+		fmt.Println(qrObj.ToSmallString(false))
+		fmt.Println("📱 ========================================================")
+	}
+
 	return session, nil
+}
+
+// GenerateQRCodePNG generuje obrazek PNG kodu QR z sesją X
+func (s *Session) GenerateQRCodePNG() ([]byte, error) {
+	payload := fmt.Sprintf(`{"auth_token":"%s","ct0":"%s"}`, s.AuthToken, s.CT0)
+	return qrcode.Encode(payload, qrcode.Medium, 256)
 }

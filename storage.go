@@ -113,8 +113,19 @@ func (sm *StorageManager) Load() *SavedSettings {
 	} else {
 		defSources := GetDefaultSources()
 		existingMap := make(map[string]bool)
-		for _, s := range settings.Sources {
-			existingMap[s.ID] = true
+		defMap := make(map[string]FeedSource)
+		for _, defS := range defSources {
+			defMap[defS.ID] = defS
+		}
+		for i := range settings.Sources {
+			existingMap[settings.Sources[i].ID] = true
+			if settings.Sources[i].Type == "" {
+				if defS, ok := defMap[settings.Sources[i].ID]; ok {
+					settings.Sources[i].Type = defS.Type
+				} else {
+					settings.Sources[i].Type = GuessFeedSourceType(settings.Sources[i].URL, settings.Sources[i].ID)
+				}
+			}
 		}
 		for _, defS := range defSources {
 			if !existingMap[defS.ID] {

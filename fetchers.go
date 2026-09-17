@@ -175,25 +175,43 @@ func (fc *FeedClient) SetXSession(session xscraper.Session, path string) {
 
 // FetchSource fetches news for a single source
 func (fc *FeedClient) FetchSource(source FeedSource, cryptoPanicToken string) ([]CryptoNewsItem, error) {
-	if strings.HasPrefix(source.ID, "x_") || strings.Contains(source.URL, "x.com") || strings.Contains(source.URL, "twitter.com") {
+	switch source.Type {
+	case FeedSourceTypeX:
 		return fc.fetchX(source)
-	}
-	if source.ID == "llama_hacks" || strings.Contains(strings.ToLower(source.URL), "api.llama.fi/hacks") {
+	case FeedSourceTypeDefiLlama:
 		return fc.fetchDefiLlamaHacks(source)
-	}
-	if source.ID == "macro_cal" || strings.Contains(strings.ToLower(source.URL), "ff_calendar") {
+	case FeedSourceTypeMacro:
 		return fc.fetchMacroCalendar(source)
-	}
-	if source.ID == "cp_api" || strings.Contains(strings.ToLower(source.URL), "cryptopanic.com") {
+	case FeedSourceTypeCryptoPanic:
 		return fc.fetchCryptoPanic(source, cryptoPanicToken)
-	}
-	if strings.HasPrefix(source.ID, "tg_") || strings.Contains(source.URL, "t.me/") {
+	case FeedSourceTypeTelegram:
 		return fc.fetchTelegram(source)
-	}
-	if strings.HasPrefix(source.ID, "rd_") || strings.Contains(source.URL, "reddit.com") {
+	case FeedSourceTypeReddit:
 		return fc.fetchReddit(source)
+	case FeedSourceTypeRSS:
+		return fc.fetchGenericRss(source)
+	default:
+		// Fallback for custom or legacy sources
+		if strings.HasPrefix(source.ID, "x_") || strings.Contains(source.URL, "x.com") || strings.Contains(source.URL, "twitter.com") {
+			return fc.fetchX(source)
+		}
+		if source.ID == "llama_hacks" || strings.Contains(strings.ToLower(source.URL), "api.llama.fi/hacks") {
+			return fc.fetchDefiLlamaHacks(source)
+		}
+		if source.ID == "macro_cal" || strings.Contains(strings.ToLower(source.URL), "ff_calendar") {
+			return fc.fetchMacroCalendar(source)
+		}
+		if source.ID == "cp_api" || strings.Contains(strings.ToLower(source.URL), "cryptopanic.com") {
+			return fc.fetchCryptoPanic(source, cryptoPanicToken)
+		}
+		if strings.HasPrefix(source.ID, "tg_") || strings.Contains(source.URL, "t.me/") {
+			return fc.fetchTelegram(source)
+		}
+		if strings.HasPrefix(source.ID, "rd_") || strings.Contains(source.URL, "reddit.com") {
+			return fc.fetchReddit(source)
+		}
+		return fc.fetchGenericRss(source)
 	}
-	return fc.fetchGenericRss(source)
 }
 
 func (fc *FeedClient) fetchX(source FeedSource) ([]CryptoNewsItem, error) {

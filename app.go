@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"math"
 	"math/rand"
@@ -317,6 +318,9 @@ func (a *App) loadDataSync() {
 }
 
 func (a *App) isXSource(s FeedSource) bool {
+	if s.Type == FeedSourceTypeX {
+		return true
+	}
 	return strings.HasPrefix(s.ID, "x_") || strings.Contains(s.URL, "x.com") || strings.Contains(s.URL, "twitter.com")
 }
 
@@ -1120,6 +1124,39 @@ func (a *App) ToggleSource(sourceID string, active bool) FullAppState {
 	return a.GetState()
 }
 
+func (a *App) ToggleAllSources(active bool, sourceIDs []string) FullAppState {
+	a.mu.Lock()
+	idMap := make(map[string]bool)
+	for _, id := range sourceIDs {
+		idMap[id] = true
+	}
+	hasSpecificIDs := len(sourceIDs) > 0
+
+	for i := range a.sources {
+		if !hasSpecificIDs || idMap[a.sources[i].ID] {
+			a.sources[i].IsActive = active
+			if active {
+				a.sources[i].FailureCount = 0
+				a.sources[i].AutoDisabledAfterFailure = false
+			}
+		}
+	}
+	if active {
+		a.xFetchMu.Lock()
+		for _, s := range a.sources {
+			if s.IsActive && a.isXSource(s) {
+				delete(a.xLastFetchTimes, s.ID)
+			}
+		}
+		a.xFetchMu.Unlock()
+	}
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.fetchFeedsDirect(false)
+	return a.GetState()
+}
+
 func (a *App) AddTelegramSource(handleOrUrl string, customName string) FullAppState {
 	cleanHandle := strings.TrimSpace(handleOrUrl)
 	cleanHandle = strings.TrimPrefix(cleanHandle, "https://t.me/s/")
@@ -1152,6 +1189,7 @@ func (a *App) AddTelegramSource(handleOrUrl string, customName string) FullAppSt
 		Name:     displayName,
 		URL:      "https://t.me/s/" + cleanHandle,
 		ColorHex: "#2AABEE",
+		Type:     FeedSourceTypeTelegram,
 		IsActive: true,
 	}
 
@@ -1191,6 +1229,7 @@ func (a *App) AddRssSource(urlInput string, customName string) FullAppState {
 		Name:     displayName,
 		URL:      cleanURL,
 		ColorHex: "#38BDF8",
+		Type:     FeedSourceTypeRSS,
 		IsActive: true,
 	}
 
@@ -1238,6 +1277,7 @@ func (a *App) AddXSource(handleOrUrl string, customName string) FullAppState {
 		Name:     displayName,
 		URL:      "https://x.com/" + cleanHandle,
 		ColorHex: "#1D9BF0",
+		Type:     FeedSourceTypeX,
 		IsActive: true,
 	}
 
@@ -1302,6 +1342,39 @@ func (a *App) SaveXSession(authToken, ct0 string) FullAppState {
 
 	go a.fetchFeedsDirect(false)
 	return a.GetState()
+}
+
+// GetXSessionQR zwraca obrazek PNG kodu QR z sesją X zakodowany w Base64 (data:image/png;base64,...)
+func (a *App) GetXSessionQR() (string, error) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	authToken := a.xAuthToken
+	ct0 := a.xCt0
+
+	if authToken == "" || ct0 == "" {
+		sessionPath := a.storage.GetSessionPath()
+		if sess, err := xscraper.LoadSessionFromFile(sessionPath); err == nil && sess.AuthToken != "" {
+			authToken = sess.AuthToken
+			ct0 = sess.CT0
+		}
+	}
+
+	if authToken == "" || ct0 == "" {
+		return "", fmt.Errorf("brak aktywnej sesji X – najpierw zaloguj się do X")
+	}
+
+	session := xscraper.Session{
+		AuthToken: authToken,
+		CT0:       ct0,
+	}
+
+	png, err := session.GenerateQRCodePNG()
+	if err != nil {
+		return "", fmt.Errorf("błąd generowania kodu QR: %w", err)
+	}
+
+	return "data:image/png;base64," + base64.StdEncoding.EncodeToString(png), nil
 }
 
 func (a *App) RemoveSource(sourceID string) FullAppState {

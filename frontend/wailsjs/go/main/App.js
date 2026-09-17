@@ -62,6 +62,10 @@ export function GetState() {
   return window['go']['main']['App']['GetState']();
 }
 
+export function GetXSessionQR() {
+  return window['go']['main']['App']['GetXSessionQR']();
+}
+
 export function HideWindow() {
   return window['go']['main']['App']['HideWindow']();
 }
@@ -188,6 +192,10 @@ export function SwitchSettingsSubTab(arg1) {
 
 export function SwitchTab(arg1) {
   return window['go']['main']['App']['SwitchTab'](arg1);
+}
+
+export function ToggleAllSources(arg1, arg2) {
+  return window['go']['main']['App']['ToggleAllSources'](arg1, arg2);
 }
 
 export function ToggleAlwaysOnTop() {

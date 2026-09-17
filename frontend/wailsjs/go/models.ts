@@ -83,6 +83,7 @@ export namespace main {
 	    name: string;
 	    url: string;
 	    colorHex: string;
+	    type: string;
 	    isActive: boolean;
 	    failureCount: number;
 	    autoDisabledAfterFailure: boolean;
@@ -97,6 +98,7 @@ export namespace main {
 	        this.name = source["name"];
 	        this.url = source["url"];
 	        this.colorHex = source["colorHex"];
+	        this.type = source["type"];
 	        this.isActive = source["isActive"];
 	        this.failureCount = source["failureCount"];
 	        this.autoDisabledAfterFailure = source["autoDisabledAfterFailure"];

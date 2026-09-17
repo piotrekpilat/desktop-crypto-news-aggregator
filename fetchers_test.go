@@ -6,11 +6,13 @@ import (
 
 func TestDefaultSourcesConfig(t *testing.T) {
 	sources := GetDefaultSources()
-	if len(sources) < 20 {
-		t.Fatalf("Expected at least 20 default sources, got %d", len(sources))
+	if len(sources) < 25 {
+		t.Fatalf("Expected at least 25 default sources, got %d", len(sources))
 	}
 
 	seenIDs := make(map[string]bool)
+	var foundDonald, foundEric bool
+
 	for _, s := range sources {
 		if s.ID == "" {
 			t.Errorf("Source with empty ID found: %+v", s)
@@ -26,10 +28,33 @@ func TestDefaultSourcesConfig(t *testing.T) {
 		if s.URL == "" {
 			t.Errorf("Source %s has empty URL", s.ID)
 		}
+		if s.Type == "" {
+			t.Errorf("Source %s has empty Type", s.ID)
+		}
 		// Requirement: All default sources must be disabled by default (IsActive = false)
 		if s.IsActive {
 			t.Errorf("Source %s (%s) should be disabled by default (IsActive=false), but is true", s.ID, s.Name)
 		}
+
+		if s.ID == "x_realdonaldtrump" {
+			foundDonald = true
+			if s.Type != FeedSourceTypeX {
+				t.Errorf("Expected Donald Trump to have type %s, got %s", FeedSourceTypeX, s.Type)
+			}
+		}
+		if s.ID == "x_erictrump" {
+			foundEric = true
+			if s.Type != FeedSourceTypeX {
+				t.Errorf("Expected Eric Trump to have type %s, got %s", FeedSourceTypeX, s.Type)
+			}
+		}
+	}
+
+	if !foundDonald {
+		t.Errorf("Default sources should contain x_realdonaldtrump")
+	}
+	if !foundEric {
+		t.Errorf("Default sources should contain x_erictrump")
 	}
 }
 
@@ -42,8 +67,13 @@ func TestFetchLiveDefaultSources(t *testing.T) {
 	fc := NewFeedClient()
 
 	for _, s := range sources {
-		if s.ID == "cp_api" {
-			// CryptoPanic requires API key, tested separately or skipped if no token
+		// Pomijamy CryptoPanic jeśli brak tokena API
+		if s.Type == FeedSourceTypeCryptoPanic || s.ID == "cp_api" {
+			continue
+		}
+
+		// Pomijamy źródła X (Twitter) w testach, bo wymagają aktywnej sesji/ciasteczek
+		if s.Type == FeedSourceTypeX {
 			continue
 		}
 

@@ -32,6 +32,8 @@ export function FetchAvailablePairs():Promise<main.FullAppState>;
 
 export function GetState():Promise<main.FullAppState>;
 
+export function GetXSessionQR():Promise<string>;
+
 export function HideWindow():Promise<void>;
 
 export function ImportNewsCSV(arg1:string):Promise<main.FullAppState>;
@@ -95,6 +97,8 @@ export function ShowWindow():Promise<void>;
 export function SwitchSettingsSubTab(arg1:string):Promise<main.FullAppState>;
 
 export function SwitchTab(arg1:string):Promise<main.FullAppState>;
+
+export function ToggleAllSources(arg1:boolean,arg2:Array<string>):Promise<main.FullAppState>;
 
 export function ToggleAlwaysOnTop():Promise<main.FullAppState>;
 

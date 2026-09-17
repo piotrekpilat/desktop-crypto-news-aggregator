@@ -1,0 +1,189 @@
+{
+  "twitter": [
+    {
+      "id": "x_saylor",
+      "name": "Michael Saylor (X)",
+      "url": "https://x.com/saylor",
+      "colorHex": "#1D9BF0"
+    },
+    {
+      "id": "x_elonmusk",
+      "name": "Elon Musk (X)",
+      "url": "https://x.com/elonmusk",
+      "colorHex": "#E7E9EA"
+    },
+    {
+      "id": "x_vitalik",
+      "name": "Vitalik Buterin (X)",
+      "url": "https://x.com/VitalikButerin",
+      "colorHex": "#627EEA"
+    },
+    {
+      "id": "x_realdonaldtrump",
+      "name": "Donald Trump (X)",
+      "url": "https://x.com/realDonaldTrump",
+      "colorHex": "#E81B23"
+    },
+    {
+      "id": "x_erictrump",
+      "name": "Eric Trump (X)",
+      "url": "https://x.com/EricTrump",
+      "colorHex": "#C5A059"
+    }
+  ],
+  "telegram": [
+    {
+      "id": "tg_unfolded",
+      "name": "Unfolded (TG)",
+      "url": "https://t.me/s/unfolded",
+      "colorHex": "#00E5FF"
+    },
+    {
+      "id": "tg_wu",
+      "name": "Wu Blockchain (TG)",
+      "url": "https://t.me/s/wublockchainenglish",
+      "colorHex": "#FF9900"
+    },
+    {
+      "id": "tg_binance",
+      "name": "Binance News (TG)",
+      "url": "https://t.me/s/binance_announcements",
+      "colorHex": "#F3BA2F"
+    },
+    {
+      "id": "tg_whale",
+      "name": "Whale Alert (TG)",
+      "url": "https://t.me/s/whale_alert_io",
+      "colorHex": "#2AABEE"
+    },
+    {
+      "id": "tg_watcherguru",
+      "name": "Watcher Guru (TG)",
+      "url": "https://t.me/s/WatcherGuru",
+      "colorHex": "#10B981"
+    },
+    {
+      "id": "tg_peckshield",
+      "name": "PeckShield Alert (TG)",
+      "url": "https://t.me/s/PeckShieldAlert",
+      "colorHex": "#EF4444"
+    }
+  ],
+  "rss": [
+    {
+      "id": "theblock_rss",
+      "name": "The Block",
+      "url": "https://www.theblock.co/rss.xml",
+      "colorHex": "#6366F1"
+    },
+    {
+      "id": "blockworks_rss",
+      "name": "Blockworks",
+      "url": "https://blockworks.co/feed",
+      "colorHex": "#EC4899"
+    },
+    {
+      "id": "btc_mag_rss",
+      "name": "Bitcoin Magazine",
+      "url": "https://bitcoinmagazine.com/feed",
+      "colorHex": "#F7931A"
+    },
+    {
+      "id": "bankless_rss",
+      "name": "Bankless",
+      "url": "https://www.bankless.com/rss/feed",
+      "colorHex": "#E11D48"
+    },
+    {
+      "id": "cd_rss",
+      "name": "CoinDesk",
+      "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+      "colorHex": "#A855F7"
+    },
+    {
+      "id": "ct_rss",
+      "name": "Cointelegraph",
+      "url": "https://cointelegraph.com/rss",
+      "colorHex": "#F59E0B"
+    },
+    {
+      "id": "cs_rss",
+      "name": "CryptoSlate",
+      "url": "https://cryptoslate.com/feed/",
+      "colorHex": "#38BDF8"
+    },
+    {
+      "id": "dc_rss",
+      "name": "Decrypt",
+      "url": "https://decrypt.co/feed",
+      "colorHex": "#34D399"
+    },
+    {
+      "id": "beincrypto_pl",
+      "name": "BeInCrypto (PL)",
+      "url": "https://pl.beincrypto.com/feed/",
+      "colorHex": "#3B82F6"
+    },
+    {
+      "id": "bithub_pl",
+      "name": "BitHub (PL)",
+      "url": "https://bithub.pl/feed/",
+      "colorHex": "#14B8A6"
+    },
+    {
+      "id": "cryps_pl",
+      "name": "CrypS (PL)",
+      "url": "https://cryps.pl/feed/",
+      "colorHex": "#8B5CF6"
+    },
+    {
+      "id": "iog_news",
+      "name": "IOG News",
+      "url": "https://www.iog.io/feed.xml",
+      "colorHex": "#0033AD"
+    },
+    {
+      "id": "dailycoin_rss",
+      "name": "DailyCoin",
+      "url": "https://dailycoin.com/feed/",
+      "colorHex": "#06B6D4"
+    },
+    {
+      "id": "ut_rss",
+      "name": "U.Today",
+      "url": "https://u.today/rss",
+      "colorHex": "#FF3366"
+    }
+  ],
+  "reddit": [
+    {
+      "id": "rd_rss",
+      "name": "Reddit",
+      "url": "https://www.reddit.com/r/CryptoCurrency/new/.rss",
+      "colorHex": "#FF4500"
+    }
+  ],
+  "special": [
+    {
+      "id": "llama_hacks",
+      "name": "DefiLlama (Hacks & Exploits)",
+      "url": "https://api.llama.fi/hacks",
+      "colorHex": "#FF3366",
+      "type": "DEFILLAMA"
+    },
+    {
+      "id": "macro_cal",
+      "name": "Makro Kalendarz (FED/CPI)",
+      "url": "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+      "colorHex": "#F59E0B",
+      "type": "MACRO"
+    },
+    {
+      "id": "cp_api",
+      "name": "CryptoPanic",
+      "url": "https://cryptopanic.com/developers/api/",
+      "colorHex": "#00E5FF",
+      "type": "CRYPTOPANIC"
+    }
+  ]
+}
