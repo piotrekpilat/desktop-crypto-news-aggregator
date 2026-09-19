@@ -21,6 +21,10 @@ type AppSettingsExport struct {
 	NightModeEnabled      bool         `json:"night_mode_enabled"`
 	NightModeStart        string       `json:"night_mode_start"`
 	NightModeEnd          string       `json:"night_mode_end"`
+	CheckInterval         int          `json:"check_interval"`
+	NightCheckInterval    int          `json:"night_check_interval"`
+	XCheckInterval        int          `json:"x_check_interval"`
+	XNightCheckInterval   int          `json:"x_night_check_interval"`
 	AppLanguage           string       `json:"app_language"`
 	MaxStoredNews         int          `json:"max_stored_news"`
 	UseInternalBrowser    bool         `json:"use_internal_browser"`
@@ -39,6 +43,10 @@ type AppSettingsExport struct {
 	NightModeEnabledCamel      *bool        `json:"nightModeEnabled,omitempty"`
 	NightModeStartCamel        string       `json:"nightModeStart,omitempty"`
 	NightModeEndCamel          string       `json:"nightModeEnd,omitempty"`
+	CheckIntervalCamel         *int         `json:"checkInterval,omitempty"`
+	NightCheckIntervalCamel    *int         `json:"nightCheckInterval,omitempty"`
+	XCheckIntervalCamel        *int         `json:"xCheckInterval,omitempty"`
+	XNightCheckIntervalCamel   *int         `json:"xNightCheckInterval,omitempty"`
 	AppLanguageCamel           string       `json:"appLanguage,omitempty"`
 	MaxStoredNewsCamel         *int         `json:"maxStoredNews,omitempty"`
 	UseInternalBrowserCamel    *bool        `json:"useInternalBrowser,omitempty"`
@@ -98,6 +106,18 @@ func ImportSettingsFromJSON(jsonContent string) (*AppSettingsExport, error) {
 	if parsed.NightModeEnd == "" && parsed.NightModeEndCamel != "" {
 		parsed.NightModeEnd = parsed.NightModeEndCamel
 	}
+	if parsed.CheckIntervalCamel != nil && *parsed.CheckIntervalCamel > 0 {
+		parsed.CheckInterval = *parsed.CheckIntervalCamel
+	}
+	if parsed.NightCheckIntervalCamel != nil && *parsed.NightCheckIntervalCamel > 0 {
+		parsed.NightCheckInterval = *parsed.NightCheckIntervalCamel
+	}
+	if parsed.XCheckIntervalCamel != nil && *parsed.XCheckIntervalCamel > 0 {
+		parsed.XCheckInterval = *parsed.XCheckIntervalCamel
+	}
+	if parsed.XNightCheckIntervalCamel != nil && *parsed.XNightCheckIntervalCamel > 0 {
+		parsed.XNightCheckInterval = *parsed.XNightCheckIntervalCamel
+	}
 	if parsed.AppLanguage == "" && parsed.AppLanguageCamel != "" {
 		parsed.AppLanguage = parsed.AppLanguageCamel
 	}
@@ -132,6 +152,18 @@ func ImportSettingsFromJSON(jsonContent string) (*AppSettingsExport, error) {
 	}
 	if parsed.NightModeEnd == "" {
 		parsed.NightModeEnd = "07:00"
+	}
+	if parsed.CheckInterval <= 0 {
+		parsed.CheckInterval = 60
+	}
+	if parsed.NightCheckInterval <= 0 {
+		parsed.NightCheckInterval = 900
+	}
+	if parsed.XCheckInterval <= 0 {
+		parsed.XCheckInterval = 300
+	}
+	if parsed.XNightCheckInterval <= 0 {
+		parsed.XNightCheckInterval = 600
 	}
 	if parsed.AppLanguage == "" {
 		parsed.AppLanguage = "pl"

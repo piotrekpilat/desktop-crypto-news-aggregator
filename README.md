@@ -39,10 +39,21 @@ Aplikacja widgetowa w technologii **Wails (Go + HTML5/CSS/JS Canvas)** odwzorowu
    - Baner trybu nocnego (gdy obowiązują ciche godziny),
    - Aktywny baner alarmu ("Nowa wiadomość oczekuje", licznik wibracji, przycisk "Widziałem").
 
-4. **Wewnętrzna przeglądarka (In-App Browser)**:
+4. **Integracja z X / Twitter & Sesja QR**:
+   - Możliwość zalogowania do X bezpośrednio w widgetcie (zapis ciasteczek `auth_token` i `ct0`),
+   - Generowanie kodu QR sesji do błyskawicznego przekazania autoryzacji do aplikacji mobilnej Android,
+   - Rate-limiting i ochrona anty-botowa przy pobieraniu tweetów obserwowanych osób.
+
+5. **Wewnętrzna przeglądarka (In-App Browser)**:
    - Otwieranie artykułów wewnątrz widgetu z opcją przejścia do domyślnej przeglądarki.
 
 ---
+
+## 📡 Zarządzanie Źródłami i Dodawanie Providerów
+
+- Lista domyślnych źródeł ładowana jest z pliku [`default_sources.json`](./default_sources.json) (wbudowanego za pomocą `//go:embed`).
+- Szczegółowa specyfikacja wszystkich kanałów oraz instrukcja krok po kroku jak napisać nowego dostawcę danych (`NewsFeedProvider` / `FeedClient`) znajduje się w dokumentacji: [Dokumentacja Kanałów i Providerów](../android/doc/channels.md).
+
 
 ## 🚀 Uruchomienie i budowanie
 

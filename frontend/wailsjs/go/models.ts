@@ -84,6 +84,7 @@ export namespace main {
 	    url: string;
 	    colorHex: string;
 	    type: string;
+	    description?: string;
 	    isActive: boolean;
 	    failureCount: number;
 	    autoDisabledAfterFailure: boolean;
@@ -99,6 +100,7 @@ export namespace main {
 	        this.url = source["url"];
 	        this.colorHex = source["colorHex"];
 	        this.type = source["type"];
+	        this.description = source["description"];
 	        this.isActive = source["isActive"];
 	        this.failureCount = source["failureCount"];
 	        this.autoDisabledAfterFailure = source["autoDisabledAfterFailure"];
@@ -141,6 +143,10 @@ export namespace main {
 	    nightModeStart: string;
 	    nightModeEnd: string;
 	    isNightTimeNow: boolean;
+	    checkInterval: number;
+	    nightCheckInterval: number;
+	    xCheckInterval: number;
+	    xNightCheckInterval: number;
 	    currentLanguage: string;
 	    cryptoPanicTokenConfigured: boolean;
 	    alarmCycle: AlarmCycleState;
@@ -151,6 +157,7 @@ export namespace main {
 	    alwaysOnTop: boolean;
 	    autostart: boolean;
 	    isXLoggedIn: boolean;
+	    showChart: boolean;
 	
 	    static createFrom(source: any = {}) {
 	        return new FullAppState(source);
@@ -180,6 +187,10 @@ export namespace main {
 	        this.nightModeStart = source["nightModeStart"];
 	        this.nightModeEnd = source["nightModeEnd"];
 	        this.isNightTimeNow = source["isNightTimeNow"];
+	        this.checkInterval = source["checkInterval"];
+	        this.nightCheckInterval = source["nightCheckInterval"];
+	        this.xCheckInterval = source["xCheckInterval"];
+	        this.xNightCheckInterval = source["xNightCheckInterval"];
 	        this.currentLanguage = source["currentLanguage"];
 	        this.cryptoPanicTokenConfigured = source["cryptoPanicTokenConfigured"];
 	        this.alarmCycle = this.convertValues(source["alarmCycle"], AlarmCycleState);
@@ -190,6 +201,7 @@ export namespace main {
 	        this.alwaysOnTop = source["alwaysOnTop"];
 	        this.autostart = source["autostart"];
 	        this.isXLoggedIn = source["isXLoggedIn"];
+	        this.showChart = source["showChart"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {

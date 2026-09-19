@@ -20,6 +20,10 @@ type SavedSettings struct {
 	NightModeEnabled      bool             `json:"nightModeEnabled"`
 	NightModeStart        string           `json:"nightModeStart"`
 	NightModeEnd          string           `json:"nightModeEnd"`
+	CheckInterval         int              `json:"checkInterval"`
+	NightCheckInterval    int              `json:"nightCheckInterval"`
+	XCheckInterval        int              `json:"xCheckInterval"`
+	XNightCheckInterval   int              `json:"xNightCheckInterval"`
 	AppLanguage           string           `json:"appLanguage"`
 	MaxStoredNews         int              `json:"maxStoredNews"`
 	UseInternalBrowser    bool             `json:"useInternalBrowser"`
@@ -31,6 +35,10 @@ type SavedSettings struct {
 	Sources               []FeedSource     `json:"sources"`
 	NewsHistory           []CryptoNewsItem `json:"newsHistory"`
 	HistoryClearedAt      int64            `json:"historyClearedAt"`
+	WindowWidth           int              `json:"windowWidth,omitempty"`
+	WindowHeight          int              `json:"windowHeight,omitempty"`
+	ShowChart             bool             `json:"showChart"`
+	DeletedNewsIDs        []string         `json:"deletedNewsIds,omitempty"`
 }
 
 type StorageManager struct {
@@ -105,6 +113,18 @@ func (sm *StorageManager) Load() *SavedSettings {
 	if settings.NightModeEnd == "" {
 		settings.NightModeEnd = "07:00"
 	}
+	if settings.CheckInterval <= 0 {
+		settings.CheckInterval = 60
+	}
+	if settings.NightCheckInterval <= 0 {
+		settings.NightCheckInterval = 900
+	}
+	if settings.XCheckInterval <= 0 {
+		settings.XCheckInterval = 300
+	}
+	if settings.XNightCheckInterval <= 0 {
+		settings.XNightCheckInterval = 600
+	}
 	if settings.MaxStoredNews <= 0 {
 		settings.MaxStoredNews = 3650
 	}
@@ -119,12 +139,18 @@ func (sm *StorageManager) Load() *SavedSettings {
 		}
 		for i := range settings.Sources {
 			existingMap[settings.Sources[i].ID] = true
-			if settings.Sources[i].Type == "" {
-				if defS, ok := defMap[settings.Sources[i].ID]; ok {
+			if defS, ok := defMap[settings.Sources[i].ID]; ok {
+				if settings.Sources[i].Type == "" {
 					settings.Sources[i].Type = defS.Type
-				} else {
-					settings.Sources[i].Type = GuessFeedSourceType(settings.Sources[i].URL, settings.Sources[i].ID)
 				}
+				if settings.Sources[i].Description == "" && defS.Description != "" {
+					settings.Sources[i].Description = defS.Description
+				}
+				if settings.Sources[i].ID == "binance_announcements" && !settings.Sources[i].IsActive {
+					settings.Sources[i].IsActive = true
+				}
+			} else if settings.Sources[i].Type == "" {
+				settings.Sources[i].Type = GuessFeedSourceType(settings.Sources[i].URL, settings.Sources[i].ID)
 			}
 		}
 		for _, defS := range defSources {
@@ -206,6 +232,10 @@ func (sm *StorageManager) defaultSettings() *SavedSettings {
 		NightModeEnabled:      true,
 		NightModeStart:        "22:00",
 		NightModeEnd:          "07:00",
+		CheckInterval:         60,
+		NightCheckInterval:    900,
+		XCheckInterval:        300,
+		XNightCheckInterval:   600,
 		AppLanguage:           "pl",
 		MaxStoredNews:         3650,
 		UseInternalBrowser:    false,

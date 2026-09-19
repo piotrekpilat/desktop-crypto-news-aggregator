@@ -6,11 +6,11 @@ export function AcknowledgeAlarm():Promise<main.FullAppState>;
 
 export function AddKeyword(arg1:string):Promise<main.FullAppState>;
 
-export function AddRssSource(arg1:string,arg2:string):Promise<main.FullAppState>;
+export function AddRssSource(arg1:string,arg2:string,arg3:string):Promise<main.FullAppState>;
 
-export function AddTelegramSource(arg1:string,arg2:string):Promise<main.FullAppState>;
+export function AddTelegramSource(arg1:string,arg2:string,arg3:string):Promise<main.FullAppState>;
 
-export function AddXSource(arg1:string,arg2:string):Promise<main.FullAppState>;
+export function AddXSource(arg1:string,arg2:string,arg3:string):Promise<main.FullAppState>;
 
 export function ClearKeywords():Promise<main.FullAppState>;
 
@@ -19,6 +19,8 @@ export function ClearNewsHistory():Promise<main.FullAppState>;
 export function ClearSourceFilters():Promise<main.FullAppState>;
 
 export function CloseWindow():Promise<void>;
+
+export function DeleteNews(arg1:Array<string>):Promise<main.FullAppState>;
 
 export function ExportNewsCSV():Promise<string>;
 
@@ -31,6 +33,8 @@ export function ExportSettingsJSON():Promise<string>;
 export function FetchAvailablePairs():Promise<main.FullAppState>;
 
 export function GetState():Promise<main.FullAppState>;
+
+export function GetWindowSize():Promise<number|number>;
 
 export function GetXSessionQR():Promise<string>;
 
@@ -64,6 +68,8 @@ export function RemoveSource(arg1:string):Promise<main.FullAppState>;
 
 export function SaveCryptoPanicToken(arg1:string):Promise<main.FullAppState>;
 
+export function SaveWindowSize(arg1:number,arg2:number):Promise<void>;
+
 export function SaveXSession(arg1:string,arg2:string):Promise<main.FullAppState>;
 
 export function SelectCoin(arg1:string):Promise<main.FullAppState>;
@@ -76,21 +82,35 @@ export function SetAlarmEnabled(arg1:boolean):Promise<main.FullAppState>;
 
 export function SetAutostart(arg1:boolean):Promise<main.FullAppState>;
 
+export function SetCheckInterval(arg1:number):Promise<main.FullAppState>;
+
 export function SetLanguage(arg1:string):Promise<main.FullAppState>;
 
 export function SetMaxStoredNews(arg1:number):Promise<main.FullAppState>;
 
 export function SetMaxVibrations(arg1:number):Promise<main.FullAppState>;
 
+export function SetNewsFetchCutoffMillis(arg1:number):Promise<main.FullAppState>;
+
+export function SetNightCheckInterval(arg1:number):Promise<main.FullAppState>;
+
 export function SetNightHours(arg1:string,arg2:string):Promise<main.FullAppState>;
 
 export function SetNightModeEnabled(arg1:boolean):Promise<main.FullAppState>;
+
+export function SetShowChart(arg1:boolean):Promise<main.FullAppState>;
 
 export function SetSourceFilter(arg1:string):Promise<main.FullAppState>;
 
 export function SetSourceFilters(arg1:Array<string>):Promise<main.FullAppState>;
 
 export function SetUseInternalBrowser(arg1:boolean):Promise<main.FullAppState>;
+
+export function SetWindowSize(arg1:number,arg2:number):Promise<void>;
+
+export function SetXCheckInterval(arg1:number):Promise<main.FullAppState>;
+
+export function SetXNightCheckInterval(arg1:number):Promise<main.FullAppState>;
 
 export function ShowWindow():Promise<void>;
 

@@ -24,8 +24,6 @@ html, body {
 .widget-frame {
     width: 100%;
     height: 100%;
-    max-width: 430px;
-    max-height: 890px;
     background: #0B0E14;
     border-radius: 18px;
     border: 1px solid rgba(255, 255, 255, 0.12);
@@ -115,6 +113,150 @@ html, body {
     background: #0B0E14;
     overflow: hidden;
     position: relative;
+}
+
+/* ========================================================= */
+/* 🎛️ SLIDE-DOWN FILTER & ALARM BAR                          */
+/* ========================================================= */
+.slide-down-container {
+    width: 100%;
+    background: #0E131D;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+}
+
+.slide-down-trigger-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 14px;
+    background: #101520;
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.slide-down-trigger-bar:hover {
+    background: #151B29;
+}
+
+.slide-down-trigger-bar.has-active-filters {
+    border-color: rgba(0, 229, 255, 0.3);
+}
+
+.slide-down-trigger-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.slide-down-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #8B949E;
+    transition: all 0.2s ease;
+}
+
+.slide-down-pill.active {
+    background: rgba(0, 229, 255, 0.14);
+    color: #00E5FF;
+}
+
+.slide-down-pill-icon {
+    flex-shrink: 0;
+}
+
+.slide-down-sep {
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 11px;
+}
+
+.slide-down-meta {
+    font-size: 11px;
+    color: #8B949E;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.slide-down-meta.highlight {
+    color: #00E5FF;
+    font-weight: 500;
+}
+
+.slide-down-trigger-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #8B949E;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.slide-down-arrow {
+    transition: transform 0.25s ease;
+}
+
+.slide-down-container.open .slide-down-arrow {
+    transform: rotate(180deg);
+}
+
+.slide-down-container.open .slide-down-trigger-bar {
+    background: #161C27;
+}
+
+.slide-down-container.open .slide-down-toggle-text {
+    color: #00E5FF;
+}
+
+.slide-down-panel {
+    background: #131824;
+    padding-bottom: 6px;
+    border-top: 1px solid rgba(0, 229, 255, 0.1);
+    animation: slideDownAnim 0.2s ease-out;
+}
+
+@keyframes slideDownAnim {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-down-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 4px 14px;
+}
+
+.slide-down-collapse-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 6px 14px 2px 14px;
+    padding: 6px;
+    background: rgba(0, 229, 255, 0.08);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    border-radius: 6px;
+    color: #00E5FF;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+}
+
+.slide-down-collapse-bar:hover {
+    background: rgba(0, 229, 255, 0.16);
 }
 
 /* ========================================================= */
@@ -480,36 +622,35 @@ html, body {
 }
 
 /* ========================================================= */
-/* 📡 SELECT2 SOURCES FILTER BAR                             */
+/* 📡 SOURCES FILTER + SEARCH ROW (SAME LINE)                */
 /* ========================================================= */
-.sources-filter-bar {
-    background: #0D1117;
-    padding: 6px 14px;
+.sources-search-row {
+    padding: 6px 14px 4px 14px;
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    overflow-x: auto;
+    width: 100%;
 }
 
-.btn-open-sources-filter {
+.sources-search-row .btn-open-sources-filter {
     background: #161B22;
     border: 1px solid rgba(0, 229, 255, 0.35);
-    border-radius: 12px;
-    padding: 4px 10px;
+    border-radius: 8px;
+    padding: 0 10px;
     color: #00E5FF;
     font-size: 11px;
     font-weight: 600;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 6px;
     white-space: nowrap;
     transition: all 0.15s ease;
     flex-shrink: 0;
+    height: 33px;
 }
 
-.btn-open-sources-filter:hover {
+.sources-search-row .btn-open-sources-filter:hover {
     background: rgba(0, 229, 255, 0.15);
     border-color: #00E5FF;
 }
@@ -527,6 +668,53 @@ html, body {
     font-size: 8px;
     color: #00E5FF;
     margin-left: 2px;
+}
+
+.sources-search-row .search-box-container {
+    position: relative;
+    flex: 1;
+    width: auto;
+}
+
+.sources-search-row .search-input {
+    width: 100%;
+    height: 33px;
+    background: #161B22;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    padding: 0 28px 0 10px;
+    color: #ffffff;
+    font-size: 11px;
+    outline: none;
+}
+
+.sources-search-row .search-input:focus {
+    border-color: #00E5FF;
+}
+
+.sources-search-row .search-clear-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #8B949E;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.active-source-chips-bar {
+    padding: 2px 14px 5px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.active-source-chips-bar::-webkit-scrollbar {
+    display: none;
 }
 
 .active-source-chips {
@@ -628,6 +816,133 @@ html, body {
     width: 5px;
     height: 5px;
     border-radius: 50%;
+}
+
+/* ========================================================= */
+/* 📅 DATE RANGE FILTER BAR                                  */
+/* ========================================================= */
+.date-filter-section {
+    padding: 4px 14px 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.date-preset-chips-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.date-preset-chips-row::-webkit-scrollbar {
+    display: none;
+}
+
+.date-filter-icon-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: #8B949E;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 2px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.date-chip {
+    background: #161B22;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    color: #8B949E;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 3px 9px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+}
+
+.date-chip:hover {
+    background: #1E293B;
+    color: #FFFFFF;
+    border-color: rgba(0, 229, 255, 0.3);
+}
+
+.date-chip.active {
+    background: rgba(0, 229, 255, 0.15);
+    border-color: #00E5FF;
+    color: #00E5FF;
+    font-weight: 700;
+}
+
+/* Expandable custom date inputs */
+.date-custom-inputs-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #111620;
+    border: 1px solid rgba(0, 229, 255, 0.25);
+    border-radius: 8px;
+    padding: 6px 10px;
+    animation: fadeInDate 0.15s ease-out;
+}
+
+@keyframes fadeInDate {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.date-input-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+}
+
+.date-input-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #8B949E;
+    text-transform: uppercase;
+}
+
+.date-native-input {
+    background: #161B22;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #00E5FF;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 6px;
+    border-radius: 5px;
+    width: 100%;
+    outline: none;
+    color-scheme: dark;
+}
+
+.date-native-input:focus {
+    border-color: #00E5FF;
+}
+
+.btn-clear-date-filter {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #8B949E;
+    border-radius: 4px;
+    font-size: 11px;
+    padding: 3px 6px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-clear-date-filter:hover {
+    background: rgba(255, 51, 102, 0.2);
+    color: #ff3366;
 }
 
 /* ========================================================= */
@@ -855,6 +1170,20 @@ html, body {
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+.link-btn-copy {
+    color: #8B949E;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.15s ease;
+}
+
+.link-btn-copy:hover {
+    color: #00E5FF;
 }
 
 .link-btn-share {
@@ -1095,6 +1424,13 @@ html, body {
     color: #ffffff;
     font-size: 14px;
     font-weight: 500;
+}
+
+.source-card-desc {
+    color: #94A3B8;
+    font-size: 11.5px;
+    line-height: 1.35;
+    margin-top: 2px;
 }
 
 .source-card-url {
@@ -1494,6 +1830,76 @@ html, body {
 }
 
 /* ========================================================= */
+/* ↔️ BOTTOM RESIZE HANDLE                                    */
+/* ========================================================= */
+.widget-resize-handle {
+    height: 12px;
+    min-height: 12px;
+    background: #0E121A;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: ns-resize;
+    user-select: none;
+    -webkit-user-select: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    position: relative;
+    z-index: 60;
+    --wails-draggable: no-drag;
+}
+
+.widget-resize-handle:hover {
+    background: #151C28;
+}
+
+.resize-grip-line {
+    width: 38px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 2px;
+    transition: all 0.15s ease;
+}
+
+.widget-resize-handle:hover .resize-grip-line {
+    background: #00E5FF;
+    width: 52px;
+    box-shadow: 0 0 8px rgba(0, 229, 255, 0.5);
+}
+
+.resize-grip-corner {
+    position: absolute;
+    right: 6px;
+    bottom: 1px;
+    cursor: se-resize;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+}
+
+.resize-grip-corner:hover {
+    opacity: 1;
+}
+
+.resize-grip-corner:hover svg path {
+    stroke: #00E5FF;
+}
+
+body.resizing-active,
+body.resizing-active * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    cursor: ns-resize !important;
+}
+
+body.resizing-active.corner-active,
+body.resizing-active.corner-active * {
+    cursor: se-resize !important;
+}
+
+/* ========================================================= */
 /* 🎛️ CUSTOM TOGGLE SWITCHES                                 */
 /* ========================================================= */
 .switch {
@@ -1750,6 +2156,16 @@ input:checked + .slider-gold:before {
     text-overflow: ellipsis;
 }
 
+.select2-source-desc {
+    color: #94A3B8;
+    font-size: 10.5px;
+    line-height: 1.3;
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .select2-source-url {
     color: #8B949E;
     font-size: 10px;
@@ -1853,4 +2269,152 @@ input:checked + .slider-gold:before {
 }
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 229, 255, 0.4);
+}
+
+/* MANAGE NEWS TAB */
+.manage-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background: #101520;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.manage-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.manage-header-icon {
+    flex-shrink: 0;
+}
+
+.manage-header-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #F0F3F6;
+}
+
+.manage-selected-count {
+    font-size: 11px;
+    color: #8B949E;
+    font-weight: 600;
+}
+
+.manage-filter-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: #0D1117;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.manage-select-all-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 12px;
+    background: #131824;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.manage-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #F0F3F6;
+    user-select: none;
+}
+
+.manage-checkbox-label input[type="checkbox"],
+.manage-card-checkbox {
+    accent-color: #00E5FF;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.btn-manage-deselect {
+    background: transparent;
+    border: none;
+    color: #8B949E;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 2px 6px;
+}
+
+.btn-manage-deselect:hover {
+    color: #00E5FF;
+}
+
+.manage-scroll-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 12px 60px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.manage-news-card-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.manage-news-card-wrapper .news-card {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.manage-bottom-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: #101520;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    z-index: 10;
+}
+
+.manage-bottom-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: #00E5FF;
+}
+
+.btn-manage-delete {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #FF4D4F;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-manage-delete:hover:not(:disabled) {
+    background: #FF7875;
+}
+
+.btn-manage-delete:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background: rgba(255, 77, 79, 0.3);
 }

@@ -17,6 +17,10 @@ func TestExportAndImportSettingsJSON(t *testing.T) {
 		NightModeEnabled:      true,
 		NightModeStart:        "23:00",
 		NightModeEnd:          "06:30",
+		CheckInterval:         45,
+		NightCheckInterval:    600,
+		XCheckInterval:        240,
+		XNightCheckInterval:   720,
 		AppLanguage:           "de",
 		MaxStoredNews:         5000,
 		Sources: []FeedSource{
@@ -53,6 +57,18 @@ func TestExportAndImportSettingsJSON(t *testing.T) {
 	}
 	if imported.MaxVibrations != original.MaxVibrations {
 		t.Errorf("MaxVibrations mismatch: got %d, want %d", imported.MaxVibrations, original.MaxVibrations)
+	}
+	if imported.CheckInterval != original.CheckInterval {
+		t.Errorf("CheckInterval mismatch: got %d, want %d", imported.CheckInterval, original.CheckInterval)
+	}
+	if imported.NightCheckInterval != original.NightCheckInterval {
+		t.Errorf("NightCheckInterval mismatch: got %d, want %d", imported.NightCheckInterval, original.NightCheckInterval)
+	}
+	if imported.XCheckInterval != original.XCheckInterval {
+		t.Errorf("XCheckInterval mismatch: got %d, want %d", imported.XCheckInterval, original.XCheckInterval)
+	}
+	if imported.XNightCheckInterval != original.XNightCheckInterval {
+		t.Errorf("XNightCheckInterval mismatch: got %d, want %d", imported.XNightCheckInterval, original.XNightCheckInterval)
 	}
 	if imported.AppLanguage != original.AppLanguage {
 		t.Errorf("AppLanguage mismatch: got %s, want %s", imported.AppLanguage, original.AppLanguage)

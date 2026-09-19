@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"desktop-widget/xscraper"
@@ -52,12 +53,19 @@ type App struct {
 	nightModeEnabled   bool
 	nightModeStart     string
 	nightModeEnd       string
+	checkInterval       int
+	nightCheckInterval  int
+	xCheckInterval      int
+	xNightCheckInterval int
+	pollWakeChan        chan struct{}
 	currentLanguage    string
 	maxStoredNews      int
 	useInternalBrowser bool
 	alwaysOnTop        bool
 	autostart          bool
 	windowVisible      bool
+	windowWidth        int
+	windowHeight       int
 
 	currentTab         AppTab
 	settingsSubTab     SettingsSubTab
@@ -69,10 +77,13 @@ type App struct {
 	isLiveMarket       bool
 	isOffline          bool
 
-	alarmCycle       AlarmCycleState
-	alarmTickerStop  chan struct{}
-	knownNewsIDs     map[string]bool
-	historyClearedAt int64
+	alarmCycle         AlarmCycleState
+	alarmTickerStop    chan struct{}
+	knownNewsIDs       map[string]bool
+	deletedNewsIDs     map[string]bool
+	historyClearedAt   int64
+	isFetchingDirect   atomic.Bool
+	showChart          bool
 }
 
 func NewApp() *App {
@@ -85,6 +96,8 @@ func NewApp() *App {
 		seenNewsIDs:           make(map[string]bool),
 		observedSymbols:       make(map[string]bool),
 		knownNewsIDs:          make(map[string]bool),
+		deletedNewsIDs:        make(map[string]bool),
+		showChart:             true,
 		xLastFetchTimes:       make(map[string]time.Time),
 		xNextIntervals:        make(map[string]time.Duration),
 		currentCoinSymbol:     "ADAUSDT",
@@ -96,10 +109,15 @@ func NewApp() *App {
 		maxVibrations:         10,
 		nightModeStart:        "22:00",
 		nightModeEnd:          "07:00",
+		checkInterval:         60,
+		nightCheckInterval:    900,
+		pollWakeChan:          make(chan struct{}, 1),
 		currentLanguage:       "pl",
 		maxStoredNews:         3650,
 		useInternalBrowser:    false,
 		windowVisible:         true,
+		windowWidth:           430,
+		windowHeight:          890,
 	}
 }
 
@@ -161,6 +179,22 @@ func (a *App) loadSettings() {
 	a.nightModeEnabled = s.NightModeEnabled
 	a.nightModeStart = s.NightModeStart
 	a.nightModeEnd = s.NightModeEnd
+	a.checkInterval = s.CheckInterval
+	if a.checkInterval <= 0 {
+		a.checkInterval = 60
+	}
+	a.nightCheckInterval = s.NightCheckInterval
+	if a.nightCheckInterval <= 0 {
+		a.nightCheckInterval = 900
+	}
+	a.xCheckInterval = s.XCheckInterval
+	if a.xCheckInterval <= 0 {
+		a.xCheckInterval = 300
+	}
+	a.xNightCheckInterval = s.XNightCheckInterval
+	if a.xNightCheckInterval <= 0 {
+		a.xNightCheckInterval = 600
+	}
 	a.currentLanguage = s.AppLanguage
 	a.maxStoredNews = s.MaxStoredNews
 	a.useInternalBrowser = s.UseInternalBrowser
@@ -190,17 +224,44 @@ func (a *App) loadSettings() {
 	a.sources = s.Sources
 	a.historyClearedAt = s.HistoryClearedAt
 
+	a.showChart = s.ShowChart
+	if !s.ShowChart && s.CurrentCoin == "" {
+		a.showChart = true
+	}
+	a.deletedNewsIDs = make(map[string]bool)
+	for _, id := range s.DeletedNewsIDs {
+		a.deletedNewsIDs[id] = true
+	}
+
 	// Load news history
 	a.knownNewsIDs = make(map[string]bool)
 	for _, n := range s.NewsHistory {
+		if a.deletedNewsIDs[n.ID] {
+			continue
+		}
 		n.IsFavorite = a.favoriteIDs[n.ID]
 		n.IsSeen = a.seenNewsIDs[n.ID]
 		a.allNews = append(a.allNews, n)
 		a.knownNewsIDs[n.ID] = true
 	}
 
+	if s.WindowWidth >= 380 {
+		a.windowWidth = s.WindowWidth
+	}
+	if s.WindowHeight >= 500 {
+		a.windowHeight = s.WindowHeight
+	}
+
 	if a.alwaysOnTop {
 		wailsRuntime.WindowSetAlwaysOnTop(a.ctx, true)
+	}
+
+	if a.windowHeight >= 500 {
+		w := a.windowWidth
+		if w < 380 {
+			w = 430
+		}
+		wailsRuntime.WindowSetSize(a.ctx, w, a.windowHeight)
 	}
 }
 
@@ -225,6 +286,11 @@ func (a *App) saveSettingsLocked() {
 		history = history[:a.maxStoredNews]
 	}
 
+	deletedList := make([]string, 0, len(a.deletedNewsIDs))
+	for id := range a.deletedNewsIDs {
+		deletedList = append(deletedList, id)
+	}
+
 	settings := &SavedSettings{
 		FavoriteNewsIDs:       favList,
 		SeenNewsIDs:           seenList,
@@ -237,6 +303,10 @@ func (a *App) saveSettingsLocked() {
 		NightModeEnabled:      a.nightModeEnabled,
 		NightModeStart:        a.nightModeStart,
 		NightModeEnd:          a.nightModeEnd,
+		CheckInterval:         a.checkInterval,
+		NightCheckInterval:    a.nightCheckInterval,
+		XCheckInterval:        a.xCheckInterval,
+		XNightCheckInterval:   a.xNightCheckInterval,
 		AppLanguage:           a.currentLanguage,
 		MaxStoredNews:         a.maxStoredNews,
 		UseInternalBrowser:    a.useInternalBrowser,
@@ -248,6 +318,10 @@ func (a *App) saveSettingsLocked() {
 		Sources:               a.sources,
 		NewsHistory:           history,
 		HistoryClearedAt:      a.historyClearedAt,
+		WindowWidth:           a.windowWidth,
+		WindowHeight:          a.windowHeight,
+		ShowChart:             a.showChart,
+		DeletedNewsIDs:        deletedList,
 	}
 
 	go a.storage.Save(settings)
@@ -313,8 +387,8 @@ func (a *App) loadDataSync() {
 	a.isOffline = !isLive && len(a.allNews) == 0
 	a.mu.Unlock()
 
-	// 2. Fetch Active Feeds
-	a.fetchFeedsDirect(false)
+	// 2. Fetch Active Feeds in background without blocking startup
+	go a.fetchFeedsDirect(false)
 }
 
 func (a *App) isXSource(s FeedSource) bool {
@@ -322,6 +396,32 @@ func (a *App) isXSource(s FeedSource) bool {
 		return true
 	}
 	return strings.HasPrefix(s.ID, "x_") || strings.Contains(s.URL, "x.com") || strings.Contains(s.URL, "twitter.com")
+}
+
+func (a *App) calculateNextXInterval() time.Duration {
+	a.mu.Lock()
+	isNight := a.isNightModeNow()
+	baseSec := a.xCheckInterval
+	if isNight {
+		baseSec = a.xNightCheckInterval
+	}
+	a.mu.Unlock()
+
+	if baseSec <= 0 {
+		if isNight {
+			baseSec = 600
+		} else {
+			baseSec = 300
+		}
+	}
+
+	// ± 30s random jitter (-30 to +30)
+	jitter := rand.Intn(61) - 30
+	targetSec := baseSec + jitter
+	if targetSec < 30 {
+		targetSec = 30
+	}
+	return time.Duration(targetSec) * time.Second
 }
 
 func (a *App) shouldFetchXSource(sourceID string, force bool) bool {
@@ -333,25 +433,21 @@ func (a *App) shouldFetchXSource(sourceID string, force bool) bool {
 
 	last, exists := a.xLastFetchTimes[sourceID]
 	if !exists || last.IsZero() {
-		// First fetch: fetch now and set random interval for next time (5-10 min)
+		// First fetch: fetch now and set random interval for next time
 		a.xLastFetchTimes[sourceID] = time.Now()
-		randSec := 300 + rand.Intn(300) // 300s (5m) to 600s (10m)
-		a.xNextIntervals[sourceID] = time.Duration(randSec) * time.Second
+		a.xNextIntervals[sourceID] = a.calculateNextXInterval()
 		return true
 	}
 
 	interval := a.xNextIntervals[sourceID]
 	if interval <= 0 {
-		randSec := 300 + rand.Intn(300)
-		interval = time.Duration(randSec) * time.Second
+		interval = a.calculateNextXInterval()
 		a.xNextIntervals[sourceID] = interval
 	}
 
 	if time.Since(last) >= interval {
 		a.xLastFetchTimes[sourceID] = time.Now()
-		// Assign next random interval (5 to 10 minutes)
-		randSec := 300 + rand.Intn(300)
-		a.xNextIntervals[sourceID] = time.Duration(randSec) * time.Second
+		a.xNextIntervals[sourceID] = a.calculateNextXInterval()
 		return true
 	}
 
@@ -359,6 +455,11 @@ func (a *App) shouldFetchXSource(sourceID string, force bool) bool {
 }
 
 func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
+	if !a.isFetchingDirect.CompareAndSwap(false, true) {
+		return nil
+	}
+	defer a.isFetchingDirect.Store(false)
+
 	a.mu.Lock()
 	sourcesToFetch := make([]FeedSource, len(a.sources))
 	copy(sourcesToFetch, a.sources)
@@ -366,11 +467,10 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 	clearedAt := a.historyClearedAt
 	a.mu.Unlock()
 
-	var wg sync.WaitGroup
-	var fetchedLock sync.Mutex
 	var accumulated []CryptoNewsItem
 	var modifiedSources []FeedSource
 	var hasSourceModifications bool
+	firstFetched := true
 
 	for _, src := range sourcesToFetch {
 		if !src.IsActive {
@@ -384,43 +484,34 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 			continue
 		}
 
-		wg.Add(1)
-		go func(s FeedSource) {
-			defer wg.Done()
+		// 1-second delay between querying each active source
+		if !firstFetched {
+			time.Sleep(1 * time.Second)
+		}
+		firstFetched = false
 
-			// Human jitter delay (1-3s) for X requests
-			if a.isXSource(s) {
-				time.Sleep(time.Duration(1000+rand.Intn(2000)) * time.Millisecond)
+		items, err := a.feedCli.FetchSource(src, token)
+		if err == nil {
+			accumulated = append(accumulated, items...)
+			if src.FailureCount > 0 || src.AutoDisabledAfterFailure {
+				src.FailureCount = 0
+				src.AutoDisabledAfterFailure = false
+				hasSourceModifications = true
 			}
-
-			items, err := a.feedCli.FetchSource(s, token)
-			fetchedLock.Lock()
-			defer fetchedLock.Unlock()
-
-			if err == nil {
-				accumulated = append(accumulated, items...)
-				if s.FailureCount > 0 || s.AutoDisabledAfterFailure {
-					s.FailureCount = 0
-					s.AutoDisabledAfterFailure = false
-					hasSourceModifications = true
+			modifiedSources = append(modifiedSources, src)
+		} else {
+			// Don't auto-disable X sources quickly due to headless browser retries
+			if !a.isXSource(src) {
+				src.FailureCount++
+				hasSourceModifications = true
+				if src.FailureCount >= 2 {
+					src.IsActive = false
+					src.AutoDisabledAfterFailure = true
 				}
-				modifiedSources = append(modifiedSources, s)
-			} else {
-				// Don't auto-disable X sources quickly due to headless browser retries
-				if !a.isXSource(s) {
-					s.FailureCount++
-					hasSourceModifications = true
-					if s.FailureCount >= 2 {
-						s.IsActive = false
-						s.AutoDisabledAfterFailure = true
-					}
-				}
-				modifiedSources = append(modifiedSources, s)
 			}
-		}(src)
+			modifiedSources = append(modifiedSources, src)
+		}
 	}
-
-	wg.Wait()
 
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -430,10 +521,20 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 		a.saveSettingsLocked()
 	}
 
-	// Filter out items older than history clear timestamp
+	// Filter out items older than history clear timestamp, except for sources with no existing items in history
 	var eligible []CryptoNewsItem
 	for _, n := range accumulated {
-		if n.PublishedAtMillis > clearedAt {
+		if a.deletedNewsIDs[n.ID] {
+			continue
+		}
+		hasExisting := false
+		for _, existing := range a.allNews {
+			if strings.EqualFold(existing.Source, n.Source) {
+				hasExisting = true
+				break
+			}
+		}
+		if !hasExisting || n.PublishedAtMillis >= clearedAt {
 			if len(a.activeKeywords) > 0 {
 				fullText := strings.ToLower(n.Title + " " + n.Description + " " + n.Tag)
 				for _, kw := range a.activeKeywords {
@@ -489,10 +590,14 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 func (a *App) mergeNews(existing []CryptoNewsItem, incoming []CryptoNewsItem) []CryptoNewsItem {
 	newsMap := make(map[string]CryptoNewsItem)
 	for _, n := range existing {
-		newsMap[n.ID] = n
+		if !a.deletedNewsIDs[n.ID] {
+			newsMap[n.ID] = n
+		}
 	}
 	for _, n := range incoming {
-		newsMap[n.ID] = n
+		if !a.deletedNewsIDs[n.ID] {
+			newsMap[n.ID] = n
+		}
 	}
 
 	merged := make([]CryptoNewsItem, 0, len(newsMap))
@@ -578,9 +683,45 @@ func (a *App) stopAlarmCycleLocked() {
 	a.alarmCycle.IsActive = false
 }
 
+func (a *App) triggerPollWake() {
+	if a.pollWakeChan != nil {
+		select {
+		case a.pollWakeChan <- struct{}{}:
+		default:
+		}
+	}
+}
+
+func (a *App) getPollingIntervalSec() int {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	sec := a.checkInterval
+	if sec < 5 {
+		sec = 60
+	}
+	if a.nightModeEnabled && a.isNightModeNow() {
+		if a.nightCheckInterval >= 5 {
+			sec = a.nightCheckInterval
+		}
+	}
+	return sec
+}
+
 func (a *App) startPeriodicNewsPolling() {
-	ticker := time.NewTicker(45 * time.Second)
-	for range ticker.C {
+	for {
+		sec := a.getPollingIntervalSec()
+		timer := time.NewTimer(time.Duration(sec) * time.Second)
+		select {
+		case <-timer.C:
+		case <-a.pollWakeChan:
+			if !timer.Stop() {
+				select {
+				case <-timer.C:
+				default:
+				}
+			}
+		}
+
 		newly := a.fetchFeedsDirect(true)
 		if len(newly) > 0 {
 			a.refreshMarketDataOnly()
@@ -854,6 +995,10 @@ func (a *App) GetState() FullAppState {
 		NightModeStart:             a.nightModeStart,
 		NightModeEnd:               a.nightModeEnd,
 		IsNightTimeNow:             a.isNightModeNow(),
+		CheckInterval:              a.checkInterval,
+		NightCheckInterval:         a.nightCheckInterval,
+		XCheckInterval:             a.xCheckInterval,
+		XNightCheckInterval:        a.xNightCheckInterval,
 		CurrentLanguage:            a.currentLanguage,
 		CryptoPanicTokenConfigured: strings.TrimSpace(a.cryptoPanicToken) != "",
 		AlarmCycle:                 a.alarmCycle,
@@ -864,6 +1009,7 @@ func (a *App) GetState() FullAppState {
 		AlwaysOnTop:                a.alwaysOnTop,
 		Autostart:                  a.autostart,
 		IsXLoggedIn:                a.xAuthToken != "",
+		ShowChart:                  a.showChart,
 	}
 }
 
@@ -1157,7 +1303,7 @@ func (a *App) ToggleAllSources(active bool, sourceIDs []string) FullAppState {
 	return a.GetState()
 }
 
-func (a *App) AddTelegramSource(handleOrUrl string, customName string) FullAppState {
+func (a *App) AddTelegramSource(handleOrUrl string, customName string, description string) FullAppState {
 	cleanHandle := strings.TrimSpace(handleOrUrl)
 	cleanHandle = strings.TrimPrefix(cleanHandle, "https://t.me/s/")
 	cleanHandle = strings.TrimPrefix(cleanHandle, "https://t.me/")
@@ -1185,12 +1331,13 @@ func (a *App) AddTelegramSource(handleOrUrl string, customName string) FullAppSt
 	}
 
 	newSource := FeedSource{
-		ID:       sourceID,
-		Name:     displayName,
-		URL:      "https://t.me/s/" + cleanHandle,
-		ColorHex: "#2AABEE",
-		Type:     FeedSourceTypeTelegram,
-		IsActive: true,
+		ID:          sourceID,
+		Name:        displayName,
+		URL:         "https://t.me/s/" + cleanHandle,
+		ColorHex:    "#2AABEE",
+		Type:        FeedSourceTypeTelegram,
+		Description: strings.TrimSpace(description),
+		IsActive:    true,
 	}
 
 	a.sources = append(a.sources, newSource)
@@ -1201,7 +1348,7 @@ func (a *App) AddTelegramSource(handleOrUrl string, customName string) FullAppSt
 	return a.GetState()
 }
 
-func (a *App) AddRssSource(urlInput string, customName string) FullAppState {
+func (a *App) AddRssSource(urlInput string, customName string, description string) FullAppState {
 	cleanURL := strings.TrimSpace(urlInput)
 	if cleanURL == "" {
 		return a.GetState()
@@ -1225,12 +1372,13 @@ func (a *App) AddRssSource(urlInput string, customName string) FullAppState {
 	}
 
 	newSource := FeedSource{
-		ID:       sourceID,
-		Name:     displayName,
-		URL:      cleanURL,
-		ColorHex: "#38BDF8",
-		Type:     FeedSourceTypeRSS,
-		IsActive: true,
+		ID:          sourceID,
+		Name:        displayName,
+		URL:         cleanURL,
+		ColorHex:    "#38BDF8",
+		Type:        FeedSourceTypeRSS,
+		Description: strings.TrimSpace(description),
+		IsActive:    true,
 	}
 
 	a.sources = append(a.sources, newSource)
@@ -1241,7 +1389,7 @@ func (a *App) AddRssSource(urlInput string, customName string) FullAppState {
 	return a.GetState()
 }
 
-func (a *App) AddXSource(handleOrUrl string, customName string) FullAppState {
+func (a *App) AddXSource(handleOrUrl string, customName string, description string) FullAppState {
 	cleanHandle := strings.TrimSpace(handleOrUrl)
 	cleanHandle = strings.TrimPrefix(cleanHandle, "https://x.com/")
 	cleanHandle = strings.TrimPrefix(cleanHandle, "http://x.com/")
@@ -1273,12 +1421,13 @@ func (a *App) AddXSource(handleOrUrl string, customName string) FullAppState {
 	}
 
 	newSource := FeedSource{
-		ID:       sourceID,
-		Name:     displayName,
-		URL:      "https://x.com/" + cleanHandle,
-		ColorHex: "#1D9BF0",
-		Type:     FeedSourceTypeX,
-		IsActive: true,
+		ID:          sourceID,
+		Name:        displayName,
+		URL:         "https://x.com/" + cleanHandle,
+		ColorHex:    "#1D9BF0",
+		Type:        FeedSourceTypeX,
+		Description: strings.TrimSpace(description),
+		IsActive:    true,
 	}
 
 	a.sources = append(a.sources, newSource)
@@ -1443,6 +1592,7 @@ func (a *App) SetNightModeEnabled(enabled bool) FullAppState {
 	}
 	a.saveSettingsLocked()
 	a.mu.Unlock()
+	a.triggerPollWake()
 	return a.GetState()
 }
 
@@ -1454,6 +1604,49 @@ func (a *App) SetNightHours(start string, end string) FullAppState {
 		a.stopAlarmCycleLocked()
 	}
 	a.saveSettingsLocked()
+	a.mu.Unlock()
+	a.triggerPollWake()
+	return a.GetState()
+}
+
+func (a *App) SetCheckInterval(sec int) FullAppState {
+	a.mu.Lock()
+	if sec >= 5 && sec <= 86400 {
+		a.checkInterval = sec
+		a.saveSettingsLocked()
+	}
+	a.mu.Unlock()
+	a.triggerPollWake()
+	return a.GetState()
+}
+
+func (a *App) SetNightCheckInterval(sec int) FullAppState {
+	a.mu.Lock()
+	if sec >= 5 && sec <= 86400 {
+		a.nightCheckInterval = sec
+		a.saveSettingsLocked()
+	}
+	a.mu.Unlock()
+	a.triggerPollWake()
+	return a.GetState()
+}
+
+func (a *App) SetXCheckInterval(sec int) FullAppState {
+	a.mu.Lock()
+	if sec >= 30 && sec <= 86400 {
+		a.xCheckInterval = sec
+		a.saveSettingsLocked()
+	}
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SetXNightCheckInterval(sec int) FullAppState {
+	a.mu.Lock()
+	if sec >= 30 && sec <= 86400 {
+		a.xNightCheckInterval = sec
+		a.saveSettingsLocked()
+	}
 	a.mu.Unlock()
 	return a.GetState()
 }
@@ -1498,6 +1691,66 @@ func (a *App) ClearNewsHistory() FullAppState {
 	a.historyClearedAt = time.Now().UnixMilli()
 	a.saveSettingsLocked()
 	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SetShowChart(enabled bool) FullAppState {
+	a.mu.Lock()
+	a.showChart = enabled
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) DeleteNews(newsIDs []string) FullAppState {
+	a.mu.Lock()
+	if a.deletedNewsIDs == nil {
+		a.deletedNewsIDs = make(map[string]bool)
+	}
+	idSet := make(map[string]bool, len(newsIDs))
+	for _, id := range newsIDs {
+		idSet[id] = true
+		a.deletedNewsIDs[id] = true
+		delete(a.knownNewsIDs, id)
+		delete(a.favoriteIDs, id)
+		delete(a.seenNewsIDs, id)
+	}
+	remaining := make([]CryptoNewsItem, 0, len(a.allNews))
+	for _, item := range a.allNews {
+		if !idSet[item.ID] {
+			remaining = append(remaining, item)
+		}
+	}
+	a.allNews = remaining
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SetNewsFetchCutoffMillis(timestampMillis int64) FullAppState {
+	a.mu.Lock()
+	if timestampMillis < 0 {
+		timestampMillis = 0
+	}
+	a.historyClearedAt = timestampMillis
+
+	if timestampMillis > 0 {
+		var filtered []CryptoNewsItem
+		newKnown := make(map[string]bool)
+		for _, n := range a.allNews {
+			if n.PublishedAtMillis >= timestampMillis {
+				filtered = append(filtered, n)
+				newKnown[n.ID] = true
+			}
+		}
+		a.allNews = filtered
+		a.knownNewsIDs = newKnown
+	}
+
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+
+	go a.loadDataSync()
 	return a.GetState()
 }
 
@@ -1583,6 +1836,38 @@ func (a *App) CloseWindow() {
 	wailsRuntime.Quit(a.ctx)
 }
 
+func (a *App) SetWindowSize(width, height int) {
+	if height < 500 {
+		height = 500
+	}
+	if height > 2500 {
+		height = 2500
+	}
+	if width < 380 {
+		width = 380
+	}
+	if width > 650 {
+		width = 650
+	}
+	a.mu.Lock()
+	a.windowWidth = width
+	a.windowHeight = height
+	a.mu.Unlock()
+	wailsRuntime.WindowSetSize(a.ctx, width, height)
+}
+
+func (a *App) SaveWindowSize(width, height int) {
+	a.SetWindowSize(width, height)
+	a.mu.Lock()
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+}
+
+func (a *App) GetWindowSize() (int, int) {
+	w, h := wailsRuntime.WindowGetSize(a.ctx)
+	return w, h
+}
+
 // ---------------- DATA IMPORT / EXPORT METHODS ----------------
 
 func (a *App) ExportSettingsJSON() (string, error) {
@@ -1624,6 +1909,10 @@ func (a *App) ExportSettingsJSON() (string, error) {
 		NightModeEnabled:      a.nightModeEnabled,
 		NightModeStart:        a.nightModeStart,
 		NightModeEnd:          a.nightModeEnd,
+		CheckInterval:         a.checkInterval,
+		NightCheckInterval:    a.nightCheckInterval,
+		XCheckInterval:        a.xCheckInterval,
+		XNightCheckInterval:   a.xNightCheckInterval,
 		AppLanguage:           a.currentLanguage,
 		MaxStoredNews:         a.maxStoredNews,
 		UseInternalBrowser:    a.useInternalBrowser,
@@ -1667,6 +1956,18 @@ func (a *App) ImportSettingsJSON(jsonContent string) (FullAppState, error) {
 	}
 	if imported.NightModeEnd != "" {
 		a.nightModeEnd = imported.NightModeEnd
+	}
+	if imported.CheckInterval > 0 {
+		a.checkInterval = imported.CheckInterval
+	}
+	if imported.NightCheckInterval > 0 {
+		a.nightCheckInterval = imported.NightCheckInterval
+	}
+	if imported.XCheckInterval > 0 {
+		a.xCheckInterval = imported.XCheckInterval
+	}
+	if imported.XNightCheckInterval > 0 {
+		a.xNightCheckInterval = imported.XNightCheckInterval
 	}
 	if imported.AppLanguage != "" {
 		a.currentLanguage = imported.AppLanguage
@@ -1715,6 +2016,7 @@ func (a *App) ImportSettingsJSON(jsonContent string) (FullAppState, error) {
 
 	a.saveSettingsLocked()
 	a.mu.Unlock()
+	a.triggerPollWake()
 
 	go a.loadDataSync()
 	return a.GetState(), nil

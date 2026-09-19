@@ -11,11 +11,18 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
 
 	"desktop-widget/xscraper"
+)
+
+const (
+	UserAgentBrowser = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+	UserAgentApp     = "CryptoNewsApp/1.0"
+	UserAgentReddit  = "desktop:com.crypto.aggregator.widget:v1.0.0 (by /u/crypto_news_widget)"
 )
 
 var (
@@ -163,7 +170,7 @@ type FeedClient struct {
 func NewFeedClient() *FeedClient {
 	return &FeedClient{
 		httpCli: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: 5 * time.Second,
 		},
 	}
 }
@@ -184,6 +191,8 @@ func (fc *FeedClient) FetchSource(source FeedSource, cryptoPanicToken string) ([
 		return fc.fetchMacroCalendar(source)
 	case FeedSourceTypeCryptoPanic:
 		return fc.fetchCryptoPanic(source, cryptoPanicToken)
+	case FeedSourceTypeBinance:
+		return fc.fetchBinanceAnnouncements(source)
 	case FeedSourceTypeTelegram:
 		return fc.fetchTelegram(source)
 	case FeedSourceTypeReddit:
@@ -203,6 +212,9 @@ func (fc *FeedClient) FetchSource(source FeedSource, cryptoPanicToken string) ([
 		}
 		if source.ID == "cp_api" || strings.Contains(strings.ToLower(source.URL), "cryptopanic.com") {
 			return fc.fetchCryptoPanic(source, cryptoPanicToken)
+		}
+		if source.ID == "binance_announcements" || strings.Contains(strings.ToLower(source.URL), "binance.com/bapi") {
+			return fc.fetchBinanceAnnouncements(source)
 		}
 		if strings.HasPrefix(source.ID, "tg_") || strings.Contains(source.URL, "t.me/") {
 			return fc.fetchTelegram(source)
@@ -319,7 +331,7 @@ func (fc *FeedClient) fetchDefiLlamaHacks(source FeedSource) ([]CryptoNewsItem, 
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "CryptoNewsApp/1.0")
+	req.Header.Set("User-Agent", UserAgentApp)
 
 	resp, err := fc.httpCli.Do(req)
 	if err != nil {
@@ -458,7 +470,7 @@ func (fc *FeedClient) fetchMacroCalendar(source FeedSource) ([]CryptoNewsItem, e
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "CryptoNewsApp/1.0")
+	req.Header.Set("User-Agent", UserAgentApp)
 
 	resp, err := fc.httpCli.Do(req)
 	if err != nil {
@@ -564,7 +576,7 @@ func (fc *FeedClient) fetchTelegram(source FeedSource) ([]CryptoNewsItem, error)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	req.Header.Set("User-Agent", UserAgentBrowser)
 
 	resp, err := fc.httpCli.Do(req)
 	if err != nil {
@@ -674,7 +686,7 @@ func (fc *FeedClient) fetchReddit(source FeedSource) ([]CryptoNewsItem, error) {
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "desktop:com.crypto.aggregator.widget:v1.0.0 (by /u/crypto_news_widget)")
+	req.Header.Set("User-Agent", UserAgentReddit)
 
 	resp, err := fc.httpCli.Do(req)
 	if err != nil {
@@ -766,7 +778,7 @@ func (fc *FeedClient) fetchGenericRss(source FeedSource) ([]CryptoNewsItem, erro
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	req.Header.Set("User-Agent", UserAgentBrowser)
 
 	resp, err := fc.httpCli.Do(req)
 	if err != nil {
@@ -898,7 +910,7 @@ func (fc *FeedClient) fetchCryptoPanic(source FeedSource, token string) ([]Crypt
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", "CryptoNewsApp/1.0")
+	req.Header.Set("User-Agent", UserAgentApp)
 
 	resp, err := fc.httpCli.Do(req)
 	if err != nil {
@@ -1105,3 +1117,127 @@ func (bc *BinanceClient) GetExchangeInfo() ([]CoinInfo, error) {
 	}
 	return coins, nil
 }
+
+type binanceArticleItem struct {
+	ID          int64  `json:"id"`
+	Code        string `json:"code"`
+	Title       string `json:"title"`
+	ReleaseDate int64  `json:"releaseDate"`
+}
+
+type binanceCatalogItem struct {
+	CatalogID   int                  `json:"catalogId"`
+	CatalogName string               `json:"catalogName"`
+	Articles    []binanceArticleItem `json:"articles"`
+}
+
+type binanceCMSResponse struct {
+	Code string `json:"code"`
+	Data struct {
+		Catalogs []binanceCatalogItem `json:"catalogs"`
+	} `json:"data"`
+}
+
+func (fc *FeedClient) fetchBinanceAnnouncements(source FeedSource) ([]CryptoNewsItem, error) {
+	req, err := http.NewRequest("GET", source.URL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", UserAgentBrowser)
+	req.Header.Set("clienttype", "web")
+	req.Header.Set("lang", "en")
+
+	resp, err := fc.httpCli.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var cmsResp binanceCMSResponse
+	if err := json.Unmarshal(body, &cmsResp); err != nil {
+		return nil, err
+	}
+
+	if cmsResp.Code != "000000" {
+		return nil, fmt.Errorf("Binance API error code: %s", cmsResp.Code)
+	}
+
+	var result []CryptoNewsItem
+	seenIDs := make(map[string]bool)
+
+	for _, cat := range cmsResp.Data.Catalogs {
+		catName := strings.TrimSpace(cat.CatalogName)
+		tag := "BINANCE"
+		switch cat.CatalogID {
+		case 48:
+			tag = "LISTING"
+		case 161:
+			tag = "DELISTING"
+		case 128:
+			tag = "AIRDROP"
+		case 93:
+			tag = "ACTIVITY"
+		}
+
+		for _, art := range cat.Articles {
+			title := strings.TrimSpace(art.Title)
+			if title == "" {
+				continue
+			}
+			code := strings.TrimSpace(art.Code)
+			newsID := fmt.Sprintf("binance_%d", art.ID)
+			if code != "" {
+				newsID = fmt.Sprintf("binance_%s", code)
+			}
+			if seenIDs[newsID] {
+				continue
+			}
+			seenIDs[newsID] = true
+
+			link := "https://www.binance.com/en/support/announcement"
+			if code != "" {
+				link = fmt.Sprintf("https://www.binance.com/en/support/announcement/%s", code)
+			}
+
+			timeMillis := art.ReleaseDate
+			if timeMillis <= 0 {
+				timeMillis = time.Now().UnixMilli()
+			}
+
+			desc := title
+			if catName != "" {
+				desc = fmt.Sprintf("[%s] %s", catName, title)
+			}
+
+			result = append(result, CryptoNewsItem{
+				ID:                newsID,
+				Title:             title,
+				Description:       desc,
+				Source:            source.Name,
+				URL:               link,
+				PublishedAtMillis: timeMillis,
+				FormattedTime:     FormatTimeAgo(timeMillis, "pl"),
+				Tag:               tag,
+				ColorHex:          "#F0B90B",
+				AssociatedPrice:   0.0,
+			})
+		}
+	}
+
+	// Sort newest first
+	sort.Slice(result, func(i, j int) bool {
+		return result[i].PublishedAtMillis > result[j].PublishedAtMillis
+	})
+
+	return result, nil
+}
+

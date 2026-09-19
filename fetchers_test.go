@@ -11,7 +11,7 @@ func TestDefaultSourcesConfig(t *testing.T) {
 	}
 
 	seenIDs := make(map[string]bool)
-	var foundDonald, foundEric bool
+	var foundDonald, foundEric, foundVlad bool
 
 	for _, s := range sources {
 		if s.ID == "" {
@@ -48,6 +48,12 @@ func TestDefaultSourcesConfig(t *testing.T) {
 				t.Errorf("Expected Eric Trump to have type %s, got %s", FeedSourceTypeX, s.Type)
 			}
 		}
+		if s.ID == "x_vladtenev" {
+			foundVlad = true
+			if s.Type != FeedSourceTypeX {
+				t.Errorf("Expected Vlad Tenev to have type %s, got %s", FeedSourceTypeX, s.Type)
+			}
+		}
 	}
 
 	if !foundDonald {
@@ -55,6 +61,9 @@ func TestDefaultSourcesConfig(t *testing.T) {
 	}
 	if !foundEric {
 		t.Errorf("Default sources should contain x_erictrump")
+	}
+	if !foundVlad {
+		t.Errorf("Default sources should contain x_vladtenev")
 	}
 }
 

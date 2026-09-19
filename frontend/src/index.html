@@ -27,25 +27,6 @@
 
         <!-- APP CONTENT SCREEN CONTAINER -->
         <div class="widget-content">
-            
-            <!-- 1. GLOBAL ALARM TOGGLE BAR -->
-            <div class="global-alarm-bar" id="globalAlarmBar">
-                <div class="alarm-bar-left">
-                    <div class="alarm-icon-box" id="alarmIconBox">
-                        <svg class="alarm-bell-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
-                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
-                        </svg>
-                    </div>
-                    <div class="alarm-info-text">
-                        <div class="alarm-title" id="txtAlarmTitle">Alarm wibracyjny</div>
-                        <div class="alarm-subtitle" id="txtAlarmStatus">Aktywny (max 10 powtórzeń)</div>
-                    </div>
-                </div>
-                <label class="switch">
-                    <input type="checkbox" id="chkAlarmToggle" checked>
-                    <span class="slider round"></span>
-                </label>
-            </div>
 
             <!-- 2. NIGHT MODE INDICATOR BAR -->
             <div class="night-mode-bar" id="nightModeBar" style="display: none;">
@@ -97,33 +78,143 @@
                         </div>
                     </div>
 
-                    <!-- Clean Chart View (Canvas) -->
-                    <div class="chart-section" id="chartSection">
-                        <canvas id="priceChartCanvas"></canvas>
-                    </div>
+                    <!-- SLIDE-DOWN BAR (FILTERS & ALARM) -->
+                    <div class="slide-down-container" id="slideDownContainer">
+                        <!-- Trigger bar (always visible, compact) -->
+                        <div class="slide-down-trigger-bar" id="slideDownTriggerBar">
+                            <div class="slide-down-trigger-left">
+                                <!-- Alarm Pill -->
+                                <div class="slide-down-pill" id="pillAlarmStatus">
+                                    <svg class="slide-down-pill-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                                        <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+                                    </svg>
+                                    <span id="txtSlideDownAlarm">Alarm: WŁ</span>
+                                </div>
+                                <span class="slide-down-sep">|</span>
+                                <!-- Filters Pill -->
+                                <div class="slide-down-pill" id="pillFiltersStatus">
+                                    <svg class="slide-down-pill-icon" viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+                                        <path d="M10 18h4v-2h-4v2zM3 6v2h18V6H3zm3 7h12v-2H6v2z"/>
+                                    </svg>
+                                    <span id="txtSlideDownFilters">Wszystkie</span>
+                                </div>
+                                <span class="slide-down-meta" id="txtSlideDownDate">• Dziś</span>
+                                <span class="slide-down-meta" id="txtSlideDownSearch" style="display: none;"></span>
+                            </div>
+                            <div class="slide-down-trigger-right">
+                                <span class="slide-down-toggle-text" id="txtSlideDownToggle">Filtry i Alarm</span>
+                                <svg class="slide-down-arrow" id="slideDownArrow" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M7 10l5 5 5-5z"/>
+                                </svg>
+                            </div>
+                        </div>
 
-                    <!-- Keywords Filter Bar -->
-                    <div class="keywords-bar">
-                        <button class="btn-add-keyword" id="btnAddKeyword">+ Słowo</button>
-                        <div class="keywords-list" id="keywordsList">
-                            <span class="keyword-empty-hint" id="txtNoKeywords">Brak filtrów słów kluczowych</span>
+                        <!-- Expandable Slide-down Panel -->
+                        <div class="slide-down-panel" id="slideDownPanel" style="display: none;">
+                            <!-- 1. Global Alarm Toggle Row inside Panel -->
+                            <div class="global-alarm-bar" id="globalAlarmBar">
+                                <div class="alarm-bar-left">
+                                    <div class="alarm-icon-box" id="alarmIconBox">
+                                        <svg class="alarm-bell-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                            <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="alarm-info-text">
+                                        <div class="alarm-title" id="txtAlarmTitle">Alarm wibracyjny</div>
+                                        <div class="alarm-subtitle" id="txtAlarmStatus">Aktywny (max 10 powtórzeń)</div>
+                                    </div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chkAlarmToggle" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                            <div class="slide-down-divider"></div>
+
+                            <!-- Show Chart Toggle Row inside Panel -->
+                            <div class="global-alarm-bar" id="globalChartBar">
+                                <div class="alarm-bar-left">
+                                    <div class="alarm-icon-box" id="chartIconBox">
+                                        <svg class="alarm-bell-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                            <path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="alarm-info-text">
+                                        <div class="alarm-title" id="txtChartTitle">Pokaż wykres</div>
+                                        <div class="alarm-subtitle" id="txtChartStatus">Widoczny na ekranie głównym</div>
+                                    </div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="chkChartToggle" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                            <div class="slide-down-divider"></div>
+
+                            <!-- Keywords Filter Bar -->
+                            <div class="keywords-bar">
+                                <button class="btn-add-keyword" id="btnAddKeyword">+ Słowo</button>
+                                <div class="keywords-list" id="keywordsList">
+                                    <span class="keyword-empty-hint" id="txtNoKeywords">Brak filtrów słów kluczowych</span>
+                                </div>
+                            </div>
+
+                            <!-- Sources Filter + News Search Row (Same Line) -->
+                            <div class="sources-search-row">
+                                <button class="btn-open-sources-filter" id="btnOpenSourcesFilter">
+                                    <span class="sources-filter-icon">📡</span>
+                                    <span class="sources-filter-label" id="lblSourcesFilterButton">Źródła: Wszystkie</span>
+                                    <span class="sources-filter-arrow">▼</span>
+                                </button>
+                                <div class="search-box-container">
+                                    <input type="text" class="search-input" id="inputNewsSearch" placeholder="Szukaj w wiadomościach (treść, tytuł, źródło)...">
+                                    <button class="search-clear-btn" id="btnClearNewsSearch" style="display: none;">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Active Source Chips Row (when specific sources selected) -->
+                            <div class="active-source-chips-bar" id="activeSourceChipsBar" style="display: none;">
+                                <div class="active-source-chips" id="activeSourceChips"></div>
+                            </div>
+
+                            <!-- Date Filter Bar (Smart Chips + Expandable Range) -->
+                            <div class="date-filter-section" id="dateFilterSection">
+                                <div class="date-preset-chips-row">
+                                    <span class="date-filter-icon-label" id="lblDateFilter">📅 Data:</span>
+                                    <button class="date-chip active" id="chipDateToday" data-range="today">Dziś</button>
+                                    <button class="date-chip" id="chipDate7d" data-range="7d">7 dni</button>
+                                    <button class="date-chip" id="chipDateMonth" data-range="month">Ten miesiąc</button>
+                                    <button class="date-chip" id="chipDateCustom" data-range="custom">Zakres ▾</button>
+                                    <button class="date-chip" id="chipDateAll" data-range="all">Wszystkie</button>
+                                </div>
+
+                                <!-- Expandable inputs -->
+                                <div class="date-custom-inputs-box" id="dateCustomInputsBox" style="display: none;">
+                                    <div class="date-input-group">
+                                        <span class="date-input-label" id="lblDateFrom">Od:</span>
+                                        <input type="date" class="date-native-input" id="inputDateFrom">
+                                    </div>
+                                    <div class="date-input-group">
+                                        <span class="date-input-label" id="lblDateTo">Do:</span>
+                                        <input type="date" class="date-native-input" id="inputDateTo">
+                                    </div>
+                                    <button class="btn-clear-date-filter" id="btnClearDateFilter" title="Wyczyść filtr daty">✕</button>
+                                </div>
+                            </div>
+
+                            <!-- Collapse Button at bottom of panel -->
+                            <div class="slide-down-collapse-bar" id="btnCollapseSlideDown">
+                                <span class="collapse-icon">▲</span>
+                                <span class="collapse-text" id="txtCollapseSlideDown">Zwiń</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Filter Bar (Select2 Multi-select Sources + Keywords) -->
-                    <div class="sources-filter-bar" id="sourcesFilterBar">
-                        <button class="btn-open-sources-filter" id="btnOpenSourcesFilter">
-                            <span class="sources-filter-icon">📡</span>
-                            <span class="sources-filter-label" id="lblSourcesFilterButton">Źródła: Wszystkie</span>
-                            <span class="sources-filter-arrow">▼</span>
-                        </button>
-                        <div class="active-source-chips" id="activeSourceChips"></div>
-                    </div>
-
-                    <!-- Search Bar for News -->
-                    <div class="search-box-container" style="margin-bottom: 8px;">
-                        <input type="text" class="search-input" id="inputNewsSearch" placeholder="Szukaj w wiadomościach (treść, tytuł, źródło)...">
-                        <button class="search-clear-btn" id="btnClearNewsSearch" style="display: none;">✕</button>
+                    <!-- Clean Chart View (Canvas) -->
+                    <div class="chart-section" id="chartSection">
+                        <canvas id="priceChartCanvas"></canvas>
                     </div>
 
                     <!-- Section Header -->
@@ -134,6 +225,51 @@
 
                     <!-- Scrollable News Cards List -->
                     <div class="news-scroll-list" id="newsCardsList"></div>
+                </div>
+
+                <!-- TAB 2: MANAGE NEWS -->
+                <div class="view-tab" id="viewManage" style="display: none;">
+                    <!-- Manage Header Bar -->
+                    <div class="manage-header-bar">
+                        <div class="manage-header-left">
+                            <svg class="manage-header-icon" viewBox="0 0 24 24" width="20" height="20" fill="#00E5FF">
+                                <path d="M22 7h-9v2h9V7zm0 8h-9v2h9v-2zM5.54 11 2 7.46l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41L5.54 11zm0 8L2 15.46l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41L5.54 19z"/>
+                            </svg>
+                            <div class="manage-header-title" id="txtManageTitle">Zarządzaj wiadomościami</div>
+                        </div>
+                        <div class="manage-selected-count" id="txtManageSelectedCount">Wybrano: 0 z 0</div>
+                    </div>
+
+                    <!-- Manage Search & Filter Bar -->
+                    <div class="manage-filter-row">
+                        <div class="search-box-container" style="flex: 1;">
+                            <input type="text" class="search-input" id="inputManageSearch" placeholder="Filtruj do usunięcia...">
+                            <button class="search-clear-btn" id="btnClearManageSearch" style="display: none;">✕</button>
+                        </div>
+                    </div>
+
+                    <!-- Manage Select All Bar -->
+                    <div class="manage-select-all-bar" id="manageSelectAllBar">
+                        <label class="manage-checkbox-label">
+                            <input type="checkbox" id="chkManageSelectAll">
+                            <span class="manage-checkbox-text" id="lblManageSelectAll">Zaznacz wszystkie</span>
+                        </label>
+                        <button class="btn-manage-deselect" id="btnManageDeselect" style="display: none;">Odznacz wszystko</button>
+                    </div>
+
+                    <!-- Scrollable Manage Cards List -->
+                    <div class="manage-scroll-list" id="manageNewsCardsList"></div>
+
+                    <!-- Bottom Sticky Action Bar -->
+                    <div class="manage-bottom-bar" id="manageBottomBar">
+                        <span class="manage-bottom-count" id="txtManageBottomCount">Wybrano: 0</span>
+                        <button class="btn-manage-delete" id="btnManageDelete" disabled>
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                            </svg>
+                            <span id="lblManageDeleteBtn">Usuń (0)</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- TAB: NEW / UNREAD NEWS -->
@@ -238,6 +374,16 @@
                     <!-- Subtab Content: APP_CONFIG -->
                     <div class="subtab-content" id="subtabContentAppConfig" style="display: none;">
                         
+                        <!-- Card: Język -->
+                        <div class="settings-card">
+                            <div class="card-section-title purple" id="txtCardLangHeader">JĘZYK APLIKACJI</div>
+                            <div class="lang-pills-row">
+                                <div class="lang-pill" data-lang="pl" id="pillLangPL">🇵🇱 Polski</div>
+                                <div class="lang-pill" data-lang="en" id="pillLangEN">🇬🇧 English</div>
+                                <div class="lang-pill" data-lang="de" id="pillLangDE">🇩🇪 Deutsch</div>
+                            </div>
+                        </div>
+
                         <!-- Card 0: Konto X (Twitter) -->
                         <div class="settings-card">
                             <div class="card-section-title cyan" id="txtCardXHeader" style="color: #1D9BF0;">KONTO X (TWITTER) &amp; SESJA</div>
@@ -313,13 +459,51 @@
                             </div>
                         </div>
 
-                        <!-- Card 3: Język -->
+                        <!-- Card 2.5: Częstotliwość sprawdzania wiadomości -->
                         <div class="settings-card">
-                            <div class="card-section-title purple" id="txtCardLangHeader">JĘZYK APLIKACJI</div>
-                            <div class="lang-pills-row">
-                                <div class="lang-pill" data-lang="pl" id="pillLangPL">🇵🇱 Polski</div>
-                                <div class="lang-pill" data-lang="en" id="pillLangEN">🇬🇧 English</div>
-                                <div class="lang-pill" data-lang="de" id="pillLangDE">🇩🇪 Deutsch</div>
+                            <div class="card-section-title cyan" id="txtCardIntervalsHeader">CZĘSTOTLIWOŚĆ SPRAWDZANIA WIADOMOŚCI</div>
+                            <div class="setting-row clickable" id="rowEditCheckInterval">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowCheckInterval">Interwał w dzień (Standardowy)</div>
+                                    <div class="setting-desc" id="txtRowCheckIntervalDesc">Częstotliwość sprawdzania nowych wiadomości</div>
+                                </div>
+                                <div class="edit-badge-cyan">
+                                    <span id="valCheckInterval">60 s</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row clickable" id="rowEditNightCheckInterval">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowNightCheckInterval">Interwał w nocy (Tryb nocny)</div>
+                                    <div class="setting-desc" id="txtRowNightCheckIntervalDesc">Częstotliwość w cichych godzinach nocnych</div>
+                                </div>
+                                <div class="edit-badge-gold">
+                                    <span id="valNightCheckInterval">900 s (15 min)</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row clickable" id="rowEditXCheckInterval">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowXCheckInterval">Interwał X (Twitter) w dzień (±30s)</div>
+                                    <div class="setting-desc" id="txtRowXCheckIntervalDesc">Częstotliwość sprawdzania profili X w dzień</div>
+                                </div>
+                                <div class="edit-badge-cyan">
+                                    <span id="valXCheckInterval">300 s (5 min)</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row clickable" id="rowEditXNightCheckInterval">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowXNightCheckInterval">Interwał X (Twitter) w nocy (±30s)</div>
+                                    <div class="setting-desc" id="txtRowXNightCheckIntervalDesc">Częstotliwość profili X w trybie nocnym</div>
+                                </div>
+                                <div class="edit-badge-gold">
+                                    <span id="valXNightCheckInterval">600 s (10 min)</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
                             </div>
                         </div>
 
@@ -359,6 +543,17 @@
                                 <div class="preset-pill" data-limit="2000">2000</div>
                                 <div class="preset-pill" data-limit="3650">3650</div>
                                 <div class="preset-pill" data-limit="5000">5000</div>
+                            </div>
+                            <div class="setting-divider"></div>
+                            <div class="setting-row clickable" id="rowEditHistoryCutoff">
+                                <div class="setting-col">
+                                    <div class="setting-label" id="txtRowHistoryCutoff">Pobieraj wiadomości od</div>
+                                    <div class="setting-desc" id="txtRowHistoryCutoffDesc">Ignoruje wiadomości starsze niż wybrana data</div>
+                                </div>
+                                <div class="edit-badge-cyan">
+                                    <span id="valHistoryCutoff">Brak limitu (wszystkie)</span>
+                                    <span class="edit-pencil">✎</span>
+                                </div>
                             </div>
                             <div class="setting-divider"></div>
                             <button class="btn-clear-history" id="btnClearHistory">Wyczyść historię</button>
@@ -437,11 +632,11 @@
                     </svg>
                     <span class="nav-label" id="lblNavChart">Wykres</span>
                 </div>
-                <div class="nav-item" data-tab="FEED_ONLY" id="navItemFeed">
+                <div class="nav-item" data-tab="MANAGE" id="navItemManage">
                     <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        <path d="M22 7h-9v2h9V7zm0 8h-9v2h9v-2zM5.54 11 2 7.46l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41L5.54 11zm0 8L2 15.46l1.41-1.41 2.12 2.12 4.24-4.24 1.41 1.41L5.54 19z"/>
                     </svg>
-                    <span class="nav-label" id="lblNavFeed">Feed</span>
+                    <span class="nav-label" id="lblNavManage">Zarządzaj</span>
                 </div>
                 <div class="nav-item" data-tab="NEW" id="navItemNew">
                     <div class="nav-icon-wrapper">
@@ -466,6 +661,16 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- BOTTOM RESIZE HANDLE (STRETCH DOWN) -->
+        <div class="widget-resize-handle" id="widgetResizeHandle" title="Przeciągnij w dół, aby rozciągnąć okno (dwuklik: przełącz rozmiar)">
+            <div class="resize-grip-line"></div>
+            <div class="resize-grip-corner" id="widgetResizeCorner" title="Przeciągnij róg, aby rozciągnąć okno">
+                <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                    <path d="M7 1L1 7M7 4L4 7M7 7L7 7" stroke="rgba(255,255,255,0.35)" stroke-width="1.2" stroke-linecap="round"/>
+                </svg>
+            </div>
         </div>
 
         <!-- MODAL DIALOGS -->
@@ -530,6 +735,86 @@
             </div>
         </div>
 
+        <!-- 3.5. Edit Check Interval (Day) Modal -->
+        <div class="modal-backdrop" id="modalEditCheckInterval" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalCheckIntervalTitle">Interwał sprawdzania w dzień (sekundy)</div>
+                <div class="modal-hint" id="txtModalCheckIntervalHint">Wpisz liczbę sekund (np. 60 dla 1 minuty)</div>
+                <div class="modal-presets-row" style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button type="button" class="lang-pill preset-interval-btn" data-sec="15">15s</button>
+                    <button type="button" class="lang-pill preset-interval-btn" data-sec="30">30s</button>
+                    <button type="button" class="lang-pill preset-interval-btn" data-sec="60">60s (1m)</button>
+                    <button type="button" class="lang-pill preset-interval-btn" data-sec="120">120s (2m)</button>
+                    <button type="button" class="lang-pill preset-interval-btn" data-sec="300">300s (5m)</button>
+                </div>
+                <input type="number" class="modal-input" id="inputCheckIntervalVal" placeholder="60" min="5" max="86400">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelCheckInterval">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmCheckInterval">Zapisz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3.6. Edit Night Check Interval Modal -->
+        <div class="modal-backdrop" id="modalEditNightCheckInterval" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalNightCheckIntervalTitle">Interwał w trybie nocnym (sekundy)</div>
+                <div class="modal-hint" id="txtModalNightCheckIntervalHint">Wpisz liczbę sekund (np. 900 dla 15 minut)</div>
+                <div class="modal-presets-row" style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button type="button" class="lang-pill preset-night-interval-btn" data-sec="300">300s (5m)</button>
+                    <button type="button" class="lang-pill preset-night-interval-btn" data-sec="600">600s (10m)</button>
+                    <button type="button" class="lang-pill preset-night-interval-btn" data-sec="900">900s (15m)</button>
+                    <button type="button" class="lang-pill preset-night-interval-btn" data-sec="1800">1800s (30m)</button>
+                    <button type="button" class="lang-pill preset-night-interval-btn" data-sec="3600">3600s (1h)</button>
+                </div>
+                <input type="number" class="modal-input" id="inputNightCheckIntervalVal" placeholder="900" min="5" max="86400">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelNightCheckInterval">Anuluj</button>
+                    <button class="modal-btn-gold" id="btnConfirmNightCheckInterval">Zapisz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3.7. Edit X Check Interval (Day) Modal -->
+        <div class="modal-backdrop" id="modalEditXCheckInterval" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalXCheckIntervalTitle" style="color: #1D9BF0;">Interwał X w dzień (±30s losowo)</div>
+                <div class="modal-hint" id="txtModalXCheckIntervalHint">Wpisz liczbę sekund (np. 300 dla 5 minut). Losowe ±30s chroni przed blokadą.</div>
+                <div class="modal-presets-row" style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button type="button" class="lang-pill preset-x-interval-btn" data-sec="60">60s (1m)</button>
+                    <button type="button" class="lang-pill preset-x-interval-btn" data-sec="120">120s (2m)</button>
+                    <button type="button" class="lang-pill preset-x-interval-btn" data-sec="180">180s (3m)</button>
+                    <button type="button" class="lang-pill preset-x-interval-btn" data-sec="300">300s (5m)</button>
+                    <button type="button" class="lang-pill preset-x-interval-btn" data-sec="600">600s (10m)</button>
+                </div>
+                <input type="number" class="modal-input" id="inputXCheckIntervalVal" placeholder="300" min="30" max="86400">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelXCheckInterval">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmXCheckInterval" style="background: #1D9BF0;">Zapisz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3.8. Edit X Night Check Interval Modal -->
+        <div class="modal-backdrop" id="modalEditXNightCheckInterval" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-title" id="txtModalXNightCheckIntervalTitle" style="color: #F59E0B;">Interwał X w nocy (±30s losowo)</div>
+                <div class="modal-hint" id="txtModalXNightCheckIntervalHint">Wpisz liczbę sekund (np. 600 dla 10 minut). Losowe ±30s chroni przed blokadą.</div>
+                <div class="modal-presets-row" style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                    <button type="button" class="lang-pill preset-x-night-interval-btn" data-sec="300">300s (5m)</button>
+                    <button type="button" class="lang-pill preset-x-night-interval-btn" data-sec="600">600s (10m)</button>
+                    <button type="button" class="lang-pill preset-x-night-interval-btn" data-sec="900">900s (15m)</button>
+                    <button type="button" class="lang-pill preset-x-night-interval-btn" data-sec="1800">1800s (30m)</button>
+                    <button type="button" class="lang-pill preset-x-night-interval-btn" data-sec="3600">3600s (1h)</button>
+                </div>
+                <input type="number" class="modal-input" id="inputXNightCheckIntervalVal" placeholder="600" min="30" max="86400">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelXNightCheckInterval">Anuluj</button>
+                    <button class="modal-btn-gold" id="btnConfirmXNightCheckInterval">Zapisz</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 4. Edit Max News Limit Modal -->
         <div class="modal-backdrop" id="modalEditMaxNews" style="display: none;">
             <div class="modal-dialog">
@@ -562,6 +847,7 @@
                 <div class="modal-hint" id="txtModalXHint">np. @saylor, @elonmusk lub https://x.com/saylor</div>
                 <input type="text" class="modal-input" id="inputXHandle" placeholder="@saylor / URL profilu">
                 <input type="text" class="modal-input" id="inputXName" placeholder="Nazwa wyświetlana (opcjonalna)" style="margin-top: 8px;">
+                <input type="text" class="modal-input" id="inputXDesc" placeholder="Opis profilu (opcjonalny, np. Twórca Solany)" style="margin-top: 8px;">
                 <div class="modal-actions">
                     <button class="modal-btn-cancel" id="btnCancelX">Anuluj</button>
                     <button class="modal-btn-confirm" id="btnConfirmX" style="background: #1D9BF0;">Dodaj profil</button>
@@ -591,6 +877,7 @@
                 <div class="modal-hint" id="txtModalTelegramHint">np. @unfolded, @tier10k lub t.me/...</div>
                 <input type="text" class="modal-input" id="inputTelegramHandle" placeholder="@channelname / URL">
                 <input type="text" class="modal-input" id="inputTelegramName" placeholder="Nazwa kanału (opcjonalna)" style="margin-top: 8px;">
+                <input type="text" class="modal-input" id="inputTelegramDesc" placeholder="Opis kanału (opcjonalny, np. Alerty wielorybów)" style="margin-top: 8px;">
                 <div class="modal-actions">
                     <button class="modal-btn-cancel" id="btnCancelTelegram">Anuluj</button>
                     <button class="modal-btn-confirm" id="btnConfirmTelegram">Dodaj</button>
@@ -605,6 +892,7 @@
                 <div class="modal-hint" id="txtModalRssHint">URL kanału (np. https://strona.pl/feed.xml lub rss.xml)</div>
                 <input type="text" class="modal-input" id="inputRssUrl" placeholder="https://example.com/feed.xml">
                 <input type="text" class="modal-input" id="inputRssName" placeholder="Nazwa źródła (opcjonalna)" style="margin-top: 8px;">
+                <input type="text" class="modal-input" id="inputRssDesc" placeholder="Opis źródła (opcjonalny, np. Wiadomości z Polski)" style="margin-top: 8px;">
                 <div class="modal-actions">
                     <button class="modal-btn-cancel" id="btnCancelRss">Anuluj</button>
                     <button class="modal-btn-confirm" id="btnConfirmRss">Dodaj</button>
@@ -629,6 +917,28 @@
             </div>
             <div class="browser-body">
                 <iframe id="browserIframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+            </div>
+        <!-- 9. Edit History Cutoff Date Modal -->
+        <div class="modal-backdrop" id="modalEditHistoryCutoff" style="display: none;">
+            <div class="modal-dialog" style="max-width: 380px;">
+                <div class="modal-title" id="txtModalCutoffTitle">Data początkowa wiadomości</div>
+                <div class="modal-hint" id="txtModalCutoffHint">Wybierz szybki preset lub ustaw własną datę i godzinę:</div>
+                <div class="limit-presets-row" style="display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px 0;">
+                    <div class="preset-pill" data-cutoff="now" id="btnCutoffNow">Od teraz</div>
+                    <div class="preset-pill" data-cutoff="today" id="btnCutoffToday">Dziś (00:00)</div>
+                    <div class="preset-pill" data-cutoff="24h" id="btnCutoff24h">Ostatnie 24h</div>
+                    <div class="preset-pill" data-cutoff="3d" id="btnCutoff3d">Ostatnie 3 dni</div>
+                    <div class="preset-pill" data-cutoff="7d" id="btnCutoff7d">Ostatnie 7 dni</div>
+                    <div class="preset-pill" data-cutoff="this_month" id="btnCutoffThisMonth">Ten miesiąc</div>
+                    <div class="preset-pill" data-cutoff="last_month" id="btnCutoffLastMonth">Poprzedni miesiąc</div>
+                    <div class="preset-pill" data-cutoff="this_year" id="btnCutoffThisYear">Ten rok</div>
+                    <div class="preset-pill" data-cutoff="all" id="btnCutoffAll">Wszystkie (brak limitu)</div>
+                </div>
+                <input type="datetime-local" class="modal-input" id="inputHistoryCutoff" style="margin-bottom: 12px;">
+                <div class="modal-actions">
+                    <button class="modal-btn-cancel" id="btnCancelHistoryCutoff">Anuluj</button>
+                    <button class="modal-btn-confirm" id="btnConfirmHistoryCutoff">Zapisz</button>
+                </div>
             </div>
         </div>
 

@@ -10,16 +10,16 @@ export function AddKeyword(arg1) {
   return window['go']['main']['App']['AddKeyword'](arg1);
 }
 
-export function AddRssSource(arg1, arg2) {
-  return window['go']['main']['App']['AddRssSource'](arg1, arg2);
+export function AddRssSource(arg1, arg2, arg3) {
+  return window['go']['main']['App']['AddRssSource'](arg1, arg2, arg3);
 }
 
-export function AddTelegramSource(arg1, arg2) {
-  return window['go']['main']['App']['AddTelegramSource'](arg1, arg2);
+export function AddTelegramSource(arg1, arg2, arg3) {
+  return window['go']['main']['App']['AddTelegramSource'](arg1, arg2, arg3);
 }
 
-export function AddXSource(arg1, arg2) {
-  return window['go']['main']['App']['AddXSource'](arg1, arg2);
+export function AddXSource(arg1, arg2, arg3) {
+  return window['go']['main']['App']['AddXSource'](arg1, arg2, arg3);
 }
 
 export function ClearKeywords() {
@@ -36,6 +36,10 @@ export function ClearSourceFilters() {
 
 export function CloseWindow() {
   return window['go']['main']['App']['CloseWindow']();
+}
+
+export function DeleteNews(arg1) {
+  return window['go']['main']['App']['DeleteNews'](arg1);
 }
 
 export function ExportNewsCSV() {
@@ -60,6 +64,10 @@ export function FetchAvailablePairs() {
 
 export function GetState() {
   return window['go']['main']['App']['GetState']();
+}
+
+export function GetWindowSize() {
+  return window['go']['main']['App']['GetWindowSize']();
 }
 
 export function GetXSessionQR() {
@@ -126,6 +134,10 @@ export function SaveCryptoPanicToken(arg1) {
   return window['go']['main']['App']['SaveCryptoPanicToken'](arg1);
 }
 
+export function SaveWindowSize(arg1, arg2) {
+  return window['go']['main']['App']['SaveWindowSize'](arg1, arg2);
+}
+
 export function SaveXSession(arg1, arg2) {
   return window['go']['main']['App']['SaveXSession'](arg1, arg2);
 }
@@ -150,6 +162,10 @@ export function SetAutostart(arg1) {
   return window['go']['main']['App']['SetAutostart'](arg1);
 }
 
+export function SetCheckInterval(arg1) {
+  return window['go']['main']['App']['SetCheckInterval'](arg1);
+}
+
 export function SetLanguage(arg1) {
   return window['go']['main']['App']['SetLanguage'](arg1);
 }
@@ -162,12 +178,24 @@ export function SetMaxVibrations(arg1) {
   return window['go']['main']['App']['SetMaxVibrations'](arg1);
 }
 
+export function SetNewsFetchCutoffMillis(arg1) {
+  return window['go']['main']['App']['SetNewsFetchCutoffMillis'](arg1);
+}
+
+export function SetNightCheckInterval(arg1) {
+  return window['go']['main']['App']['SetNightCheckInterval'](arg1);
+}
+
 export function SetNightHours(arg1, arg2) {
   return window['go']['main']['App']['SetNightHours'](arg1, arg2);
 }
 
 export function SetNightModeEnabled(arg1) {
   return window['go']['main']['App']['SetNightModeEnabled'](arg1);
+}
+
+export function SetShowChart(arg1) {
+  return window['go']['main']['App']['SetShowChart'](arg1);
 }
 
 export function SetSourceFilter(arg1) {
@@ -180,6 +208,18 @@ export function SetSourceFilters(arg1) {
 
 export function SetUseInternalBrowser(arg1) {
   return window['go']['main']['App']['SetUseInternalBrowser'](arg1);
+}
+
+export function SetWindowSize(arg1, arg2) {
+  return window['go']['main']['App']['SetWindowSize'](arg1, arg2);
+}
+
+export function SetXCheckInterval(arg1) {
+  return window['go']['main']['App']['SetXCheckInterval'](arg1);
+}
+
+export function SetXNightCheckInterval(arg1) {
+  return window['go']['main']['App']['SetXNightCheckInterval'](arg1);
 }
 
 export function ShowWindow() {

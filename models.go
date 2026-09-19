@@ -16,6 +16,7 @@ const (
 	FeedSourceTypeDefiLlama   FeedSourceType = "DEFILLAMA"
 	FeedSourceTypeMacro       FeedSourceType = "MACRO"
 	FeedSourceTypeCryptoPanic FeedSourceType = "CRYPTOPANIC"
+	FeedSourceTypeBinance     FeedSourceType = "BINANCE"
 )
 
 type PricePoint struct {
@@ -38,6 +39,7 @@ type FeedSource struct {
 	URL                      string         `json:"url"`
 	ColorHex                 string         `json:"colorHex"`
 	Type                     FeedSourceType `json:"type"`
+	Description              string         `json:"description,omitempty"`
 	IsActive                 bool           `json:"isActive"`
 	FailureCount             int            `json:"failureCount"`
 	AutoDisabledAfterFailure bool           `json:"autoDisabledAfterFailure"`
@@ -72,6 +74,7 @@ type AppTab string
 const (
 	TabChartAndFeed AppTab = "CHART_AND_FEED"
 	TabFeedOnly     AppTab = "FEED_ONLY"
+	TabManage       AppTab = "MANAGE"
 	TabNew          AppTab = "NEW"
 	TabFavorites    AppTab = "FAVORITES"
 	TabSettings     AppTab = "SETTINGS"
@@ -108,6 +111,10 @@ type FullAppState struct {
 	NightModeStart             string           `json:"nightModeStart"`
 	NightModeEnd               string           `json:"nightModeEnd"`
 	IsNightTimeNow             bool             `json:"isNightTimeNow"`
+	CheckInterval              int              `json:"checkInterval"`
+	NightCheckInterval         int              `json:"nightCheckInterval"`
+	XCheckInterval             int              `json:"xCheckInterval"`
+	XNightCheckInterval        int              `json:"xNightCheckInterval"`
 	CurrentLanguage            string           `json:"currentLanguage"`
 	CryptoPanicTokenConfigured bool             `json:"cryptoPanicTokenConfigured"`
 	AlarmCycle                 AlarmCycleState  `json:"alarmCycle"`
@@ -118,6 +125,7 @@ type FullAppState struct {
 	AlwaysOnTop                bool             `json:"alwaysOnTop"`
 	Autostart                  bool             `json:"autostart"`
 	IsXLoggedIn                bool             `json:"isXLoggedIn"`
+	ShowChart                  bool             `json:"showChart"`
 }
 
 var DefaultInitialCoins = []CoinInfo{
@@ -139,11 +147,13 @@ var DefaultInitialCoins = []CoinInfo{
 var defaultSourcesJSON []byte
 
 type rawDefaultSourceItem struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	URL      string `json:"url"`
-	ColorHex string `json:"colorHex"`
-	Type     string `json:"type,omitempty"`
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	URL         string `json:"url"`
+	ColorHex    string `json:"colorHex"`
+	Type        string `json:"type,omitempty"`
+	Description string `json:"description,omitempty"`
+	IsActive    *bool  `json:"isActive,omitempty"`
 }
 
 type defaultSourcesConfig struct {
@@ -157,7 +167,7 @@ type defaultSourcesConfig struct {
 func GuessFeedSourceType(url, id string) FeedSourceType {
 	lowerURL := strings.ToLower(url)
 	lowerID := strings.ToLower(id)
-	if strings.HasPrefix(lowerID, "x_") || strings.Contains(lowerURL, "x.com") || strings.Contains(lowerURL, "twitter.com") {
+	if strings.HasPrefix(lowerID, "x_") || strings.Contains(lowerURL, "twitter.com") || strings.Contains(lowerURL, "x.com") {
 		return FeedSourceTypeX
 	}
 	if strings.HasPrefix(lowerID, "tg_") || strings.Contains(lowerURL, "t.me/") {
@@ -175,7 +185,17 @@ func GuessFeedSourceType(url, id string) FeedSourceType {
 	if lowerID == "cp_api" || strings.Contains(lowerURL, "cryptopanic.com") {
 		return FeedSourceTypeCryptoPanic
 	}
+	if lowerID == "binance_announcements" || strings.Contains(lowerURL, "binance.com/bapi") {
+		return FeedSourceTypeBinance
+	}
 	return FeedSourceTypeRSS
+}
+
+func determineDefaultActive(item rawDefaultSourceItem, st FeedSourceType) bool {
+	if item.IsActive != nil {
+		return *item.IsActive
+	}
+	return st != FeedSourceTypeX
 }
 
 func GetDefaultSources() []FeedSource {
@@ -187,42 +207,46 @@ func GetDefaultSources() []FeedSource {
 	var sources []FeedSource
 	for _, item := range cfg.Twitter {
 		sources = append(sources, FeedSource{
-			ID:       item.ID,
-			Name:     item.Name,
-			URL:      item.URL,
-			ColorHex: item.ColorHex,
-			Type:     FeedSourceTypeX,
-			IsActive: false,
+			ID:          item.ID,
+			Name:        item.Name,
+			URL:         item.URL,
+			ColorHex:    item.ColorHex,
+			Type:        FeedSourceTypeX,
+			Description: item.Description,
+			IsActive:    false,
 		})
 	}
 	for _, item := range cfg.Telegram {
 		sources = append(sources, FeedSource{
-			ID:       item.ID,
-			Name:     item.Name,
-			URL:      item.URL,
-			ColorHex: item.ColorHex,
-			Type:     FeedSourceTypeTelegram,
-			IsActive: false,
+			ID:          item.ID,
+			Name:        item.Name,
+			URL:         item.URL,
+			ColorHex:    item.ColorHex,
+			Type:        FeedSourceTypeTelegram,
+			Description: item.Description,
+			IsActive:    false,
 		})
 	}
 	for _, item := range cfg.RSS {
 		sources = append(sources, FeedSource{
-			ID:       item.ID,
-			Name:     item.Name,
-			URL:      item.URL,
-			ColorHex: item.ColorHex,
-			Type:     FeedSourceTypeRSS,
-			IsActive: false,
+			ID:          item.ID,
+			Name:        item.Name,
+			URL:         item.URL,
+			ColorHex:    item.ColorHex,
+			Type:        FeedSourceTypeRSS,
+			Description: item.Description,
+			IsActive:    false,
 		})
 	}
 	for _, item := range cfg.Reddit {
 		sources = append(sources, FeedSource{
-			ID:       item.ID,
-			Name:     item.Name,
-			URL:      item.URL,
-			ColorHex: item.ColorHex,
-			Type:     FeedSourceTypeReddit,
-			IsActive: false,
+			ID:          item.ID,
+			Name:        item.Name,
+			URL:         item.URL,
+			ColorHex:    item.ColorHex,
+			Type:        FeedSourceTypeReddit,
+			Description: item.Description,
+			IsActive:    false,
 		})
 	}
 	for _, item := range cfg.Special {
@@ -231,12 +255,13 @@ func GetDefaultSources() []FeedSource {
 			st = GuessFeedSourceType(item.URL, item.ID)
 		}
 		sources = append(sources, FeedSource{
-			ID:       item.ID,
-			Name:     item.Name,
-			URL:      item.URL,
-			ColorHex: item.ColorHex,
-			Type:     st,
-			IsActive: false,
+			ID:          item.ID,
+			Name:        item.Name,
+			URL:         item.URL,
+			ColorHex:    item.ColorHex,
+			Type:        st,
+			Description: item.Description,
+			IsActive:    false,
 		})
 	}
 	return sources

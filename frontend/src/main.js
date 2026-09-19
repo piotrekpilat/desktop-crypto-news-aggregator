@@ -7,6 +7,12 @@ const I18N = {
         alarm_banner_title: "Nowa wiadomość oczekuje",
         alarm_banner_info: "Wibracja %d z %d (kolejna za %ds)",
         alarm_action_seen: "Widziałem",
+        slide_down_alarm_on: "Alarm: WŁ",
+        slide_down_alarm_off: "Alarm: WYŁ",
+        slide_down_filters_active: "%d aktywne",
+        slide_down_filters_all: "Wszystkie",
+        slide_down_collapse: "Zwiń",
+        slide_down_expand: "Filtry i Alarm",
         night_banner: "🌙 Obowiązuje Tryb Nocny (%s – %s)",
         night_muted: "Wibracje wyciszone",
         news_title: "WIADOMOŚCI (%d)",
@@ -14,6 +20,9 @@ const I18N = {
         news_empty: "Brak wiadomości spełniających kryteria filtrów.",
         share_link: "Udostępnij link",
         open_link: "Otwórz link ↗",
+        copy_action: "Kopiuj",
+        copy_news: "Kopiuj wiadomość do schowka",
+        copied_status: "Skopiowano!",
         fav_title: "Ulubione Wiadomości (%d)",
         fav_empty_title: "Brak zapisanych wiadomości",
         fav_empty_desc: "Kliknij ikonkę gwiazdki na karcie newsa, aby dodać go tutaj.",
@@ -30,6 +39,15 @@ const I18N = {
         sources_filter_btn_all: "Źródła: Wszystkie",
         sources_filter_btn_selected: "Źródła: Wybrane (%d)",
         sources_filter_clear_all: "Wyczyść filtry",
+        date_filter_label: "Data:",
+        date_filter_today: "Dziś",
+        date_filter_7d: "7 dni",
+        date_filter_month: "Ten miesiąc",
+        date_filter_custom: "Zakres ▾",
+        date_filter_all: "Wszystkie",
+        date_filter_from: "Od:",
+        date_filter_to: "Do:",
+        date_filter_clear_hint: "Wyczyść filtr daty",
         settings_title: "Ustawienia Aplikacji",
         tab_pairs: "🪙 Pary",
         tab_sources: "📡 Źródła",
@@ -71,6 +89,23 @@ const I18N = {
         night_enable_desc: "Całkowicie blokuje wibracje w nocy",
         night_start: "Godzina rozpoczęcia (Od)",
         night_end: "Godzina zakończenia (Do)",
+        section_intervals: "CZĘSTOTLIWOŚĆ SPRAWDZANIA WIADOMOŚCI",
+        interval_day_title: "Interwał w dzień (Standardowy)",
+        interval_day_desc: "Częstotliwość sprawdzania nowych wiadomości",
+        interval_night_title: "Interwał w nocy (Tryb nocny)",
+        interval_night_desc: "Częstotliwość w cichych godzinach nocnych",
+        interval_x_day_title: "Interwał X w dzień (±30s)",
+        interval_x_day_desc: "Częstotliwość profili X w dzień (losowo ±30s)",
+        interval_x_night_title: "Interwał X w nocy (±30s)",
+        interval_x_night_desc: "Częstotliwość profili X w trybie nocnym (losowo ±30s)",
+        modal_interval_day_title: "Interwał sprawdzania w dzień (sekundy)",
+        modal_interval_day_hint: "Wpisz liczbę sekund (np. 60 dla 1 minuty)",
+        modal_interval_night_title: "Interwał w trybie nocnym (sekundy)",
+        modal_interval_night_hint: "Wpisz liczbę sekund (np. 900 dla 15 minut)",
+        modal_interval_x_day_title: "Interwał X w dzień (±30s losowo)",
+        modal_interval_x_day_hint: "Wpisz liczbę sekund (np. 300 dla 5 minut). Losowe ±30s chroni konto.",
+        modal_interval_x_night_title: "Interwał X w nocy (±30s losowo)",
+        modal_interval_x_night_hint: "Wpisz liczbę sekund (np. 600 dla 10 minut). Losowe ±30s chroni konto.",
         section_lang: "JĘZYK APLIKACJI",
         browser_title: "Używaj wewnętrznej przeglądarki",
         browser_desc: "Otwieraj linki wewnątrz aplikacji bez przełączania",
@@ -82,7 +117,21 @@ const I18N = {
         history_max_desc: "Limit przechowywanych wiadomości w pamięci",
         history_clear_btn: "Wyczyść historię",
         history_clear_title: "Wyczyścić historię newsów?",
-        history_clear_msg: "Ta operacja trwale usunie lokalnie zapisane newsy. Ulubione i ustawienia źródeł pozostaną bez zmian.",
+        history_clear_msg: "Ta operacja trwale usunie lokalnie zapisane newsy oraz ustawi datę pobierania na bieżącą chwilę. Ulubione i ustawienia źródeł pozostaną bez zmian.",
+        history_cutoff_title: "Pobieraj wiadomości od",
+        history_cutoff_desc: "Ignoruje wiadomości starsze niż wybrana data (Wyczyść ustawia na teraz)",
+        history_cutoff_no_limit: "Brak limitu (wszystkie)",
+        modal_cutoff_title: "Data początkowa wiadomości",
+        modal_cutoff_hint: "Wybierz szybki preset lub ustaw własną datę i godzinę:",
+        cutoff_preset_now: "Od teraz",
+        cutoff_preset_today: "Dziś (00:00)",
+        cutoff_preset_24h: "Ostatnie 24h",
+        cutoff_preset_3d: "Ostatnie 3 dni",
+        cutoff_preset_7d: "Ostatnie 7 dni",
+        cutoff_preset_this_month: "Ten miesiąc",
+        cutoff_preset_last_month: "Poprzedni miesiąc",
+        cutoff_preset_this_year: "Ten rok",
+        cutoff_preset_all: "Wszystkie (brak limitu)",
         section_import_export: "IMPORT / EKSPORT DANYCH",
         import_export_desc: "Kopia zapasowa konfiguracji (JSON) oraz wiadomości (CSV).",
         btn_export_settings: "Eksportuj ustawienia",
@@ -107,6 +156,19 @@ const I18N = {
         btn_clear: "Wyczyść",
         nav_chart: "Wykres",
         nav_feed: "Feed",
+        nav_manage: "Zarządzaj",
+        manage_title: "Zarządzaj wiadomościami",
+        manage_selected_count: "Wybrano: %d z %d",
+        manage_selected_short: "Wybrano: %d",
+        manage_select_all: "Zaznacz wszystkie",
+        manage_uncheck_all: "Odznacz wszystko",
+        manage_btn_delete: "Usuń (%d)",
+        manage_delete_confirm: "Czy na pewno chcesz usunąć %d wybranych wiadomości z lokalnej historii?",
+        manage_empty: "Brak wiadomości w historii do zarządzania.",
+        manage_filter_placeholder: "Filtruj do usunięcia...",
+        slide_down_show_chart_title: "Pokaż wykres",
+        slide_down_show_chart_desc_on: "Widoczny na ekranie głównym",
+        slide_down_show_chart_desc_off: "Ukryty (tylko strumień)",
         nav_new: "Nowe",
         nav_fav: "Ulubione",
         nav_settings: "Ustawienia",
@@ -125,6 +187,12 @@ const I18N = {
         alarm_banner_title: "New message waiting",
         alarm_banner_info: "Vibration %d of %d (next in %ds)",
         alarm_action_seen: "Seen",
+        slide_down_alarm_on: "Alarm: ON",
+        slide_down_alarm_off: "Alarm: OFF",
+        slide_down_filters_active: "%d active",
+        slide_down_filters_all: "All filters",
+        slide_down_collapse: "Collapse",
+        slide_down_expand: "Filters & Alarm",
         night_banner: "🌙 Night Mode Active (%s – %s)",
         night_muted: "Vibrations muted",
         news_title: "NEWS (%d)",
@@ -132,6 +200,9 @@ const I18N = {
         news_empty: "No news matching filter criteria.",
         share_link: "Share link",
         open_link: "Open link ↗",
+        copy_action: "Copy",
+        copy_news: "Copy news to clipboard",
+        copied_status: "Copied!",
         fav_title: "Favorite News (%d)",
         fav_empty_title: "No saved news",
         fav_empty_desc: "Click the star icon on any news card to add it here.",
@@ -148,6 +219,15 @@ const I18N = {
         sources_filter_btn_all: "Sources: All",
         sources_filter_btn_selected: "Sources: Selected (%d)",
         sources_filter_clear_all: "Clear filters",
+        date_filter_label: "Date:",
+        date_filter_today: "Today",
+        date_filter_7d: "7 days",
+        date_filter_month: "This month",
+        date_filter_custom: "Range ▾",
+        date_filter_all: "All",
+        date_filter_from: "From:",
+        date_filter_to: "To:",
+        date_filter_clear_hint: "Clear date filter",
         settings_title: "App Settings",
         tab_pairs: "🪙 Pairs",
         tab_sources: "📡 Sources",
@@ -189,6 +269,23 @@ const I18N = {
         night_enable_desc: "Completely mutes vibrations at night",
         night_start: "Start time (From)",
         night_end: "End time (To)",
+        section_intervals: "NEWS CHECK FREQUENCY",
+        interval_day_title: "Day Interval (Standard)",
+        interval_day_desc: "Frequency of checking for new messages",
+        interval_night_title: "Night Interval (Night mode)",
+        interval_night_desc: "Frequency during quiet night hours",
+        interval_x_day_title: "X Day Interval (±30s)",
+        interval_x_day_desc: "Check frequency for X profiles during day (±30s anti-bot)",
+        interval_x_night_title: "X Night Interval (±30s)",
+        interval_x_night_desc: "Check frequency for X profiles during night (±30s anti-bot)",
+        modal_interval_day_title: "Day Check Interval (seconds)",
+        modal_interval_day_hint: "Enter number of seconds (e.g. 60 for 1 minute)",
+        modal_interval_night_title: "Night Check Interval (seconds)",
+        modal_interval_night_hint: "Enter number of seconds (e.g. 900 for 15 minutes)",
+        modal_interval_x_day_title: "X Day Check Interval (seconds)",
+        modal_interval_x_day_hint: "Enter seconds (e.g. 300 for 5 minutes). Random ±30s avoids rate limits.",
+        modal_interval_x_night_title: "X Night Check Interval (seconds)",
+        modal_interval_x_night_hint: "Enter seconds (e.g. 600 for 10 minutes). Random ±30s avoids rate limits.",
         section_lang: "LANGUAGE",
         browser_title: "Use internal browser",
         browser_desc: "Open news links inside app without switching",
@@ -200,7 +297,21 @@ const I18N = {
         history_max_desc: "Maximum number of news kept in local memory",
         history_clear_btn: "Clear history",
         history_clear_title: "Clear news history?",
-        history_clear_msg: "This permanently removes locally saved news. Favorites and source settings will remain.",
+        history_clear_msg: "This permanently removes locally saved news and sets the fetch start date to right now. Favorites and source settings will remain.",
+        history_cutoff_title: "Fetch news from",
+        history_cutoff_desc: "Ignores news older than selected date (Clear sets to now)",
+        history_cutoff_no_limit: "No limit (all)",
+        modal_cutoff_title: "News fetch start date",
+        modal_cutoff_hint: "Choose a quick preset or specify date and time:",
+        cutoff_preset_now: "From now",
+        cutoff_preset_today: "Today (00:00)",
+        cutoff_preset_24h: "Last 24h",
+        cutoff_preset_3d: "Last 3 days",
+        cutoff_preset_7d: "Last 7 days",
+        cutoff_preset_this_month: "This month",
+        cutoff_preset_last_month: "Last month",
+        cutoff_preset_this_year: "This year",
+        cutoff_preset_all: "All (no limit)",
         section_import_export: "IMPORT & EXPORT DATA",
         import_export_desc: "Backup configuration (JSON) and news history (CSV).",
         btn_export_settings: "Export settings",
@@ -225,6 +336,19 @@ const I18N = {
         btn_clear: "Clear",
         nav_chart: "Chart",
         nav_feed: "Feed",
+        nav_manage: "Manage",
+        manage_title: "Manage News",
+        manage_selected_count: "Selected: %d of %d",
+        manage_selected_short: "Selected: %d",
+        manage_select_all: "Select all",
+        manage_uncheck_all: "Uncheck all",
+        manage_btn_delete: "Delete (%d)",
+        manage_delete_confirm: "Are you sure you want to delete %d selected news from local history?",
+        manage_empty: "No news in history to manage.",
+        manage_filter_placeholder: "Filter to delete...",
+        slide_down_show_chart_title: "Show chart",
+        slide_down_show_chart_desc_on: "Visible on main screen",
+        slide_down_show_chart_desc_off: "Hidden (feed only)",
         nav_new: "New",
         nav_fav: "Favorites",
         nav_settings: "Settings",
@@ -243,6 +367,12 @@ const I18N = {
         alarm_banner_title: "Neue Nachricht wartet",
         alarm_banner_info: "Vibration %d von %d (nächste in %ds)",
         alarm_action_seen: "Gesehen",
+        slide_down_alarm_on: "Alarm: AN",
+        slide_down_alarm_off: "Alarm: AUS",
+        slide_down_filters_active: "%d aktiv",
+        slide_down_filters_all: "Alle",
+        slide_down_collapse: "Einklappen",
+        slide_down_expand: "Filter & Alarm",
         night_banner: "🌙 Nachtmodus Aktiv (%s – %s)",
         night_muted: "Vibrationen stummgeschaltet",
         news_title: "NACHRICHTEN (%d)",
@@ -250,6 +380,9 @@ const I18N = {
         news_empty: "Keine Nachrichten entsprechen den Filterkriterien.",
         share_link: "Link teilen",
         open_link: "Link öffnen ↗",
+        copy_action: "Kopieren",
+        copy_news: "News in die Zwischenablage kopieren",
+        copied_status: "Kopiert!",
         fav_title: "Favoriten (%d)",
         fav_empty_title: "Keine gespeicherten Nachrichten",
         fav_empty_desc: "Klicken Sie auf den Stern bei einer Nachricht, um sie hier zu speichern.",
@@ -266,6 +399,15 @@ const I18N = {
         sources_filter_btn_all: "Quellen: Alle",
         sources_filter_btn_selected: "Quellen: Ausgewählt (%d)",
         sources_filter_clear_all: "Filter zurücksetzen",
+        date_filter_label: "Datum:",
+        date_filter_today: "Heute",
+        date_filter_7d: "7 Tage",
+        date_filter_month: "Dieser Monat",
+        date_filter_custom: "Bereich ▾",
+        date_filter_all: "Alle",
+        date_filter_from: "Von:",
+        date_filter_to: "Bis:",
+        date_filter_clear_hint: "Datumsfilter leeren",
         settings_title: "Einstellungen",
         tab_pairs: "🪙 Paare",
         tab_sources: "📡 Quellen",
@@ -307,6 +449,23 @@ const I18N = {
         night_enable_desc: "Deaktiviert Vibrationen nachts komplett",
         night_start: "Startzeit (Von)",
         night_end: "Endzeit (Bis)",
+        section_intervals: "NACHRICHTEN-ABRUFINTERVALL",
+        interval_day_title: "Tagesintervall (Standard)",
+        interval_day_desc: "Häufigkeit der Nachrichtenabfrage am Tag",
+        interval_night_title: "Nachtintervall (Nachtmodus)",
+        interval_night_desc: "Häufigkeit während der Nachtruhe",
+        interval_x_day_title: "X-Tagesintervall (±30s)",
+        interval_x_day_desc: "Abrufhäufigkeit für X-Profile am Tag (±30s Anti-Bot)",
+        interval_x_night_title: "X-Nachtintervall (±30s)",
+        interval_x_night_desc: "Abrufhäufigkeit für X-Profile bei Nacht (±30s Anti-Bot)",
+        modal_interval_day_title: "Tages-Abrufintervall (Sekunden)",
+        modal_interval_day_hint: "Sekundenanzahl eingeben (z. B. 60 für 1 Minute)",
+        modal_interval_night_title: "Nacht-Abrufintervall (Sekunden)",
+        modal_interval_night_hint: "Sekundenanzahl eingeben (z. B. 900 für 15 Minuten)",
+        modal_interval_x_day_title: "X-Tagesabrufintervall (Sekunden)",
+        modal_interval_x_day_hint: "Sekundenanzahl eingeben (z. B. 300 für 5 Min.). Zufall ±30s schützt vor Sperren.",
+        modal_interval_x_night_title: "X-Nachtabrufintervall (Sekunden)",
+        modal_interval_x_night_hint: "Sekundenanzahl eingeben (z. B. 600 für 10 Min.). Zufall ±30s schützt vor Sperren.",
         section_lang: "SPRACHE",
         browser_title: "Internen Browser nutzen",
         browser_desc: "Links direkt in der App ohne App-Wechsel öffnen",
@@ -318,7 +477,21 @@ const I18N = {
         history_max_desc: "Maximales Limit für den lokalen Speicher",
         history_clear_btn: "Verlauf löschen",
         history_clear_title: "Verlauf wirklich löschen?",
-        history_clear_msg: "Dies löscht gespeicherte Nachrichten dauerhaft. Favoriten bleiben erhalten.",
+        history_clear_msg: "Dadurch werden gespeicherte Nachrichten gelöscht und das Abrufdatum auf jetzt gesetzt. Favoriten bleiben erhalten.",
+        history_cutoff_title: "Nachrichten abrufen ab",
+        history_cutoff_desc: "Ignoriert Nachrichten vor diesem Datum (Löschen setzt auf jetzt)",
+        history_cutoff_no_limit: "Kein Limit (alle)",
+        modal_cutoff_title: "Startdatum für Nachrichtenabruf",
+        modal_cutoff_hint: "Wählen Sie ein Preset oder legen Sie Datum und Uhrzeit fest:",
+        cutoff_preset_now: "Ab jetzt",
+        cutoff_preset_today: "Heute (00:00)",
+        cutoff_preset_24h: "Letzte 24h",
+        cutoff_preset_3d: "Letzte 3 Tage",
+        cutoff_preset_7d: "Letzte 7 Tage",
+        cutoff_preset_this_month: "Diesen Monat",
+        cutoff_preset_last_month: "Letzten Monat",
+        cutoff_preset_this_year: "Dieses Jahr",
+        cutoff_preset_all: "Alle (kein Limit)",
         section_import_export: "DATEN IMPORTIEREN & EXPORTIEREN",
         import_export_desc: "Sicherungskopie der Einstellungen (JSON) und Nachrichten (CSV).",
         btn_export_settings: "Einstellungen exportieren",
@@ -341,8 +514,21 @@ const I18N = {
         btn_add: "Hinzufügen",
         btn_save: "Speichern",
         btn_clear: "Löschen",
-        nav_chart: "Wykres",
+        nav_chart: "Chart",
         nav_feed: "Feed",
+        nav_manage: "Verwalten",
+        manage_title: "Nachrichten verwalten",
+        manage_selected_count: "Ausgewählt: %d von %d",
+        manage_selected_short: "Ausgewählt: %d",
+        manage_select_all: "Alle auswählen",
+        manage_uncheck_all: "Alle abwählen",
+        manage_btn_delete: "Löschen (%d)",
+        manage_delete_confirm: "Möchten Sie wirklich %d ausgewählte Nachrichten aus dem lokalen Verlauf löschen?",
+        manage_empty: "Keine Nachrichten zum Verwalten im Verlauf.",
+        manage_filter_placeholder: "Zum Löschen filtern...",
+        slide_down_show_chart_title: "Chart anzeigen",
+        slide_down_show_chart_desc_on: "Auf Hauptbildschirm sichtbar",
+        slide_down_show_chart_desc_off: "Ausgeblendet (nur Feed)",
         nav_new: "Neu",
         nav_fav: "Favoriten",
         nav_settings: "Einstellungen",
@@ -365,7 +551,146 @@ let sourceFilterSearchQuery = "";
 let newsSearchQuery = "";
 let newNewsSearchQuery = "";
 let favNewsSearchQuery = "";
+let manageSearchQuery = "";
+let selectedManageNewsIds = new Set();
 let sourceManageSearchQuery = "";
+
+// Date Range Filter State (Default: "today", "all" at the end)
+let dateFilterPreset = "today";
+let dateFilterFrom = "";
+let dateFilterTo = "";
+
+function formatDateIso(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+}
+
+function initDefaultDateFilter() {
+    const now = new Date();
+    dateFilterPreset = "today";
+    dateFilterFrom = formatDateIso(now);
+    dateFilterTo = formatDateIso(now);
+}
+
+function setDatePreset(preset) {
+    dateFilterPreset = preset;
+    const now = new Date();
+    if (preset === 'today') {
+        dateFilterFrom = formatDateIso(now);
+        dateFilterTo = formatDateIso(now);
+    } else if (preset === '7d') {
+        const past7 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+        dateFilterFrom = formatDateIso(past7);
+        dateFilterTo = formatDateIso(now);
+    } else if (preset === 'month') {
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        dateFilterFrom = formatDateIso(startOfMonth);
+        dateFilterTo = formatDateIso(now);
+    } else if (preset === 'all') {
+        dateFilterFrom = "";
+        dateFilterTo = "";
+    }
+    updateDateFilterInputs();
+    if (currentAppState) renderState(currentAppState);
+}
+
+function toggleCustomDateBox() {
+    const box = document.getElementById('dateCustomInputsBox');
+    const chip = document.getElementById('chipDateCustom');
+    if (!box) return;
+    const isHidden = box.style.display === 'none';
+    box.style.display = isHidden ? 'flex' : 'none';
+    if (chip) chip.classList.toggle('active', isHidden || dateFilterPreset === 'custom');
+}
+
+function onDateInputChange() {
+    const inputFrom = document.getElementById('inputDateFrom');
+    const inputTo = document.getElementById('inputDateTo');
+    dateFilterFrom = inputFrom ? inputFrom.value : "";
+    dateFilterTo = inputTo ? inputTo.value : "";
+    dateFilterPreset = "custom";
+    if (currentAppState) renderState(currentAppState);
+}
+
+function isWithinDateRange(publishedAtMillis, fromStr, toStr) {
+    if (!publishedAtMillis) return true;
+    if (fromStr) {
+        const parts = fromStr.split('-').map(Number);
+        if (parts.length === 3 && !isNaN(parts[0])) {
+            const fromMillis = new Date(parts[0], parts[1] - 1, parts[2], 0, 0, 0, 0).getTime();
+            if (publishedAtMillis < fromMillis) return false;
+        }
+    }
+    if (toStr) {
+        const parts = toStr.split('-').map(Number);
+        if (parts.length === 3 && !isNaN(parts[0])) {
+            const toMillis = new Date(parts[0], parts[1] - 1, parts[2], 23, 59, 59, 999).getTime();
+            if (publishedAtMillis > toMillis) return false;
+        }
+    }
+    return true;
+}
+
+function updateDateFilterInputs() {
+    const inputFrom = document.getElementById('inputDateFrom');
+    const inputTo = document.getElementById('inputDateTo');
+    if (inputFrom && document.activeElement !== inputFrom) inputFrom.value = dateFilterFrom;
+    if (inputTo && document.activeElement !== inputTo) inputTo.value = dateFilterTo;
+}
+
+function updateDateFilterUI() {
+    const lblDate = document.getElementById('lblDateFilter');
+    const chipToday = document.getElementById('chipDateToday');
+    const chip7d = document.getElementById('chipDate7d');
+    const chipMonth = document.getElementById('chipDateMonth');
+    const chipCustom = document.getElementById('chipDateCustom');
+    const chipAll = document.getElementById('chipDateAll');
+    const lblFrom = document.getElementById('lblDateFrom');
+    const lblTo = document.getElementById('lblDateTo');
+    const btnClear = document.getElementById('btnClearDateFilter');
+
+    if (lblDate) lblDate.innerText = '📅 ' + t('date_filter_label');
+    if (chipToday) {
+        chipToday.innerText = t('date_filter_today');
+        chipToday.classList.toggle('active', dateFilterPreset === 'today');
+    }
+    if (chip7d) {
+        chip7d.innerText = t('date_filter_7d');
+        chip7d.classList.toggle('active', dateFilterPreset === '7d');
+    }
+    if (chipMonth) {
+        chipMonth.innerText = t('date_filter_month');
+        chipMonth.classList.toggle('active', dateFilterPreset === 'month');
+    }
+    if (chipCustom) {
+        chipCustom.innerText = t('date_filter_custom');
+        const box = document.getElementById('dateCustomInputsBox');
+        const isBoxOpen = box && box.style.display !== 'none';
+        chipCustom.classList.toggle('active', dateFilterPreset === 'custom' || isBoxOpen);
+    }
+    if (chipAll) {
+        chipAll.innerText = t('date_filter_all');
+        chipAll.classList.toggle('active', dateFilterPreset === 'all');
+    }
+    if (lblFrom) lblFrom.innerText = t('date_filter_from');
+    if (lblTo) lblTo.innerText = t('date_filter_to');
+    if (btnClear) btnClear.title = t('date_filter_clear_hint');
+
+    updateDateFilterInputs();
+}
+
+initDefaultDateFilter();
+
+function formatIntervalText(sec) {
+    if (!sec || sec < 60) return `${sec || 60} s`;
+    const min = Math.round(sec / 60);
+    if (sec % 60 === 0) {
+        return `${sec} s (${min} min)`;
+    }
+    return `${sec} s (~${min} min)`;
+}
 
 // Web Audio API Alarm Sound
 function playAlarmSound() {
@@ -397,6 +722,100 @@ function t(key, ...args) {
 }
 
 // =========================================================================
+// 🎛️ SLIDE-DOWN FILTER & ALARM BAR LOGIC
+// =========================================================================
+let isSlideDownOpen = false;
+
+function toggleSlideDown(open) {
+    const panel = document.getElementById('slideDownPanel');
+    const container = document.getElementById('slideDownContainer');
+    const toggleTxt = document.getElementById('txtSlideDownToggle');
+    if (!panel || !container) return;
+
+    if (open !== undefined) {
+        isSlideDownOpen = Boolean(open);
+    } else {
+        isSlideDownOpen = !isSlideDownOpen;
+    }
+
+    if (isSlideDownOpen) {
+        panel.style.display = 'block';
+        container.classList.add('open');
+        if (toggleTxt) toggleTxt.innerText = t('slide_down_collapse');
+    } else {
+        panel.style.display = 'none';
+        container.classList.remove('open');
+        if (toggleTxt) toggleTxt.innerText = t('slide_down_expand');
+    }
+}
+
+function updateSlideDownTriggerUI(state) {
+    if (!state) return;
+    const pillAlarm = document.getElementById('pillAlarmStatus');
+    const txtAlarm = document.getElementById('txtSlideDownAlarm');
+    const pillFilters = document.getElementById('pillFiltersStatus');
+    const txtFilters = document.getElementById('txtSlideDownFilters');
+    const txtDate = document.getElementById('txtSlideDownDate');
+    const txtSearch = document.getElementById('txtSlideDownSearch');
+    const triggerBar = document.getElementById('slideDownTriggerBar');
+    const toggleTxt = document.getElementById('txtSlideDownToggle');
+    const collapseTxt = document.getElementById('txtCollapseSlideDown');
+
+    if (toggleTxt) toggleTxt.innerText = isSlideDownOpen ? t('slide_down_collapse') : t('slide_down_expand');
+    if (collapseTxt) collapseTxt.innerText = t('slide_down_collapse');
+
+    // 1. Alarm status pill
+    if (pillAlarm && txtAlarm) {
+        if (state.alarmEnabled) {
+            pillAlarm.classList.add('active');
+            txtAlarm.innerText = t('slide_down_alarm_on');
+        } else {
+            pillAlarm.classList.remove('active');
+            txtAlarm.innerText = t('slide_down_alarm_off');
+        }
+    }
+
+    // 2. Active filters count
+    const selFilters = state.selectedSourceFilters || [];
+    const hasSpecificSources = selFilters.length > 0 && !selFilters.some(f => f === 'Wszystkie' || f === 'All' || f === 'Alle');
+    const sourcesCount = hasSpecificSources ? selFilters.length : 0;
+    const keywordsCount = (state.keywords || []).length;
+    const searchCount = (newsSearchQuery && newsSearchQuery.trim().length > 0) ? 1 : 0;
+    const dateCount = (dateFilterPreset !== 'today') ? 1 : 0;
+    const totalActive = sourcesCount + keywordsCount + searchCount + dateCount;
+
+    if (pillFilters && txtFilters && triggerBar) {
+        if (totalActive > 0) {
+            pillFilters.classList.add('active');
+            txtFilters.innerText = t('slide_down_filters_active', totalActive);
+            triggerBar.classList.add('has-active-filters');
+        } else {
+            pillFilters.classList.remove('active');
+            txtFilters.innerText = t('slide_down_filters_all');
+            triggerBar.classList.remove('has-active-filters');
+        }
+    }
+
+    // 3. Date label
+    if (txtDate) {
+        txtDate.innerText = '• ' + t('date_filter_' + dateFilterPreset);
+    }
+
+    // 4. Search label
+    if (txtSearch) {
+        if (newsSearchQuery && newsSearchQuery.trim().length > 0) {
+            txtSearch.style.display = 'inline';
+            txtSearch.innerText = '• "' + newsSearchQuery.trim() + '"';
+            txtSearch.classList.add('highlight');
+        } else {
+            txtSearch.style.display = 'none';
+            txtSearch.innerText = '';
+            txtSearch.classList.remove('highlight');
+        }
+    }
+}
+
+// =========================================================================
 // RENDER FULL APPLICATION STATE
 // =========================================================================
 function renderState(state) {
@@ -425,6 +844,18 @@ function renderState(state) {
         txtAlarmStatus.innerText = t('alarm_disabled');
         txtAlarmStatus.classList.add('disabled');
         iconBox.classList.add('disabled');
+    }
+
+    // 2b. Global Chart Toggle Bar
+    const chkChart = document.getElementById('chkChartToggle');
+    if (chkChart) {
+        chkChart.checked = state.showChart !== false;
+        const txtChartTitle = document.getElementById('txtChartTitle');
+        if (txtChartTitle) txtChartTitle.innerText = t('slide_down_show_chart_title');
+        const txtChartStatus = document.getElementById('txtChartStatus');
+        if (txtChartStatus) {
+            txtChartStatus.innerText = state.showChart !== false ? t('slide_down_show_chart_desc_on') : t('slide_down_show_chart_desc_off');
+        }
     }
 
     // 3. Night Mode Banner
@@ -473,6 +904,9 @@ function renderState(state) {
     // 7. Select2 Sources Filter Bar
     renderSelect2SourceFilterBar(state.sourcesList || [], state.selectedSourceFilters || ['Wszystkie']);
 
+    // 7b. Update Slide-down Bar Trigger UI
+    updateSlideDownTriggerUI(state);
+
     // 8. Unread Badge Counter in Bottom Nav
     const navNewBadge = document.getElementById('navNewBadge');
     if (navNewBadge) {
@@ -494,7 +928,10 @@ function renderState(state) {
     });
 
     document.getElementById('lblNavChart').innerText = t('nav_chart');
-    document.getElementById('lblNavFeed').innerText = t('nav_feed');
+    const lblNavManage = document.getElementById('lblNavManage');
+    if (lblNavManage) lblNavManage.innerText = t('nav_manage');
+    const lblNavFeed = document.getElementById('lblNavFeed');
+    if (lblNavFeed) lblNavFeed.innerText = t('nav_feed');
     document.getElementById('lblNavNew').innerText = t('nav_new');
     document.getElementById('lblNavFav').innerText = t('nav_fav');
     document.getElementById('lblNavSettings').innerText = t('nav_settings');
@@ -502,11 +939,13 @@ function renderState(state) {
     // 10. Switch visible view tab & Render News Cards
     const viewFeed = document.getElementById('viewFeed');
     const chartSection = document.getElementById('chartSection');
+    const viewManage = document.getElementById('viewManage');
     const viewNew = document.getElementById('viewNew');
     const viewFavorites = document.getElementById('viewFavorites');
     const viewSettings = document.getElementById('viewSettings');
 
     viewFeed.style.display = 'none';
+    if (viewManage) viewManage.style.display = 'none';
     if (viewNew) viewNew.style.display = 'none';
     viewFavorites.style.display = 'none';
     viewSettings.style.display = 'none';
@@ -515,15 +954,21 @@ function renderState(state) {
 
     if (state.currentTab === 'CHART_AND_FEED' || state.currentTab === 'FEED_ONLY') {
         viewFeed.style.display = 'flex';
-        chartSection.style.display = state.currentTab === 'CHART_AND_FEED' ? 'block' : 'none';
+        chartSection.style.display = state.showChart !== false ? 'block' : 'none';
 
         const q = newsSearchQuery.toLowerCase().trim();
         const filtered = baseNewsList.filter(n => {
-            if (!q) return true;
-            return (n.title && n.title.toLowerCase().includes(q)) ||
-                   (n.description && n.description.toLowerCase().includes(q)) ||
-                   (n.source && n.source.toLowerCase().includes(q)) ||
-                   (n.tag && n.tag.toLowerCase().includes(q));
+            if (q) {
+                const matchesQ = (n.title && n.title.toLowerCase().includes(q)) ||
+                                 (n.description && n.description.toLowerCase().includes(q)) ||
+                                 (n.source && n.source.toLowerCase().includes(q)) ||
+                                 (n.tag && n.tag.toLowerCase().includes(q));
+                if (!matchesQ) return false;
+            }
+            if (!isWithinDateRange(n.publishedAtMillis, dateFilterFrom, dateFilterTo)) {
+                return false;
+            }
+            return true;
         });
 
         document.getElementById('txtNewsCount').innerText = t('news_title', filtered.length);
@@ -531,6 +976,12 @@ function renderState(state) {
         const inputNews = document.getElementById('inputNewsSearch');
         if (inputNews) inputNews.placeholder = t('news_search_placeholder');
         renderNewsCards(filtered, state.selectedNewsID, document.getElementById('newsCardsList'));
+        updateDateFilterUI();
+    } else if (state.currentTab === 'MANAGE') {
+        if (viewManage) {
+            viewManage.style.display = 'flex';
+            renderManageView(baseNewsList);
+        }
     } else if (state.currentTab === 'NEW') {
         if (viewNew) {
             viewNew.style.display = 'flex';
@@ -630,6 +1081,7 @@ function renderKeywords(keywords) {
 function renderSelect2SourceFilterBar(sourcesList, selectedFilters) {
     const btnLabel = document.getElementById('lblSourcesFilterButton');
     const chipsContainer = document.getElementById('activeSourceChips');
+    const chipsBar = document.getElementById('activeSourceChipsBar');
     if (!btnLabel || !chipsContainer) return;
 
     const hasAll = !selectedFilters || selectedFilters.length === 0 ||
@@ -637,8 +1089,10 @@ function renderSelect2SourceFilterBar(sourcesList, selectedFilters) {
 
     if (hasAll) {
         btnLabel.innerText = t('sources_filter_btn_all');
+        if (chipsBar) chipsBar.style.display = 'none';
     } else {
         btnLabel.innerText = t('sources_filter_btn_selected', selectedFilters.length);
+        if (chipsBar) chipsBar.style.display = 'flex';
     }
 
     chipsContainer.innerHTML = '';
@@ -706,7 +1160,9 @@ function renderSelect2SourcesList() {
     const sorted = [...sources].sort((a, b) => a.name.localeCompare(b.name));
     const filtered = sorted.filter(s => {
         if (!query) return true;
-        return s.name.toLowerCase().includes(query) || s.url.toLowerCase().includes(query);
+        return s.name.toLowerCase().includes(query) || 
+               (s.description && s.description.toLowerCase().includes(query)) ||
+               s.url.toLowerCase().includes(query);
     });
 
     filtered.forEach(src => {
@@ -718,6 +1174,7 @@ function renderSelect2SourcesList() {
                 <span class="select2-source-color-dot" style="background: ${src.colorHex};"></span>
                 <div class="select2-source-info">
                     <div class="select2-source-name">${escapeHtml(src.name)}</div>
+                    ${src.description ? `<div class="select2-source-desc">${escapeHtml(src.description)}</div>` : ''}
                     <div class="select2-source-url">${escapeHtml(src.url)}</div>
                 </div>
             </div>
@@ -747,6 +1204,28 @@ function renderSelect2SourcesList() {
 
         container.appendChild(item);
     });
+}
+
+// Format News for Clipboard (Provider Y-m-d:\nSummary\n\nLink)
+function formatNewsForClipboard(news) {
+    let dateStr = '';
+    const ts = (news && news.publishedAtMillis && news.publishedAtMillis > 0) ? news.publishedAtMillis : Date.now();
+    const d = new Date(ts);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    dateStr = `${y}-${m}-${day}`;
+
+    let message = (news && news.title ? news.title : '').trim();
+    if (news && news.description && news.description.startsWith('PROGNOZA:')) {
+        message += `\n${news.description.trim()}`;
+    }
+
+    let text = `${(news && news.source) || ''} ${dateStr}:\n${message}`;
+    if (news && news.url && news.url.trim()) {
+        text += `\n\n${news.url.trim()}`;
+    }
+    return text;
 }
 
 // Render News Cards
@@ -822,12 +1301,16 @@ function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = f
             ${macroHtml}
             <div class="card-bottom-row">
                 <div class="card-tag">${escapeHtml(news.tag)}</div>
-                ${news.url ? `
-                    <div class="card-links-row">
+                <div class="card-links-row">
+                    <span class="link-btn-copy" title="${t('copy_news')}">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px; margin-right: 3px;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <span>${t('copy_action')}</span>
+                    </span>
+                    ${news.url ? `
                         <span class="link-btn-share">${t('share_link')}</span>
                         <span class="link-btn-open">${t('open_link')}</span>
-                    </div>
-                ` : ''}
+                    ` : ''}
+                </div>
             </div>
         `;
 
@@ -840,6 +1323,32 @@ function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = f
             e.stopPropagation();
             window.go.main.App.ToggleFavorite(news.id).then(renderState);
         };
+
+        const copyBtn = card.querySelector('.link-btn-copy');
+        if (copyBtn) {
+            copyBtn.onclick = (e) => {
+                e.stopPropagation();
+                const copyText = formatNewsForClipboard(news);
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(copyText);
+                } else {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = copyText;
+                    textArea.style.position = "fixed";
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy'); } catch (_) {}
+                    document.body.removeChild(textArea);
+                }
+                const label = copyBtn.querySelector('span');
+                if (label) {
+                    label.innerText = t('copied_status');
+                    setTimeout(() => { label.innerText = t('copy_action'); }, 1500);
+                }
+            };
+        }
 
         const shareBtn = card.querySelector('.link-btn-share');
         if (shareBtn) {
@@ -863,6 +1372,116 @@ function renderNewsCards(newsList, selectedNewsId, container, isFavoritesTab = f
         }
 
         container.appendChild(card);
+    });
+}
+
+function renderManageView(newsList) {
+    const txtManageTitle = document.getElementById('txtManageTitle');
+    if (txtManageTitle) txtManageTitle.innerText = t('manage_title');
+    const lblManageSelectAll = document.getElementById('lblManageSelectAll');
+    if (lblManageSelectAll) lblManageSelectAll.innerText = t('manage_select_all');
+    const btnManageDeselect = document.getElementById('btnManageDeselect');
+    if (btnManageDeselect) btnManageDeselect.innerText = t('manage_uncheck_all');
+    const inputManageSearch = document.getElementById('inputManageSearch');
+    if (inputManageSearch) inputManageSearch.placeholder = t('manage_filter_placeholder');
+
+    const q = manageSearchQuery.toLowerCase().trim();
+    const filtered = (newsList || []).filter(n => {
+        if (!q) return true;
+        return (n.title && n.title.toLowerCase().includes(q)) ||
+               (n.description && n.description.toLowerCase().includes(q)) ||
+               (n.source && n.source.toLowerCase().includes(q)) ||
+               (n.tag && n.tag.toLowerCase().includes(q));
+    });
+
+    const txtManageSelectedCount = document.getElementById('txtManageSelectedCount');
+    if (txtManageSelectedCount) {
+        txtManageSelectedCount.innerText = t('manage_selected_count', selectedManageNewsIds.size, filtered.length);
+    }
+    const txtManageBottomCount = document.getElementById('txtManageBottomCount');
+    if (txtManageBottomCount) {
+        txtManageBottomCount.innerText = t('manage_selected_short', selectedManageNewsIds.size);
+    }
+    const btnManageDelete = document.getElementById('btnManageDelete');
+    if (btnManageDelete) {
+        btnManageDelete.disabled = selectedManageNewsIds.size === 0;
+    }
+    const lblManageDeleteBtn = document.getElementById('lblManageDeleteBtn');
+    if (lblManageDeleteBtn) {
+        lblManageDeleteBtn.innerText = t('manage_btn_delete', selectedManageNewsIds.size);
+    }
+
+    const chkManageSelectAll = document.getElementById('chkManageSelectAll');
+    if (chkManageSelectAll) {
+        chkManageSelectAll.checked = filtered.length > 0 && filtered.every(n => selectedManageNewsIds.has(n.id));
+    }
+    if (btnManageDeselect) {
+        btnManageDeselect.style.display = selectedManageNewsIds.size > 0 ? 'block' : 'none';
+    }
+
+    renderManageNewsCards(filtered, document.getElementById('manageNewsCardsList'));
+}
+
+function renderManageNewsCards(newsList, container) {
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!newsList || newsList.length === 0) {
+        const emptyBox = document.createElement('div');
+        emptyBox.className = 'empty-state-box';
+        emptyBox.innerHTML = `<div class="empty-title" style="color: #8B949E; font-size: 13px;">${t('manage_empty')}</div>`;
+        container.appendChild(emptyBox);
+        return;
+    }
+
+    newsList.forEach(news => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'manage-news-card-wrapper';
+
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.className = 'manage-card-checkbox';
+        chk.checked = selectedManageNewsIds.has(news.id);
+
+        const card = document.createElement('div');
+        card.className = `news-card ${chk.checked ? 'selected' : ''}`;
+        card.style.cursor = 'pointer';
+
+        card.innerHTML = `
+            <div class="card-top-row">
+                <div class="card-source-badge" style="color: ${news.colorHex};">
+                    <span class="card-source-dot" style="background: ${news.colorHex};"></span>
+                    <span>${escapeHtml(news.source)}</span>
+                </div>
+                <div class="card-meta-right">
+                    <span class="card-time">${escapeHtml(news.formattedTime)}</span>
+                </div>
+            </div>
+            <div class="card-title">${escapeHtml(news.title)}</div>
+        `;
+
+        const toggleSelection = (e) => {
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
+            if (selectedManageNewsIds.has(news.id)) {
+                selectedManageNewsIds.delete(news.id);
+                chk.checked = false;
+                card.classList.remove('selected');
+            } else {
+                selectedManageNewsIds.add(news.id);
+                chk.checked = true;
+                card.classList.add('selected');
+            }
+            if (currentAppState) {
+                renderManageView(currentAppState.newsList);
+            }
+        };
+
+        chk.addEventListener('change', toggleSelection);
+        card.addEventListener('click', toggleSelection);
+
+        wrapper.appendChild(chk);
+        wrapper.appendChild(card);
+        container.appendChild(wrapper);
     });
 }
 
@@ -899,7 +1518,7 @@ function renderChart() {
     ctx.clearRect(0, 0, width, height);
 
     const points = currentAppState.pricePoints;
-    const newsList = currentAppState.newsList || [];
+    const newsList = (currentAppState.newsList || []).filter(n => isWithinDateRange(n.publishedAtMillis, dateFilterFrom, dateFilterTo));
     const selectedNewsId = currentAppState.selectedNewsID;
 
     let minPrice = Infinity, maxPrice = -Infinity;
@@ -1181,6 +1800,7 @@ function renderSourcesSubtab(state) {
     const allSources = (state.sourcesList || []).filter(s => {
         if (!q) return true;
         return (s.name && s.name.toLowerCase().includes(q)) ||
+               (s.description && s.description.toLowerCase().includes(q)) ||
                (s.url && s.url.toLowerCase().includes(q)) ||
                (s.id && s.id.toLowerCase().includes(q));
     });
@@ -1227,6 +1847,10 @@ function renderSourcesSubtab(state) {
 
     const defaultIds = [
         'x_saylor', 'x_elonmusk', 'x_vitalik', 'x_realdonaldtrump', 'x_erictrump',
+        'x_iohk_charles', 'x_aeyakovenko', 'x_bgarlinghouse', 'x_cz_binance',
+        'x_brian_armstrong', 'x_vladtenev', 'x_cryptohayes', 'x_paoloardoino', 'x_ericbalchunas',
+        'x_jseyffart', 'x_lynaldencontact', 'x_zachxbt', 'x_ki_young_ju',
+        'x_woonomic', 'x_pentosh1', 'x_gcrclassic',
         'llama_hacks', 'macro_cal', 'tg_unfolded', 'tg_wu', 'tg_binance',
         'tg_whale', 'tg_watcherguru', 'tg_peckshield', 'theblock_rss',
         'blockworks_rss', 'btc_mag_rss', 'bankless_rss', 'cd_rss', 'ct_rss',
@@ -1261,6 +1885,7 @@ function renderSourcesSubtab(state) {
                         ${escapeHtml(src.name)}
                         ${isCustom ? '<span class="custom-source-badge">CUSTOM</span>' : ''}
                     </div>
+                    ${src.description ? `<div class="source-card-desc">${escapeHtml(src.description)}</div>` : ''}
                     <div class="source-card-url">${escapeHtml(src.url)}</div>
                 </div>
                 <div style="display: flex; align-items: center;">
@@ -1384,6 +2009,49 @@ function renderAppConfigSubtab(state) {
     document.getElementById('txtRowNightEnd').innerText = t('night_end');
     document.getElementById('valNightEnd').innerText = state.nightModeEnd;
 
+    document.getElementById('txtCardIntervalsHeader').innerText = t('section_intervals');
+    document.getElementById('txtRowCheckInterval').innerText = t('interval_day_title');
+    document.getElementById('txtRowCheckIntervalDesc').innerText = t('interval_day_desc');
+    document.getElementById('valCheckInterval').innerText = formatIntervalText(state.checkInterval || 60);
+
+    document.getElementById('txtRowNightCheckInterval').innerText = t('interval_night_title');
+    document.getElementById('txtRowNightCheckIntervalDesc').innerText = t('interval_night_desc');
+    document.getElementById('valNightCheckInterval').innerText = formatIntervalText(state.nightCheckInterval || 900);
+
+    const txtRowXCheck = document.getElementById('txtRowXCheckInterval');
+    if (txtRowXCheck) txtRowXCheck.innerText = t('interval_x_day_title');
+    const txtRowXCheckDesc = document.getElementById('txtRowXCheckIntervalDesc');
+    if (txtRowXCheckDesc) txtRowXCheckDesc.innerText = t('interval_x_day_desc');
+    const valXCheck = document.getElementById('valXCheckInterval');
+    if (valXCheck) valXCheck.innerText = formatIntervalText(state.xCheckInterval || 300);
+
+    const txtRowXNightCheck = document.getElementById('txtRowXNightCheckInterval');
+    if (txtRowXNightCheck) txtRowXNightCheck.innerText = t('interval_x_night_title');
+    const txtRowXNightCheckDesc = document.getElementById('txtRowXNightCheckIntervalDesc');
+    if (txtRowXNightCheckDesc) txtRowXNightCheckDesc.innerText = t('interval_x_night_desc');
+    const valXNightCheck = document.getElementById('valXNightCheckInterval');
+    if (valXNightCheck) valXNightCheck.innerText = formatIntervalText(state.xNightCheckInterval || 600);
+
+    const txtModalCheckTitle = document.getElementById('txtModalCheckIntervalTitle');
+    if (txtModalCheckTitle) txtModalCheckTitle.innerText = t('modal_interval_day_title');
+    const txtModalCheckHint = document.getElementById('txtModalCheckIntervalHint');
+    if (txtModalCheckHint) txtModalCheckHint.innerText = t('modal_interval_day_hint');
+
+    const txtModalNightCheckTitle = document.getElementById('txtModalNightCheckIntervalTitle');
+    if (txtModalNightCheckTitle) txtModalNightCheckTitle.innerText = t('modal_interval_night_title');
+    const txtModalNightCheckHint = document.getElementById('txtModalNightCheckIntervalHint');
+    if (txtModalNightCheckHint) txtModalNightCheckHint.innerText = t('modal_interval_night_hint');
+
+    const txtModalXTitle = document.getElementById('txtModalXCheckIntervalTitle');
+    if (txtModalXTitle) txtModalXTitle.innerText = t('modal_interval_x_day_title');
+    const txtModalXHint = document.getElementById('txtModalXCheckIntervalHint');
+    if (txtModalXHint) txtModalXHint.innerText = t('modal_interval_x_day_hint');
+
+    const txtModalXNightTitle = document.getElementById('txtModalXNightCheckIntervalTitle');
+    if (txtModalXNightTitle) txtModalXNightTitle.innerText = t('modal_interval_x_night_title');
+    const txtModalXNightHint = document.getElementById('txtModalXNightCheckIntervalHint');
+    if (txtModalXNightHint) txtModalXNightHint.innerText = t('modal_interval_x_night_hint');
+
     document.getElementById('txtCardLangHeader').innerText = t('section_lang');
     document.querySelectorAll('.lang-pill').forEach(pill => {
         if (pill.getAttribute('data-lang') === state.currentLanguage) {
@@ -1402,6 +2070,45 @@ function renderAppConfigSubtab(state) {
     document.getElementById('txtRowMaxNews').innerText = t('history_max_title');
     document.getElementById('txtRowMaxNewsDesc').innerText = t('history_max_desc');
     document.getElementById('valMaxStoredNews').innerText = state.maxStoredNews;
+
+    const rowCutoff = document.getElementById('txtRowHistoryCutoff');
+    if (rowCutoff) rowCutoff.innerText = t('history_cutoff_title');
+    const rowCutoffDesc = document.getElementById('txtRowHistoryCutoffDesc');
+    if (rowCutoffDesc) rowCutoffDesc.innerText = t('history_cutoff_desc');
+    const cutoffEl = document.getElementById('valHistoryCutoff');
+    if (cutoffEl) {
+        if (!state.historyClearedAt || state.historyClearedAt <= 0) {
+            cutoffEl.innerText = t('history_cutoff_no_limit');
+        } else {
+            const d = new Date(state.historyClearedAt);
+            const pad = n => String(n).padStart(2, '0');
+            cutoffEl.innerText = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+    }
+
+    const txtModalCutoffTitle = document.getElementById('txtModalCutoffTitle');
+    if (txtModalCutoffTitle) txtModalCutoffTitle.innerText = t('modal_cutoff_title');
+    const txtModalCutoffHint = document.getElementById('txtModalCutoffHint');
+    if (txtModalCutoffHint) txtModalCutoffHint.innerText = t('modal_cutoff_hint');
+    const btnCutoffNow = document.getElementById('btnCutoffNow');
+    if (btnCutoffNow) btnCutoffNow.innerText = t('cutoff_preset_now');
+    const btnCutoffToday = document.getElementById('btnCutoffToday');
+    if (btnCutoffToday) btnCutoffToday.innerText = t('cutoff_preset_today');
+    const btnCutoff24h = document.getElementById('btnCutoff24h');
+    if (btnCutoff24h) btnCutoff24h.innerText = t('cutoff_preset_24h');
+    const btnCutoff3d = document.getElementById('btnCutoff3d');
+    if (btnCutoff3d) btnCutoff3d.innerText = t('cutoff_preset_3d');
+    const btnCutoff7d = document.getElementById('btnCutoff7d');
+    if (btnCutoff7d) btnCutoff7d.innerText = t('cutoff_preset_7d');
+    const btnCutoffThisMonth = document.getElementById('btnCutoffThisMonth');
+    if (btnCutoffThisMonth) btnCutoffThisMonth.innerText = t('cutoff_preset_this_month');
+    const btnCutoffLastMonth = document.getElementById('btnCutoffLastMonth');
+    if (btnCutoffLastMonth) btnCutoffLastMonth.innerText = t('cutoff_preset_last_month');
+    const btnCutoffThisYear = document.getElementById('btnCutoffThisYear');
+    if (btnCutoffThisYear) btnCutoffThisYear.innerText = t('cutoff_preset_this_year');
+    const btnCutoffAll = document.getElementById('btnCutoffAll');
+    if (btnCutoffAll) btnCutoffAll.innerText = t('cutoff_preset_all');
+
     document.getElementById('btnClearHistory').innerText = t('history_clear_btn');
 
     document.getElementById('txtCardImportExportHeader').innerText = t('section_import_export');
@@ -1415,7 +2122,7 @@ function renderAppConfigSubtab(state) {
     document.getElementById('lblImportNews').innerText = t('btn_import_news');
     document.getElementById('lblImportNewsSub').innerText = t('btn_import_news_sub');
 
-    document.querySelectorAll('.preset-pill').forEach(pill => {
+    document.querySelectorAll('.preset-pill[data-limit]').forEach(pill => {
         if (parseInt(pill.getAttribute('data-limit'), 10) === state.maxStoredNews) {
             pill.classList.add('active');
         } else {
@@ -1437,9 +2144,124 @@ function renderAppConfigSubtab(state) {
 }
 
 // =========================================================================
+// ↔️ WINDOW RESIZE HANDLER (STRETCH DOWNWARDS & CORNER RESIZE)
+// =========================================================================
+function initWindowResizeHandler() {
+    const handle = document.getElementById('widgetResizeHandle');
+    const corner = document.getElementById('widgetResizeCorner');
+    if (!handle) return;
+
+    let isResizing = false;
+    let isCorner = false;
+    let startX = 0;
+    let startY = 0;
+    let startW = 0;
+    let startH = 0;
+    let rafId = null;
+
+    function startResize(e, cornerMode) {
+        e.preventDefault();
+        e.stopPropagation();
+        isResizing = true;
+        isCorner = cornerMode;
+        startX = e.screenX;
+        startY = e.screenY;
+        startW = window.innerWidth;
+        startH = window.innerHeight;
+
+        document.body.classList.add('resizing-active');
+        if (isCorner) {
+            document.body.classList.add('corner-active');
+        }
+
+        const onMouseMove = (moveEvent) => {
+            if (!isResizing) return;
+            if (rafId) return;
+
+            rafId = requestAnimationFrame(() => {
+                rafId = null;
+                if (!isResizing) return;
+
+                const deltaY = moveEvent.screenY - startY;
+                let newH = Math.round(startH + deltaY);
+                if (newH < 500) newH = 500;
+                if (newH > 2500) newH = 2500;
+
+                let newW = startW;
+                if (isCorner) {
+                    const deltaX = moveEvent.screenX - startX;
+                    newW = Math.round(startW + deltaX);
+                    if (newW < 380) newW = 380;
+                    if (newW > 650) newW = 650;
+                }
+
+                if (window.go && window.go.main && window.go.main.App && window.go.main.App.SetWindowSize) {
+                    window.go.main.App.SetWindowSize(newW, newH);
+                }
+            });
+        };
+
+        const onMouseUp = () => {
+            if (!isResizing) return;
+            isResizing = false;
+            if (rafId) {
+                cancelAnimationFrame(rafId);
+                rafId = null;
+            }
+            document.body.classList.remove('resizing-active');
+            document.body.classList.remove('corner-active');
+            window.removeEventListener('mousemove', onMouseMove);
+            window.removeEventListener('mouseup', onMouseUp);
+
+            if (window.go && window.go.main && window.go.main.App && window.go.main.App.SaveWindowSize) {
+                window.go.main.App.SaveWindowSize(window.innerWidth, window.innerHeight);
+            }
+        };
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mouseup', onMouseUp);
+    }
+
+    handle.addEventListener('mousedown', (e) => {
+        if (e.target.closest('#widgetResizeCorner')) {
+            startResize(e, true);
+        } else {
+            startResize(e, false);
+        }
+    });
+
+    if (corner) {
+        corner.addEventListener('mousedown', (e) => {
+            startResize(e, true);
+        });
+    }
+
+    // Double-click toggle height: 890px <-> 1250px
+    handle.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const currentH = window.innerHeight;
+        const targetH = currentH >= 1100 ? 890 : 1250;
+        if (window.go && window.go.main && window.go.main.App && window.go.main.App.SaveWindowSize) {
+            window.go.main.App.SaveWindowSize(window.innerWidth, targetH);
+        }
+    });
+
+    // Re-render chart on window resize
+    window.addEventListener('resize', () => {
+        if (currentAppState && (currentAppState.currentTab === 'CHART_AND_FEED' || !currentAppState.currentTab)) {
+            renderChart();
+        }
+    });
+}
+
+// =========================================================================
 // 🚀 EVENT LISTENERS SETUP
 // =========================================================================
 document.addEventListener('DOMContentLoaded', () => {
+    // 0. Resize Handler
+    initWindowResizeHandler();
+
     // 1. Window Controls
     document.getElementById('btnMinimize').onclick = () => window.go.main.App.MinimizeWindow();
     document.getElementById('btnClose').onclick = () => window.go.main.App.CloseWindow();
@@ -1452,6 +2274,88 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnAcknowledgeAlarm').onclick = () => {
         window.go.main.App.AcknowledgeAlarm().then(renderState);
     };
+
+    // 2c. Global Show Chart Toggle
+    const chkChartToggle = document.getElementById('chkChartToggle');
+    if (chkChartToggle) {
+        chkChartToggle.onchange = (e) => {
+            if (window.go && window.go.main && window.go.main.App && window.go.main.App.SetShowChart) {
+                window.go.main.App.SetShowChart(e.target.checked).then(renderState);
+            }
+        };
+    }
+
+    // 2d. Manage News View Controls
+    const chkManageSelectAll = document.getElementById('chkManageSelectAll');
+    if (chkManageSelectAll) {
+        chkManageSelectAll.onchange = (e) => {
+            if (!currentAppState || !currentAppState.newsList) return;
+            const q = manageSearchQuery.toLowerCase().trim();
+            const filtered = currentAppState.newsList.filter(n => {
+                if (!q) return true;
+                return (n.title && n.title.toLowerCase().includes(q)) ||
+                       (n.description && n.description.toLowerCase().includes(q)) ||
+                       (n.source && n.source.toLowerCase().includes(q)) ||
+                       (n.tag && n.tag.toLowerCase().includes(q));
+            });
+            if (e.target.checked) {
+                filtered.forEach(n => selectedManageNewsIds.add(n.id));
+            } else {
+                filtered.forEach(n => selectedManageNewsIds.delete(n.id));
+            }
+            renderManageView(currentAppState.newsList);
+        };
+    }
+
+    const btnManageDeselect = document.getElementById('btnManageDeselect');
+    if (btnManageDeselect) {
+        btnManageDeselect.onclick = () => {
+            selectedManageNewsIds.clear();
+            if (currentAppState) renderManageView(currentAppState.newsList);
+        };
+    }
+
+    const inputManageSearch = document.getElementById('inputManageSearch');
+    const btnClearManageSearch = document.getElementById('btnClearManageSearch');
+    if (inputManageSearch && btnClearManageSearch) {
+        inputManageSearch.oninput = (e) => {
+            manageSearchQuery = e.target.value;
+            btnClearManageSearch.style.display = manageSearchQuery ? 'block' : 'none';
+            if (currentAppState) renderManageView(currentAppState.newsList);
+        };
+        btnClearManageSearch.onclick = () => {
+            manageSearchQuery = '';
+            inputManageSearch.value = '';
+            btnClearManageSearch.style.display = 'none';
+            if (currentAppState) renderManageView(currentAppState.newsList);
+        };
+    }
+
+    const btnManageDelete = document.getElementById('btnManageDelete');
+    if (btnManageDelete) {
+        btnManageDelete.onclick = async () => {
+            if (selectedManageNewsIds.size === 0) return;
+            const confirmMsg = t('manage_delete_confirm', selectedManageNewsIds.size);
+            if (confirm(confirmMsg)) {
+                const ids = Array.from(selectedManageNewsIds);
+                if (window.go && window.go.main && window.go.main.App && window.go.main.App.DeleteNews) {
+                    const newState = await window.go.main.App.DeleteNews(ids);
+                    selectedManageNewsIds.clear();
+                    renderState(newState);
+                }
+            }
+        };
+    }
+
+    // 2b. Slide-Down Bar Trigger & Collapse
+    const triggerBar = document.getElementById('slideDownTriggerBar');
+    if (triggerBar) {
+        triggerBar.onclick = () => toggleSlideDown();
+    }
+    const btnCollapse = document.getElementById('btnCollapseSlideDown');
+    if (btnCollapse) {
+        btnCollapse.onclick = () => toggleSlideDown(false);
+    }
 
     // 3. Coin Dropdown Toggle
     document.getElementById('btnCoinDropdown').onclick = (e) => {
@@ -1644,6 +2548,36 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // Date Filter Presets & Inputs
+    const chipDateToday = document.getElementById('chipDateToday');
+    if (chipDateToday) chipDateToday.onclick = () => setDatePreset('today');
+
+    const chipDate7d = document.getElementById('chipDate7d');
+    if (chipDate7d) chipDate7d.onclick = () => setDatePreset('7d');
+
+    const chipDateMonth = document.getElementById('chipDateMonth');
+    if (chipDateMonth) chipDateMonth.onclick = () => setDatePreset('month');
+
+    const chipDateCustom = document.getElementById('chipDateCustom');
+    if (chipDateCustom) chipDateCustom.onclick = () => toggleCustomDateBox();
+
+    const chipDateAll = document.getElementById('chipDateAll');
+    if (chipDateAll) chipDateAll.onclick = () => setDatePreset('all');
+
+    const btnClearDate = document.getElementById('btnClearDateFilter');
+    if (btnClearDate) btnClearDate.onclick = () => setDatePreset('all');
+
+    const inputDateFrom = document.getElementById('inputDateFrom');
+    const inputDateTo = document.getElementById('inputDateTo');
+    if (inputDateFrom) {
+        inputDateFrom.onchange = onDateInputChange;
+        inputDateFrom.oninput = onDateInputChange;
+    }
+    if (inputDateTo) {
+        inputDateTo.onchange = onDateInputChange;
+        inputDateTo.oninput = onDateInputChange;
+    }
+
     // New News Search
     const inputNewNewsSearch = document.getElementById('inputNewNewsSearch');
     const btnClearNewNewsSearch = document.getElementById('btnClearNewNewsSearch');
@@ -1745,6 +2679,102 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modalEditNightEnd').style.display = 'none';
     };
 
+    // Check Interval (Day)
+    document.getElementById('rowEditCheckInterval').onclick = () => {
+        document.getElementById('modalEditCheckInterval').style.display = 'flex';
+        document.getElementById('inputCheckIntervalVal').value = currentAppState ? (currentAppState.checkInterval || 60) : 60;
+    };
+    document.getElementById('btnCancelCheckInterval').onclick = () => {
+        document.getElementById('modalEditCheckInterval').style.display = 'none';
+    };
+    document.getElementById('btnConfirmCheckInterval').onclick = () => {
+        const val = parseInt(document.getElementById('inputCheckIntervalVal').value, 10);
+        if (val && val >= 5 && val <= 86400) {
+            window.go.main.App.SetCheckInterval(val).then(renderState);
+        }
+        document.getElementById('modalEditCheckInterval').style.display = 'none';
+    };
+    document.querySelectorAll('.preset-interval-btn').forEach(btn => {
+        btn.onclick = () => {
+            const sec = parseInt(btn.getAttribute('data-sec'), 10);
+            if (sec) {
+                document.getElementById('inputCheckIntervalVal').value = sec;
+            }
+        };
+    });
+
+    // Night Check Interval (Night)
+    document.getElementById('rowEditNightCheckInterval').onclick = () => {
+        document.getElementById('modalEditNightCheckInterval').style.display = 'flex';
+        document.getElementById('inputNightCheckIntervalVal').value = currentAppState ? (currentAppState.nightCheckInterval || 900) : 900;
+    };
+    document.getElementById('btnCancelNightCheckInterval').onclick = () => {
+        document.getElementById('modalEditNightCheckInterval').style.display = 'none';
+    };
+    document.getElementById('btnConfirmNightCheckInterval').onclick = () => {
+        const val = parseInt(document.getElementById('inputNightCheckIntervalVal').value, 10);
+        if (val && val >= 5 && val <= 86400) {
+            window.go.main.App.SetNightCheckInterval(val).then(renderState);
+        }
+        document.getElementById('modalEditNightCheckInterval').style.display = 'none';
+    };
+    document.querySelectorAll('.preset-night-interval-btn').forEach(btn => {
+        btn.onclick = () => {
+            const sec = parseInt(btn.getAttribute('data-sec'), 10);
+            if (sec) {
+                document.getElementById('inputNightCheckIntervalVal').value = sec;
+            }
+        };
+    });
+
+    // X Check Interval (Day)
+    document.getElementById('rowEditXCheckInterval').onclick = () => {
+        document.getElementById('modalEditXCheckInterval').style.display = 'flex';
+        document.getElementById('inputXCheckIntervalVal').value = currentAppState ? (currentAppState.xCheckInterval || 300) : 300;
+    };
+    document.getElementById('btnCancelXCheckInterval').onclick = () => {
+        document.getElementById('modalEditXCheckInterval').style.display = 'none';
+    };
+    document.getElementById('btnConfirmXCheckInterval').onclick = () => {
+        const val = parseInt(document.getElementById('inputXCheckIntervalVal').value, 10);
+        if (val && val >= 30 && val <= 86400) {
+            window.go.main.App.SetXCheckInterval(val).then(renderState);
+        }
+        document.getElementById('modalEditXCheckInterval').style.display = 'none';
+    };
+    document.querySelectorAll('.preset-x-interval-btn').forEach(btn => {
+        btn.onclick = () => {
+            const sec = parseInt(btn.getAttribute('data-sec'), 10);
+            if (sec) {
+                document.getElementById('inputXCheckIntervalVal').value = sec;
+            }
+        };
+    });
+
+    // X Night Check Interval (Night)
+    document.getElementById('rowEditXNightCheckInterval').onclick = () => {
+        document.getElementById('modalEditXNightCheckInterval').style.display = 'flex';
+        document.getElementById('inputXNightCheckIntervalVal').value = currentAppState ? (currentAppState.xNightCheckInterval || 600) : 600;
+    };
+    document.getElementById('btnCancelXNightCheckInterval').onclick = () => {
+        document.getElementById('modalEditXNightCheckInterval').style.display = 'none';
+    };
+    document.getElementById('btnConfirmXNightCheckInterval').onclick = () => {
+        const val = parseInt(document.getElementById('inputXNightCheckIntervalVal').value, 10);
+        if (val && val >= 30 && val <= 86400) {
+            window.go.main.App.SetXNightCheckInterval(val).then(renderState);
+        }
+        document.getElementById('modalEditXNightCheckInterval').style.display = 'none';
+    };
+    document.querySelectorAll('.preset-x-night-interval-btn').forEach(btn => {
+        btn.onclick = () => {
+            const sec = parseInt(btn.getAttribute('data-sec'), 10);
+            if (sec) {
+                document.getElementById('inputXNightCheckIntervalVal').value = sec;
+            }
+        };
+    });
+
     // Max News Limit
     document.getElementById('rowEditMaxNews').onclick = () => {
         document.getElementById('modalEditMaxNews').style.display = 'flex';
@@ -1772,6 +2802,92 @@ document.addEventListener('DOMContentLoaded', () => {
         window.go.main.App.ClearNewsHistory().then(renderState);
         document.getElementById('modalClearHistory').style.display = 'none';
     };
+
+    // History Cutoff Date
+    function toLocalIsoDateTime(ts) {
+        if (!ts || ts <= 0) return '';
+        const d = new Date(ts);
+        const pad = n => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    const rowEditHistoryCutoff = document.getElementById('rowEditHistoryCutoff');
+    const modalEditHistoryCutoff = document.getElementById('modalEditHistoryCutoff');
+    const inputHistoryCutoff = document.getElementById('inputHistoryCutoff');
+
+    if (rowEditHistoryCutoff) {
+        rowEditHistoryCutoff.onclick = () => {
+            modalEditHistoryCutoff.style.display = 'flex';
+            const currentTs = currentAppState ? (currentAppState.historyClearedAt || 0) : 0;
+            inputHistoryCutoff.value = toLocalIsoDateTime(currentTs);
+            document.querySelectorAll('.preset-pill[data-cutoff]').forEach(p => p.classList.remove('active'));
+        };
+    }
+
+    document.querySelectorAll('.preset-pill[data-cutoff]').forEach(pill => {
+        pill.onclick = () => {
+            const cutoffKey = pill.getAttribute('data-cutoff');
+            let targetTs = 0;
+            const now = Date.now();
+            if (cutoffKey === 'now') {
+                targetTs = now;
+            } else if (cutoffKey === 'today') {
+                const d = new Date();
+                d.setHours(0, 0, 0, 0);
+                targetTs = d.getTime();
+            } else if (cutoffKey === '24h') {
+                targetTs = now - 24 * 3600 * 1000;
+            } else if (cutoffKey === '3d') {
+                targetTs = now - 3 * 24 * 3600 * 1000;
+            } else if (cutoffKey === '7d') {
+                targetTs = now - 7 * 24 * 3600 * 1000;
+            } else if (cutoffKey === 'this_month') {
+                const d = new Date();
+                d.setDate(1);
+                d.setHours(0, 0, 0, 0);
+                targetTs = d.getTime();
+            } else if (cutoffKey === 'last_month') {
+                const d = new Date();
+                d.setMonth(d.getMonth() - 1, 1);
+                d.setHours(0, 0, 0, 0);
+                targetTs = d.getTime();
+            } else if (cutoffKey === 'this_year') {
+                const d = new Date();
+                d.setMonth(0, 1);
+                d.setHours(0, 0, 0, 0);
+                targetTs = d.getTime();
+            } else if (cutoffKey === 'all') {
+                targetTs = 0;
+            }
+            inputHistoryCutoff.value = toLocalIsoDateTime(targetTs);
+            document.querySelectorAll('.preset-pill[data-cutoff]').forEach(p => p.classList.remove('active'));
+            pill.classList.add('active');
+        };
+    });
+
+    const btnCancelHistoryCutoff = document.getElementById('btnCancelHistoryCutoff');
+    if (btnCancelHistoryCutoff) {
+        btnCancelHistoryCutoff.onclick = () => {
+            modalEditHistoryCutoff.style.display = 'none';
+        };
+    }
+
+    const btnConfirmHistoryCutoff = document.getElementById('btnConfirmHistoryCutoff');
+    if (btnConfirmHistoryCutoff) {
+        btnConfirmHistoryCutoff.onclick = () => {
+            const rawVal = inputHistoryCutoff.value.trim();
+            let ts = 0;
+            if (rawVal) {
+                const parsed = new Date(rawVal).getTime();
+                if (!isNaN(parsed) && parsed > 0) {
+                    ts = parsed;
+                }
+            }
+            window.go.main.App.SetNewsFetchCutoffMillis(ts).then(renderState);
+            modalEditHistoryCutoff.style.display = 'none';
+        };
+    }
+
 
     // X Login & Logout
     const handleLoginXClick = () => {
@@ -1831,6 +2947,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalAddX = document.getElementById('modalAddX');
     const inputXHandle = document.getElementById('inputXHandle');
     const inputXName = document.getElementById('inputXName');
+    const inputXDesc = document.getElementById('inputXDesc');
     const btnCancelX = document.getElementById('btnCancelX');
     const btnConfirmX = document.getElementById('btnConfirmX');
 
@@ -1839,6 +2956,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modalAddX.style.display = 'flex';
             inputXHandle.value = '';
             inputXName.value = '';
+            if (inputXDesc) inputXDesc.value = '';
             inputXHandle.focus();
         };
         btnCancelX.onclick = () => {
@@ -1847,8 +2965,9 @@ document.addEventListener('DOMContentLoaded', () => {
         btnConfirmX.onclick = () => {
             const handle = inputXHandle.value.trim();
             const name = inputXName.value.trim();
+            const desc = inputXDesc ? inputXDesc.value.trim() : '';
             if (handle) {
-                window.go.main.App.AddXSource(handle, name).then(renderState);
+                window.go.main.App.AddXSource(handle, name, desc).then(renderState);
             }
             modalAddX.style.display = 'none';
         };
@@ -1859,6 +2978,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modalAddTelegram').style.display = 'flex';
         document.getElementById('inputTelegramHandle').value = '';
         document.getElementById('inputTelegramName').value = '';
+        const descInput = document.getElementById('inputTelegramDesc');
+        if (descInput) descInput.value = '';
     };
     document.getElementById('btnCancelTelegram').onclick = () => {
         document.getElementById('modalAddTelegram').style.display = 'none';
@@ -1866,8 +2987,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnConfirmTelegram').onclick = () => {
         const handle = document.getElementById('inputTelegramHandle').value.trim();
         const name = document.getElementById('inputTelegramName').value.trim();
+        const descInput = document.getElementById('inputTelegramDesc');
+        const desc = descInput ? descInput.value.trim() : '';
         if (handle) {
-            window.go.main.App.AddTelegramSource(handle, name).then(renderState);
+            window.go.main.App.AddTelegramSource(handle, name, desc).then(renderState);
         }
         document.getElementById('modalAddTelegram').style.display = 'none';
     };
@@ -1877,6 +3000,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('modalAddRss').style.display = 'flex';
         document.getElementById('inputRssUrl').value = '';
         document.getElementById('inputRssName').value = '';
+        const descInput = document.getElementById('inputRssDesc');
+        if (descInput) descInput.value = '';
     };
     document.getElementById('btnCancelRss').onclick = () => {
         document.getElementById('modalAddRss').style.display = 'none';
@@ -1884,8 +3009,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btnConfirmRss').onclick = () => {
         const url = document.getElementById('inputRssUrl').value.trim();
         const name = document.getElementById('inputRssName').value.trim();
+        const descInput = document.getElementById('inputRssDesc');
+        const desc = descInput ? descInput.value.trim() : '';
         if (url) {
-            window.go.main.App.AddRssSource(url, name).then(renderState);
+            window.go.main.App.AddRssSource(url, name, desc).then(renderState);
         }
         document.getElementById('modalAddRss').style.display = 'none';
     };
