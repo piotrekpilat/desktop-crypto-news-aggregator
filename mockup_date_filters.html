@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mockup – Filtrowanie Wiadomości po Dacie (Od / Do)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background-color: #080B10;
+      color: #E6EDF3;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .mockup-header {
+      text-align: center;
+      max-width: 800px;
+    }
+
+    .mockup-header h1 {
+      font-size: 22px;
+      color: #00E5FF;
+      margin-bottom: 8px;
+    }
+
+    .mockup-header p {
+      font-size: 13px;
+      color: #8B949E;
+      line-height: 1.5;
+    }
+
+    .variant-selector {
+      display: flex;
+      gap: 10px;
+      background: #161B22;
+      padding: 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .variant-btn {
+      background: transparent;
+      border: none;
+      color: #8B949E;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .variant-btn.active {
+      background: #00E5FF;
+      color: #0B0E14;
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.35);
+    }
+
+    /* WIDGET CONTAINER REPLICA */
+    .widget-container {
+      width: 430px;
+      height: 760px;
+      background: #0B0E14;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(0, 229, 255, 0.08);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* TOP BAR */
+    .widget-top-bar {
+      height: 34px;
+      background: #0E131D;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .top-bar-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #F0F3F6;
+    }
+
+    /* HEADER META */
+    .top-header-bar {
+      background: #0E121A;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .coin-badge-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #161B22;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .price-val {
+      font-size: 14px;
+      font-weight: 700;
+      color: #00FF88;
+      text-align: right;
+    }
+
+    /* SEARCH BAR */
+    .search-box-container {
+      padding: 8px 16px 4px 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 32px;
+      background: #161B22;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 11px;
+      padding: 0 10px;
+      outline: none;
+    }
+
+    /* ======================================================== */
+    /* 📅 WARIANT 1: SMART DATE CHIPS + EXPANDABLE CUSTOM DATES */
+    /* ======================================================== */
+    .date-filter-section-v1 {
+      padding: 4px 16px 8px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .date-preset-chips-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .date-preset-chips-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .date-filter-icon-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #8B949E;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-right: 2px;
+      white-space: nowrap;
+    }
+
+    .date-chip {
+      background: #161B22;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      color: #8B949E;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 3px 9px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .date-chip:hover {
+      background: #1E293B;
+      color: #FFFFFF;
+      border-color: rgba(0, 229, 255, 0.3);
+    }
+
+    .date-chip.active {
+      background: rgba(0, 229, 255, 0.15);
+      border-color: #00E5FF;
+      color: #00E5FF;
+      font-weight: 700;
+    }
+
+    /* Expandable custom date inputs */
+    .date-custom-inputs-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #111620;
+      border: 1px solid rgba(0, 229, 255, 0.25);
+      border-radius: 8px;
+      padding: 6px 10px;
+      animation: fadeIn 0.15s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .date-input-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .date-input-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #8B949E;
+      text-transform: uppercase;
+    }
+
+    .date-native-input {
+      background: #161B22;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #00E5FF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 6px;
+      border-radius: 5px;
+      width: 100%;
+      outline: none;
+      color-scheme: dark;
+    }
+
+    .date-native-input:focus {
+      border-color: #00E5FF;
+    }
+
+    .btn-clear-date-filter {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #8B949E;
+      border-radius: 4px;
+      font-size: 11px;
+      padding: 3px 6px;
+      cursor: pointer;
+    }
+
+    .btn-clear-date-filter:hover {
+      background: rgba(255, 51, 102, 0.2);
+      color: #ff3366;
+    }
+
+    /* ======================================================== */
+    /* 📅 WARIANT 2: DEDICATED TWO-INPUT BAR WITH PRESET PILLS */
+    /* ======================================================== */
+    .date-filter-section-v2 {
+      padding: 6px 16px 8px 16px;
+      background: #0E131D;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .date-v2-main-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .date-v2-input-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #161B22;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 7px;
+      padding: 4px 8px;
+      flex: 1;
+    }
+
+    .date-v2-input-badge span {
+      font-size: 10px;
+      font-weight: 700;
+      color: #8B949E;
+    }
+
+    .date-v2-input-badge input {
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 600;
+      width: 100%;
+      outline: none;
+      color-scheme: dark;
+    }
+
+    .date-v2-arrow {
+      color: #8B949E;
+      font-size: 12px;
+    }
+
+    .date-v2-presets-row {
+      display: flex;
+      gap: 5px;
+    }
+
+    .date-v2-preset-btn {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #8B949E;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 2px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .date-v2-preset-btn:hover {
+      background: rgba(0, 229, 255, 0.1);
+      color: #00E5FF;
+      border-color: rgba(0, 229, 255, 0.3);
+    }
+
+    .date-v2-preset-btn.active {
+      background: #00E5FF;
+      color: #0B0E14;
+      border-color: #00E5FF;
+      font-weight: 700;
+    }
+
+    /* ======================================================== */
+    /* 📅 WARIANT 3: DROPDOWN BUTTON WITH POPOVER MENU          */
+    /* ======================================================== */
+    .date-filter-section-v3 {
+      padding: 4px 16px 8px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .btn-date-popover-trigger {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #161B22;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 8px;
+      padding: 6px 12px;
+      color: #E6EDF3;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      justify-content: space-between;
+      transition: all 0.15s;
+    }
+
+    .btn-date-popover-trigger:hover {
+      border-color: #00E5FF;
+    }
+
+    .date-badge-highlight {
+      color: #00E5FF;
+      font-weight: 700;
+    }
+
+    .date-popover-menu {
+      position: absolute;
+      top: 42px;
+      left: 16px;
+      right: 16px;
+      background: #161B22;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      padding: 12px;
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .date-popover-menu.open {
+      display: flex;
+    }
+
+    .popover-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .popover-preset-btn {
+      background: #1E293B;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #8B949E;
+      font-size: 10.5px;
+      padding: 6px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .popover-preset-btn.active {
+      background: rgba(0, 229, 255, 0.2);
+      border-color: #00E5FF;
+      color: #00E5FF;
+      font-weight: 700;
+    }
+
+    /* NEWS LIST HEADER & NEWS CARDS */
+    .news-list-header {
+      padding: 8px 16px 4px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .news-header-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: #8B949E;
+    }
+
+    .news-filter-status {
+      font-size: 10px;
+      color: #00E5FF;
+      font-weight: 600;
+    }
+
+    .news-scroll-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 4px 16px 10px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .news-card {
+      background: #161B22;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .card-source {
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .card-date {
+      font-size: 10px;
+      color: #8B949E;
+    }
+
+    .card-title {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #FFFFFF;
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-tag {
+      background: rgba(255, 255, 255, 0.06);
+      color: #8B949E;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 10px;
+      color: #8B949E;
+    }
+
+    .card-actions span:hover {
+      color: #00E5FF;
+      cursor: pointer;
+    }
+
+    /* BOTTOM NAV */
+    .bottom-nav-bar {
+      height: 52px;
+      background: #0E121A;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      font-size: 10px;
+      color: #8B949E;
+    }
+
+    .widget-resize-handle {
+      height: 12px;
+      background: #0E121A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .resize-grip-line {
+      width: 38px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mockup-header">
+    <h1>🔍 Mockup: Filtrowanie Wiadomości wg Daty [Od – Do]</h1>
+    <p>
+      Poniższy interaktywny widget demonstruje 3 warianty ergonomicznego filtrowania dużej liczby wiadomości.<br>
+      Możesz kliknąć przyciski <b>Dziś</b>, <b>Ostatnie 7 dni</b>, <b>Ten miesiąc</b> lub wybrać własny zakres w kalendarzu.
+    </p>
+  </div>
+
+  <!-- VARIANT SWITCHER -->
+  <div class="variant-selector">
+    <button class="variant-btn active" onclick="switchVariant(1)">Wariant 1: Chipy z rozwijanym zakresem (Polecany)</button>
+    <button class="variant-btn" onclick="switchVariant(2)">Wariant 2: Stałe pola [Od] [Do] z przyciskami</button>
+    <button class="variant-btn" onclick="switchVariant(3)">Wariant 3: Przycisk Dropdown / Popup</button>
+  </div>
+
+  <!-- MAIN WIDGET REPLICA -->
+  <div class="widget-container">
+    
+    <!-- Window Top Bar -->
+    <div class="widget-top-bar">
+      <div class="top-bar-title">⚡ Crypto News</div>
+      <div style="color: #8b949e; font-size: 13px;">✕</div>
+    </div>
+
+    <!-- Header / Coin Price -->
+    <div class="top-header-bar">
+      <div class="coin-badge-box">
+        <span style="color: #00E5FF;">●</span>
+        <span>ADA / USDT</span>
+      </div>
+      <div>
+        <div class="price-val">$0.3450</div>
+        <div style="font-size: 10px; color: #8B949E; text-align: right;">+3.42% 24h</div>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="search-box-container">
+      <input type="text" class="search-input" id="mockupSearch" placeholder="Szukaj w wiadomościach..." oninput="applyFilters()">
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- WARIANT 1: Chipy presetów + rozwijany wiersz Od/Do       -->
+    <!-- ======================================================== -->
+    <div id="dateFilterV1" class="date-filter-section-v1">
+      <div class="date-preset-chips-row">
+        <span class="date-filter-icon-label">📅 Data:</span>
+        <button class="date-chip active" data-range="all" onclick="setPreset('all', 1)">Wszystkie</button>
+        <button class="date-chip" data-range="today" onclick="setPreset('today', 1)">Dziś</button>
+        <button class="date-chip" data-range="7d" onclick="setPreset('7d', 1)">7 dni</button>
+        <button class="date-chip" data-range="month" onclick="setPreset('month', 1)">Ten miesiąc</button>
+        <button class="date-chip" id="chipCustomV1" data-range="custom" onclick="toggleCustomV1()">Zakres ▾</button>
+      </div>
+
+      <!-- Expandable inputs -->
+      <div class="date-custom-inputs-box" id="customBoxV1" style="display: none;">
+        <div class="date-input-group">
+          <span class="date-input-label">Od:</span>
+          <input type="date" class="date-native-input" id="dateFromV1" onchange="onCustomDateChange(1)">
+        </div>
+        <div class="date-input-group">
+          <span class="date-input-label">Do:</span>
+          <input type="date" class="date-native-input" id="dateToV1" onchange="onCustomDateChange(1)">
+        </div>
+        <button class="btn-clear-date-filter" onclick="setPreset('all', 1)" title="Wyczyść filtr daty">✕</button>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- WARIANT 2: Zawsze widoczne pola Od/Do + presety          -->
+    <!-- ======================================================== -->
+    <div id="dateFilterV2" class="date-filter-section-v2" style="display: none;">
+      <div class="date-v2-main-row">
+        <div class="date-v2-input-badge">
+          <span>OD:</span>
+          <input type="date" id="dateFromV2" onchange="onCustomDateChange(2)">
+        </div>
+        <span class="date-v2-arrow">➔</span>
+        <div class="date-v2-input-badge">
+          <span>DO:</span>
+          <input type="date" id="dateToV2" onchange="onCustomDateChange(2)">
+        </div>
+      </div>
+      <div class="date-v2-presets-row">
+        <button class="date-v2-preset-btn active" data-range="all" onclick="setPreset('all', 2)">Wszystkie</button>
+        <button class="date-v2-preset-btn" data-range="today" onclick="setPreset('today', 2)">Dziś</button>
+        <button class="date-v2-preset-btn" data-range="7d" onclick="setPreset('7d', 2)">7 dni</button>
+        <button class="date-v2-preset-btn" data-range="month" onclick="setPreset('month', 2)">Ten miesiąc</button>
+        <button class="date-v2-preset-btn" onclick="setPreset('all', 2)">Wyczyść</button>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- WARIANT 3: Przycisk Popover / Dropdown                   -->
+    <!-- ======================================================== -->
+    <div id="dateFilterV3" class="date-filter-section-v3" style="display: none;">
+      <button class="btn-date-popover-trigger" onclick="togglePopoverV3()">
+        <span>📅 Zakres dat: <span class="date-badge-highlight" id="lblPopoverTrigger">Wszystkie</span></span>
+        <span>▼</span>
+      </button>
+
+      <div class="date-popover-menu" id="popoverMenuV3">
+        <div class="popover-presets-grid">
+          <button class="popover-preset-btn active" data-range="all" onclick="setPreset('all', 3)">Wszystkie</button>
+          <button class="popover-preset-btn" data-range="today" onclick="setPreset('today', 3)">Dziś</button>
+          <button class="popover-preset-btn" data-range="7d" onclick="setPreset('7d', 3)">Ostatnie 7 dni</button>
+          <button class="popover-preset-btn" data-range="month" onclick="setPreset('month', 3)">Ten miesiąc</button>
+          <button class="popover-preset-btn" data-range="last_month" onclick="setPreset('last_month', 3)">Poprzedni m-c</button>
+          <button class="popover-preset-btn" data-range="year" onclick="setPreset('year', 3)">Ten rok</button>
+        </div>
+        <div style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 8px; display: flex; gap: 8px;">
+          <div class="date-input-group">
+            <span class="date-input-label">Od:</span>
+            <input type="date" class="date-native-input" id="dateFromV3" onchange="onCustomDateChange(3)">
+          </div>
+          <div class="date-input-group">
+            <span class="date-input-label">Do:</span>
+            <input type="date" class="date-native-input" id="dateToV3" onchange="onCustomDateChange(3)">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section Header -->
+    <div class="news-list-header">
+      <div class="news-header-title" id="txtCountDisplay">WIADOMOŚCI (6)</div>
+      <div class="news-filter-status" id="txtActiveFilterStatus">Zakres: Wszystkie</div>
+    </div>
+
+    <!-- News List -->
+    <div class="news-scroll-list" id="mockupNewsList">
+      <!-- Injected via JS -->
+    </div>
+
+    <!-- Bottom Nav -->
+    <div class="bottom-nav-bar">
+      <div style="color: #00E5FF; font-weight: 700;">Wykres</div>
+      <div>Feed</div>
+      <div>Nowe (2)</div>
+      <div>Ulubione</div>
+      <div>Ustawienia</div>
+    </div>
+
+    <!-- Bottom resize handle -->
+    <div class="widget-resize-handle">
+      <div class="resize-grip-line"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Sample news database across different dates
+    const SAMPLE_NEWS = [
+      {
+        id: 1,
+        source: "CoinDesk",
+        color: "#F7931A",
+        date: "2026-09-19",
+        time: "10:15",
+        title: "Bitcoin breaks through key resistance as institutional inflows surge",
+        tag: "#BTC",
+        url: "https://example.com/1"
+      },
+      {
+        id: 2,
+        source: "Binance Announcements",
+        color: "#F0B90B",
+        date: "2026-09-19",
+        time: "08:40",
+        title: "Binance lists new spot trading pairs for ADA and SOL",
+        tag: "#Binance",
+        url: "https://example.com/2"
+      },
+      {
+        id: 3,
+        source: "Watcher Guru",
+        color: "#00E5FF",
+        date: "2026-09-17",
+        time: "14:20",
+        title: "JUST IN: US Federal Reserve hints at upcoming liquidity adjustments",
+        tag: "#Macro",
+        url: "https://example.com/3"
+      },
+      {
+        id: 4,
+        source: "Unfolded (Telegram)",
+        color: "#0088CC",
+        date: "2026-09-14",
+        time: "19:05",
+        title: "MicroStrategy acquires additional 4,500 BTC for corporate treasury reserve",
+        tag: "#Telegram",
+        url: "https://example.com/4"
+      },
+      {
+        id: 5,
+        source: "Decrypt",
+        color: "#9C27B0",
+        date: "2026-09-02",
+        time: "11:30",
+        title: "Cardano DeFi TVL crosses multi-month highs following network optimization",
+        tag: "#Cardano",
+        url: "https://example.com/5"
+      },
+      {
+        id: 6,
+        source: "Cointelegraph",
+        color: "#FF9800",
+        date: "2026-08-25",
+        time: "16:00",
+        title: "European Union regulators finalize secondary framework guidelines for crypto asset providers",
+        tag: "#Regulation",
+        url: "https://example.com/6"
+      }
+    ];
+
+    let currentFilterFrom = "";
+    let currentFilterTo = "";
+    let currentPreset = "all";
+    let activeVariant = 1;
+
+    function switchVariant(varNum) {
+      activeVariant = varNum;
+      document.querySelectorAll('.variant-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', idx + 1 === varNum);
+      });
+
+      document.getElementById('dateFilterV1').style.display = varNum === 1 ? 'flex' : 'none';
+      document.getElementById('dateFilterV2').style.display = varNum === 2 ? 'flex' : 'none';
+      document.getElementById('dateFilterV3').style.display = varNum === 3 ? 'flex' : 'none';
+
+      // Sync active preset in new variant
+      setPreset(currentPreset, varNum);
+    }
+
+    function toggleCustomV1() {
+      const box = document.getElementById('customBoxV1');
+      const chip = document.getElementById('chipCustomV1');
+      const isOpen = box.style.display !== 'none';
+      box.style.display = isOpen ? 'none' : 'flex';
+      chip.classList.toggle('active', !isOpen);
+    }
+
+    function togglePopoverV3() {
+      const menu = document.getElementById('popoverMenuV3');
+      menu.classList.toggle('open');
+    }
+
+    function setPreset(preset, variant) {
+      currentPreset = preset;
+      const today = new Date();
+      const formatDate = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+
+      if (preset === 'all') {
+        currentFilterFrom = "";
+        currentFilterTo = "";
+      } else if (preset === 'today') {
+        currentFilterFrom = formatDate(today);
+        currentFilterTo = formatDate(today);
+      } else if (preset === '7d') {
+        const past7 = new Date();
+        past7.setDate(today.getDate() - 7);
+        currentFilterFrom = formatDate(past7);
+        currentFilterTo = formatDate(today);
+      } else if (preset === 'month') {
+        const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        currentFilterFrom = formatDate(startOfMonth);
+        currentFilterTo = formatDate(today);
+      } else if (preset === 'last_month') {
+        const startOfLast = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+        const endOfLast = new Date(today.getFullYear(), today.getMonth(), 0);
+        currentFilterFrom = formatDate(startOfLast);
+        currentFilterTo = formatDate(endOfLast);
+      } else if (preset === 'year') {
+        const startOfYear = new Date(today.getFullYear(), 0, 1);
+        currentFilterFrom = formatDate(startOfYear);
+        currentFilterTo = formatDate(today);
+      }
+
+      // Update input fields across variants
+      ['1', '2', '3'].forEach(v => {
+        const f = document.getElementById(`dateFromV${v}`);
+        const t = document.getElementById(`dateToV${v}`);
+        if (f) f.value = currentFilterFrom;
+        if (t) t.value = currentFilterTo;
+
+        document.querySelectorAll(`#dateFilterV${v} [data-range]`).forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-range') === preset);
+        });
+      });
+
+      // Update popover label in V3
+      const lblPopover = document.getElementById('lblPopoverTrigger');
+      if (lblPopover) {
+        if (preset === 'all') lblPopover.innerText = 'Wszystkie';
+        else if (preset === 'today') lblPopover.innerText = 'Dziś';
+        else if (preset === '7d') lblPopover.innerText = 'Ostatnie 7 dni';
+        else if (preset === 'month') lblPopover.innerText = 'Ten miesiąc';
+        else lblPopover.innerText = `${currentFilterFrom} do ${currentFilterTo}`;
+      }
+
+      const menu = document.getElementById('popoverMenuV3');
+      if (menu) menu.classList.remove('open');
+
+      applyFilters();
+    }
+
+    function onCustomDateChange(variant) {
+      const f = document.getElementById(`dateFromV${variant}`);
+      const t = document.getElementById(`dateToV${variant}`);
+      currentFilterFrom = f ? f.value : "";
+      currentFilterTo = t ? t.value : "";
+      currentPreset = "custom";
+
+      ['1', '2', '3'].forEach(v => {
+        const otherF = document.getElementById(`dateFromV${v}`);
+        const otherT = document.getElementById(`dateToV${v}`);
+        if (otherF && otherF !== f) otherF.value = currentFilterFrom;
+        if (otherT && otherT !== t) otherT.value = currentFilterTo;
+
+        document.querySelectorAll(`#dateFilterV${v} [data-range]`).forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-range') === 'custom');
+        });
+      });
+
+      const lblPopover = document.getElementById('lblPopoverTrigger');
+      if (lblPopover) {
+        lblPopover.innerText = `${currentFilterFrom || '...'} do ${currentFilterTo || '...'}`;
+      }
+
+      applyFilters();
+    }
+
+    function applyFilters() {
+      const search = (document.getElementById('mockupSearch').value || '').toLowerCase();
+      const listContainer = document.getElementById('mockupNewsList');
+      listContainer.innerHTML = '';
+
+      const filtered = SAMPLE_NEWS.filter(item => {
+        if (search) {
+          const matchText = (item.title + ' ' + item.source + ' ' + item.tag).toLowerCase();
+          if (!matchText.includes(search)) return false;
+        }
+
+        if (currentFilterFrom && item.date < currentFilterFrom) {
+          return false;
+        }
+        if (currentFilterTo && item.date > currentFilterTo) {
+          return false;
+        }
+        return true;
+      });
+
+      // Update count & label
+      document.getElementById('txtCountDisplay').innerText = `WIADOMOŚCI (${filtered.length})`;
+      const statusLbl = document.getElementById('txtActiveFilterStatus');
+      if (!currentFilterFrom && !currentFilterTo) {
+        statusLbl.innerText = 'Zakres: Wszystkie';
+      } else {
+        statusLbl.innerText = `${currentFilterFrom || 'Od początku'} – ${currentFilterTo || 'Dziś'}`;
+      }
+
+      if (filtered.length === 0) {
+        listContainer.innerHTML = `
+          <div style="text-align: center; color: #8B949E; padding: 40px 20px; font-size: 13px;">
+            Brak wiadomości w wybranym zakresie dat.<br>
+            <button onclick="setPreset('all', activeVariant)" style="margin-top: 10px; background: rgba(0,229,255,0.15); border: 1px solid #00E5FF; color: #00E5FF; border-radius: 6px; padding: 5px 12px; cursor: pointer;">Pokaż wszystkie</button>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'news-card';
+        card.innerHTML = `
+          <div class="card-top">
+            <div class="card-source" style="color: ${item.color};">
+              <span class="card-dot" style="background: ${item.color};"></span>
+              <span>${item.source}</span>
+            </div>
+            <div class="card-date">${item.date} ${item.time}</div>
+          </div>
+          <div class="card-title">${item.title}</div>
+          <div class="card-bottom">
+            <div class="card-tag">${item.tag}</div>
+            <div class="card-actions">
+              <span>⎘ Kopiuj</span>
+              <span>Udostępnij</span>
+              <span style="color: #00E5FF;">Otwórz ↗</span>
+            </div>
+          </div>
+        `;
+        listContainer.appendChild(card);
+      });
+    }
+
+    // Initial render
+    setPreset('all', 1);
+  </script>
+</body>
+</html>
