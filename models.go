@@ -43,6 +43,7 @@ type FeedSource struct {
 	IsActive                 bool           `json:"isActive"`
 	FailureCount             int            `json:"failureCount"`
 	AutoDisabledAfterFailure bool           `json:"autoDisabledAfterFailure"`
+	Language                 string         `json:"language"`
 }
 
 type CryptoNewsItem struct {
@@ -77,6 +78,7 @@ const (
 	TabManage       AppTab = "MANAGE"
 	TabNew          AppTab = "NEW"
 	TabFavorites    AppTab = "FAVORITES"
+	TabIntegrations AppTab = "INTEGRATIONS"
 	TabSettings     AppTab = "SETTINGS"
 )
 
@@ -89,43 +91,49 @@ const (
 )
 
 type FullAppState struct {
-	PricePoints                []PricePoint     `json:"pricePoints"`
-	NewsList                   []CryptoNewsItem `json:"newsList"`
-	SourcesList                []FeedSource     `json:"sourcesList"`
-	SelectedCoin               CoinInfo         `json:"selectedCoin"`
-	ObservedCoins              []CoinInfo       `json:"observedCoins"`
-	AllAvailableCoins          []CoinInfo       `json:"allAvailableCoins"`
-	Keywords                   []string         `json:"keywords"`
-	CurrentPrice               float64          `json:"currentPrice"`
-	PriceChangePercent         float64          `json:"priceChangePercent"`
-	SelectedNewsID             string           `json:"selectedNewsId"`
-	ActiveSourceFilter         string           `json:"activeSourceFilter"`
-	SelectedSourceFilters      []string         `json:"selectedSourceFilters"`
-	CurrentTab                 AppTab           `json:"currentTab"`
-	SettingsSubTab             SettingsSubTab   `json:"settingsSubTab"`
-	IsOffline                  bool             `json:"isOffline"`
-	IsLiveMarket               bool             `json:"isLiveMarket"`
-	AlarmEnabled               bool             `json:"alarmEnabled"`
-	MaxVibrations              int              `json:"maxVibrations"`
-	NightModeEnabled           bool             `json:"nightModeEnabled"`
-	NightModeStart             string           `json:"nightModeStart"`
-	NightModeEnd               string           `json:"nightModeEnd"`
-	IsNightTimeNow             bool             `json:"isNightTimeNow"`
-	CheckInterval              int              `json:"checkInterval"`
-	NightCheckInterval         int              `json:"nightCheckInterval"`
-	XCheckInterval             int              `json:"xCheckInterval"`
-	XNightCheckInterval        int              `json:"xNightCheckInterval"`
-	CurrentLanguage            string           `json:"currentLanguage"`
-	CryptoPanicTokenConfigured bool             `json:"cryptoPanicTokenConfigured"`
-	AlarmCycle                 AlarmCycleState  `json:"alarmCycle"`
-	MaxStoredNews              int              `json:"maxStoredNews"`
-	TotalStoredNewsCount       int              `json:"totalStoredNewsCount"`
-	UnreadNewsCount            int              `json:"unreadNewsCount"`
-	UseInternalBrowser         bool             `json:"useInternalBrowser"`
-	AlwaysOnTop                bool             `json:"alwaysOnTop"`
-	Autostart                  bool             `json:"autostart"`
-	IsXLoggedIn                bool             `json:"isXLoggedIn"`
-	ShowChart                  bool             `json:"showChart"`
+	PricePoints                   []PricePoint     `json:"pricePoints"`
+	NewsList                      []CryptoNewsItem `json:"newsList"`
+	SourcesList                   []FeedSource     `json:"sourcesList"`
+	SelectedCoin                  CoinInfo         `json:"selectedCoin"`
+	ObservedCoins                 []CoinInfo       `json:"observedCoins"`
+	AllAvailableCoins             []CoinInfo       `json:"allAvailableCoins"`
+	Keywords                      []string         `json:"keywords"`
+	CurrentPrice                  float64          `json:"currentPrice"`
+	PriceChangePercent            float64          `json:"priceChangePercent"`
+	SelectedNewsID                string           `json:"selectedNewsId"`
+	ActiveSourceFilter            string           `json:"activeSourceFilter"`
+	SelectedSourceFilters         []string         `json:"selectedSourceFilters"`
+	CurrentTab                    AppTab           `json:"currentTab"`
+	SettingsSubTab                SettingsSubTab   `json:"settingsSubTab"`
+	IsOffline                     bool             `json:"isOffline"`
+	IsLiveMarket                  bool             `json:"isLiveMarket"`
+	AlarmEnabled                  bool             `json:"alarmEnabled"`
+	MaxVibrations                 int              `json:"maxVibrations"`
+	NightModeEnabled              bool             `json:"nightModeEnabled"`
+	NightModeStart                string           `json:"nightModeStart"`
+	NightModeEnd                  string           `json:"nightModeEnd"`
+	IsNightTimeNow                bool             `json:"isNightTimeNow"`
+	CheckInterval                 int              `json:"checkInterval"`
+	NightCheckInterval            int              `json:"nightCheckInterval"`
+	XCheckInterval                int              `json:"xCheckInterval"`
+	XNightCheckInterval           int              `json:"xNightCheckInterval"`
+	CurrentLanguage               string           `json:"currentLanguage"`
+	CryptoPanicTokenConfigured    bool             `json:"cryptoPanicTokenConfigured"`
+	DiscordWebhookEnabled         bool             `json:"discordWebhookEnabled"`
+	DiscordWebhookConfigured      bool             `json:"discordWebhookConfigured"`
+	TelegramIntegrationEnabled    bool             `json:"telegramIntegrationEnabled"`
+	TelegramIntegrationConfigured bool             `json:"telegramIntegrationConfigured"`
+	SlackWebhookEnabled           bool             `json:"slackWebhookEnabled"`
+	SlackWebhookConfigured        bool             `json:"slackWebhookConfigured"`
+	AlarmCycle                    AlarmCycleState  `json:"alarmCycle"`
+	MaxStoredNews                 int              `json:"maxStoredNews"`
+	TotalStoredNewsCount          int              `json:"totalStoredNewsCount"`
+	UnreadNewsCount               int              `json:"unreadNewsCount"`
+	UseInternalBrowser            bool             `json:"useInternalBrowser"`
+	AlwaysOnTop                   bool             `json:"alwaysOnTop"`
+	Autostart                     bool             `json:"autostart"`
+	IsXLoggedIn                   bool             `json:"isXLoggedIn"`
+	ShowChart                     bool             `json:"showChart"`
 }
 
 var DefaultInitialCoins = []CoinInfo{
@@ -154,6 +162,7 @@ type rawDefaultSourceItem struct {
 	Type        string `json:"type,omitempty"`
 	Description string `json:"description,omitempty"`
 	IsActive    *bool  `json:"isActive,omitempty"`
+	Language    string `json:"language,omitempty"`
 }
 
 type defaultSourcesConfig struct {
@@ -198,6 +207,43 @@ func determineDefaultActive(item rawDefaultSourceItem, st FeedSourceType) bool {
 	return st != FeedSourceTypeX
 }
 
+func NormalizeSourceLanguage(language, id, name, url string) string {
+	explicit := strings.ToLower(strings.TrimSpace(language))
+	if explicit != "" {
+		switch explicit {
+		case "pl", "polish", "polski":
+			return "pl"
+		case "en", "eng", "english":
+			return "en"
+		case "de", "ger", "deu", "german", "deutsch":
+			return "de"
+		case "ja", "jp", "jpn", "japanese":
+			return "ja"
+		case "multi", "all", "mixed":
+			return "multi"
+		default:
+			if len(explicit) > 8 {
+				return explicit[:8]
+			}
+			return explicit
+		}
+	}
+
+	combined := strings.ToLower(id + " " + name + " " + url)
+	switch {
+	case strings.Contains(combined, "(pl)") || strings.Contains(combined, "_pl") || strings.Contains(combined, "-pl") ||
+		strings.Contains(combined, ".pl/") || strings.Contains(combined, "pl.") || strings.Contains(combined, "cryps.pl") ||
+		strings.Contains(combined, "bithub.pl") || strings.Contains(combined, "pl.beincrypto"):
+		return "pl"
+	case strings.Contains(combined, "(de)") || strings.Contains(combined, "_de") || strings.Contains(combined, "-de"):
+		return "de"
+	case strings.Contains(combined, "(ja)") || strings.Contains(combined, "_ja") || strings.Contains(combined, "-ja"):
+		return "ja"
+	default:
+		return "en"
+	}
+}
+
 func GetDefaultSources() []FeedSource {
 	var cfg defaultSourcesConfig
 	if err := json.Unmarshal(defaultSourcesJSON, &cfg); err != nil {
@@ -214,6 +260,7 @@ func GetDefaultSources() []FeedSource {
 			Type:        FeedSourceTypeX,
 			Description: item.Description,
 			IsActive:    false,
+			Language:    NormalizeSourceLanguage(item.Language, item.ID, item.Name, item.URL),
 		})
 	}
 	for _, item := range cfg.Telegram {
@@ -225,6 +272,7 @@ func GetDefaultSources() []FeedSource {
 			Type:        FeedSourceTypeTelegram,
 			Description: item.Description,
 			IsActive:    false,
+			Language:    NormalizeSourceLanguage(item.Language, item.ID, item.Name, item.URL),
 		})
 	}
 	for _, item := range cfg.RSS {
@@ -236,6 +284,7 @@ func GetDefaultSources() []FeedSource {
 			Type:        FeedSourceTypeRSS,
 			Description: item.Description,
 			IsActive:    false,
+			Language:    NormalizeSourceLanguage(item.Language, item.ID, item.Name, item.URL),
 		})
 	}
 	for _, item := range cfg.Reddit {
@@ -247,6 +296,7 @@ func GetDefaultSources() []FeedSource {
 			Type:        FeedSourceTypeReddit,
 			Description: item.Description,
 			IsActive:    false,
+			Language:    NormalizeSourceLanguage(item.Language, item.ID, item.Name, item.URL),
 		})
 	}
 	for _, item := range cfg.Special {
@@ -262,6 +312,7 @@ func GetDefaultSources() []FeedSource {
 			Type:        st,
 			Description: item.Description,
 			IsActive:    false,
+			Language:    NormalizeSourceLanguage(item.Language, item.ID, item.Name, item.URL),
 		})
 	}
 	return sources

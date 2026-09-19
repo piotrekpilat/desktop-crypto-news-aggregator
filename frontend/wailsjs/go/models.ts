@@ -88,6 +88,7 @@ export namespace main {
 	    isActive: boolean;
 	    failureCount: number;
 	    autoDisabledAfterFailure: boolean;
+	    language: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new FeedSource(source);
@@ -104,6 +105,7 @@ export namespace main {
 	        this.isActive = source["isActive"];
 	        this.failureCount = source["failureCount"];
 	        this.autoDisabledAfterFailure = source["autoDisabledAfterFailure"];
+	        this.language = source["language"];
 	    }
 	}
 	export class PricePoint {
@@ -149,6 +151,12 @@ export namespace main {
 	    xNightCheckInterval: number;
 	    currentLanguage: string;
 	    cryptoPanicTokenConfigured: boolean;
+	    discordWebhookEnabled: boolean;
+	    discordWebhookConfigured: boolean;
+	    telegramIntegrationEnabled: boolean;
+	    telegramIntegrationConfigured: boolean;
+	    slackWebhookEnabled: boolean;
+	    slackWebhookConfigured: boolean;
 	    alarmCycle: AlarmCycleState;
 	    maxStoredNews: number;
 	    totalStoredNewsCount: number;
@@ -193,6 +201,12 @@ export namespace main {
 	        this.xNightCheckInterval = source["xNightCheckInterval"];
 	        this.currentLanguage = source["currentLanguage"];
 	        this.cryptoPanicTokenConfigured = source["cryptoPanicTokenConfigured"];
+	        this.discordWebhookEnabled = source["discordWebhookEnabled"];
+	        this.discordWebhookConfigured = source["discordWebhookConfigured"];
+	        this.telegramIntegrationEnabled = source["telegramIntegrationEnabled"];
+	        this.telegramIntegrationConfigured = source["telegramIntegrationConfigured"];
+	        this.slackWebhookEnabled = source["slackWebhookEnabled"];
+	        this.slackWebhookConfigured = source["slackWebhookConfigured"];
 	        this.alarmCycle = this.convertValues(source["alarmCycle"], AlarmCycleState);
 	        this.maxStoredNews = source["maxStoredNews"];
 	        this.totalStoredNewsCount = source["totalStoredNewsCount"];

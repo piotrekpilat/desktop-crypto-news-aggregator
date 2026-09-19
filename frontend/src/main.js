@@ -157,6 +157,20 @@ const I18N = {
         nav_chart: "Wykres",
         nav_feed: "Feed",
         nav_manage: "Zarządzaj",
+        nav_integrations: "Integracje",
+        integrations_title: "Integracje",
+        integrations_desc: "Wysyłaj nowe lub wybrane wiadomości na zewnętrzne kanały.",
+        integration_configured: "Skonfigurowano",
+        integration_not_configured: "Nie skonfigurowano",
+        integration_enabled: "Aktywne",
+        integration_disabled: "Wyłączone",
+        discord_desc: "Webhook kanału Discord do wysyłki wiadomości.",
+        telegram_desc: "Bot token i chat ID dla kanału lub grupy Telegram.",
+        slack_desc: "Incoming Webhook Slack.",
+        webhook_placeholder: "Wklej webhook URL...",
+        tg_token_placeholder: "Bot token...",
+        tg_chat_placeholder: "Chat ID...",
+        btn_test_send: "Wyślij wybraną wiadomość",
         manage_title: "Zarządzaj wiadomościami",
         manage_selected_count: "Wybrano: %d z %d",
         manage_selected_short: "Wybrano: %d",
@@ -337,6 +351,20 @@ const I18N = {
         nav_chart: "Chart",
         nav_feed: "Feed",
         nav_manage: "Manage",
+        nav_integrations: "Integrations",
+        integrations_title: "Integrations",
+        integrations_desc: "Send new or selected news to external channels.",
+        integration_configured: "Configured",
+        integration_not_configured: "Not configured",
+        integration_enabled: "Enabled",
+        integration_disabled: "Disabled",
+        discord_desc: "Discord webhook for news delivery.",
+        telegram_desc: "Bot token and chat ID for Telegram.",
+        slack_desc: "Slack Incoming Webhook.",
+        webhook_placeholder: "Paste webhook URL...",
+        tg_token_placeholder: "Bot token...",
+        tg_chat_placeholder: "Chat ID...",
+        btn_test_send: "Send selected news",
         manage_title: "Manage News",
         manage_selected_count: "Selected: %d of %d",
         manage_selected_short: "Selected: %d",
@@ -517,6 +545,20 @@ const I18N = {
         nav_chart: "Chart",
         nav_feed: "Feed",
         nav_manage: "Verwalten",
+        nav_integrations: "Integrationen",
+        integrations_title: "Integrationen",
+        integrations_desc: "Sende neue oder ausgewählte Nachrichten an externe Kanäle.",
+        integration_configured: "Konfiguriert",
+        integration_not_configured: "Nicht konfiguriert",
+        integration_enabled: "Aktiv",
+        integration_disabled: "Aus",
+        discord_desc: "Discord-Webhook für News-Versand.",
+        telegram_desc: "Bot-Token und Chat-ID für Telegram.",
+        slack_desc: "Slack Incoming Webhook.",
+        webhook_placeholder: "Webhook-URL einfügen...",
+        tg_token_placeholder: "Bot-Token...",
+        tg_chat_placeholder: "Chat-ID...",
+        btn_test_send: "Ausgewählte Nachricht senden",
         manage_title: "Nachrichten verwalten",
         manage_selected_count: "Ausgewählt: %d von %d",
         manage_selected_short: "Ausgewählt: %d",
@@ -554,6 +596,7 @@ let favNewsSearchQuery = "";
 let manageSearchQuery = "";
 let selectedManageNewsIds = new Set();
 let sourceManageSearchQuery = "";
+let sourceManageLanguageFilter = "all";
 
 // Date Range Filter State (Default: "today", "all" at the end)
 let dateFilterPreset = "today";
@@ -934,6 +977,8 @@ function renderState(state) {
     if (lblNavFeed) lblNavFeed.innerText = t('nav_feed');
     document.getElementById('lblNavNew').innerText = t('nav_new');
     document.getElementById('lblNavFav').innerText = t('nav_fav');
+    const lblNavIntegrations = document.getElementById('lblNavIntegrations');
+    if (lblNavIntegrations) lblNavIntegrations.innerText = t('nav_integrations');
     document.getElementById('lblNavSettings').innerText = t('nav_settings');
 
     // 10. Switch visible view tab & Render News Cards
@@ -942,12 +987,14 @@ function renderState(state) {
     const viewManage = document.getElementById('viewManage');
     const viewNew = document.getElementById('viewNew');
     const viewFavorites = document.getElementById('viewFavorites');
+    const viewIntegrations = document.getElementById('viewIntegrations');
     const viewSettings = document.getElementById('viewSettings');
 
     viewFeed.style.display = 'none';
     if (viewManage) viewManage.style.display = 'none';
     if (viewNew) viewNew.style.display = 'none';
     viewFavorites.style.display = 'none';
+    if (viewIntegrations) viewIntegrations.style.display = 'none';
     viewSettings.style.display = 'none';
 
     const baseNewsList = state.newsList || [];
@@ -1015,6 +1062,11 @@ function renderState(state) {
         const inputFav = document.getElementById('inputFavNewsSearch');
         if (inputFav) inputFav.placeholder = t('fav_news_search_placeholder');
         renderNewsCards(filtered, state.selectedNewsID, document.getElementById('favCardsList'), true, false);
+    } else if (state.currentTab === 'INTEGRATIONS') {
+        if (viewIntegrations) {
+            viewIntegrations.style.display = 'flex';
+            renderIntegrationsView(state);
+        }
     } else if (state.currentTab === 'SETTINGS') {
         viewSettings.style.display = 'flex';
         renderSettingsView(state);
@@ -1678,6 +1730,110 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+// =========================================================================
+// 🔌 RENDER INTEGRATIONS VIEW
+// =========================================================================
+function renderIntegrationsView(state) {
+    const title = document.getElementById('txtIntegrationsTitle');
+    const list = document.getElementById('integrationsList');
+    if (!title || !list) return;
+    title.innerText = t('integrations_title');
+    const selectedNews = getSelectedNewsItem(state);
+    list.innerHTML = `
+        <div class="integrations-desc">${t('integrations_desc')}</div>
+        ${renderIntegrationCard('discord', 'Discord', t('discord_desc'), '#5865F2', state.discordWebhookEnabled, state.discordWebhookConfigured)}
+        ${renderIntegrationCard('telegram', 'Telegram', t('telegram_desc'), '#2AABEE', state.telegramIntegrationEnabled, state.telegramIntegrationConfigured)}
+        ${renderIntegrationCard('slack', 'Slack', t('slack_desc'), '#611F69', state.slackWebhookEnabled, state.slackWebhookConfigured)}
+    `;
+    setupIntegrationCard('discord', {
+        save: () => window.go.main.App.SaveDiscordWebhookURL(document.getElementById('inputDiscordWebhook').value),
+        clear: () => window.go.main.App.ClearDiscordWebhookURL(),
+        toggle: checked => window.go.main.App.SetDiscordWebhookEnabled(checked)
+    });
+    setupIntegrationCard('telegram', {
+        save: () => window.go.main.App.SaveTelegramIntegration(document.getElementById('inputTelegramToken').value, document.getElementById('inputTelegramChat').value),
+        clear: () => window.go.main.App.ClearTelegramIntegration(),
+        toggle: checked => window.go.main.App.SetTelegramIntegrationEnabled(checked)
+    });
+    setupIntegrationCard('slack', {
+        save: () => window.go.main.App.SaveSlackWebhookURL(document.getElementById('inputSlackWebhook').value),
+        clear: () => window.go.main.App.ClearSlackWebhookURL(),
+        toggle: checked => window.go.main.App.SetSlackWebhookEnabled(checked)
+    });
+    document.querySelectorAll('.btn-test-integration').forEach(btn => {
+        btn.disabled = !selectedNews;
+        btn.onclick = () => {
+            if (!selectedNews) return;
+            window.go.main.App.SendNewsToIntegrations(selectedNews.id).then(renderState).catch(err => alert(err));
+        };
+    });
+}
+
+function renderIntegrationCard(kind, name, desc, color, enabled, configured) {
+    const status = configured ? t('integration_configured') : t('integration_not_configured');
+    const enabledText = enabled ? t('integration_enabled') : t('integration_disabled');
+    const input = kind === 'telegram'
+        ? `<input type="password" class="token-input" id="inputTelegramToken" placeholder="${t('tg_token_placeholder')}"><input type="text" class="token-input" id="inputTelegramChat" placeholder="${t('tg_chat_placeholder')}">`
+        : `<input type="password" class="token-input" id="input${kind === 'discord' ? 'Discord' : 'Slack'}Webhook" placeholder="${t('webhook_placeholder')}">`;
+    return `<div class="integration-card" style="--integration-color: ${color};"><div class="integration-card-head"><div><div class="integration-title">${name}</div><div class="integration-desc">${desc}</div></div><label class="switch"><input type="checkbox" class="chk-integration" data-kind="${kind}" ${enabled ? 'checked' : ''}><span class="slider round"></span></label></div><div class="integration-status-row"><span>${status}</span><span>${enabledText}</span></div><div class="integration-inputs">${input}</div><div class="integration-actions"><button class="btn-token-save btn-save-integration" data-kind="${kind}">${t('btn_save')}</button><button class="btn-token-remove btn-clear-integration" data-kind="${kind}">${t('btn_clear')}</button><button class="btn-add-source-header btn-test-integration" data-kind="${kind}">${t('btn_test_send')}</button></div></div>`;
+}
+
+function setupIntegrationCard(kind, handlers) {
+    const saveBtn = document.querySelector(`.btn-save-integration[data-kind="${kind}"]`);
+    const clearBtn = document.querySelector(`.btn-clear-integration[data-kind="${kind}"]`);
+    const toggle = document.querySelector(`.chk-integration[data-kind="${kind}"]`);
+    if (saveBtn) saveBtn.onclick = () => handlers.save().then(renderState).catch(err => alert(err));
+    if (clearBtn) clearBtn.onclick = () => handlers.clear().then(renderState);
+    if (toggle) toggle.onchange = e => handlers.toggle(e.target.checked).then(renderState);
+}
+
+function getSelectedNewsItem(state) {
+    const list = state.newsList || [];
+    return list.find(n => n.id === state.selectedNewsId) || list[0] || null;
+}
+
+
+function normalizeSourceLanguageCode(language) {
+    const lang = (language || 'multi').toLowerCase().trim();
+    return ['en', 'pl', 'de', 'ja', 'multi'].includes(lang) ? lang : 'multi';
+}
+
+function sourceLanguageLabel(language) {
+    const labels = { en: 'EN', pl: 'PL', de: 'DE', ja: 'JA', multi: 'MULTI' };
+    return labels[normalizeSourceLanguageCode(language)] || 'MULTI';
+}
+
+function nextSourceLanguage(language) {
+    const order = ['en', 'pl', 'de', 'ja', 'multi'];
+    const idx = order.indexOf(normalizeSourceLanguageCode(language));
+    return order[(idx + 1) % order.length];
+}
+
+function renderSourceLanguageFilters(sources) {
+    const row = document.getElementById('sourceLanguageFilterRow');
+    if (!row) return;
+    const counts = { all: sources.length, en: 0, pl: 0, de: 0, ja: 0, multi: 0 };
+    sources.forEach(source => { counts[normalizeSourceLanguageCode(source.language)]++; });
+    const labels = {
+        all: `ALL · ${counts.all}`,
+        en: `EN · ${counts.en}`,
+        pl: `PL · ${counts.pl}`,
+        de: `DE · ${counts.de}`,
+        ja: `JA · ${counts.ja}`,
+        multi: `MULTI · ${counts.multi}`
+    };
+    row.innerHTML = ['all', 'en', 'pl', 'de', 'ja', 'multi'].map(lang =>
+        `<button class="source-language-chip ${sourceManageLanguageFilter === lang ? 'active' : ''}" data-lang="${lang}">${labels[lang]}</button>`
+    ).join('');
+    row.querySelectorAll('.source-language-chip').forEach(chip => {
+        chip.onclick = () => {
+            sourceManageLanguageFilter = chip.getAttribute('data-lang') || 'all';
+            if (currentAppState) renderSourcesSubtab(currentAppState);
+        };
+    });
+}
+
 // =========================================================================
 // ⚙️ RENDER SETTINGS VIEW & SUBTABS
 // =========================================================================
@@ -1797,7 +1953,10 @@ function renderSourcesSubtab(state) {
     genContainer.innerHTML = '';
 
     const q = sourceManageSearchQuery.toLowerCase().trim();
+    renderSourceLanguageFilters(state.sourcesList || []);
     const allSources = (state.sourcesList || []).filter(s => {
+        const sourceLanguage = normalizeSourceLanguageCode(s.language);
+        if (sourceManageLanguageFilter !== 'all' && sourceLanguage !== sourceManageLanguageFilter) return false;
         if (!q) return true;
         return (s.name && s.name.toLowerCase().includes(q)) ||
                (s.description && s.description.toLowerCase().includes(q)) ||
@@ -1833,7 +1992,7 @@ function renderSourcesSubtab(state) {
 
         chkToggleAll.onclick = () => {
             const shouldActivate = activeVisibleCount < totalVisibleCount;
-            const targetIDs = q ? allSources.map(s => s.id) : [];
+            const targetIDs = (q || sourceManageLanguageFilter !== 'all') ? allSources.map(s => s.id) : [];
             window.go.main.App.ToggleAllSources(shouldActivate, targetIDs).then(renderState);
         };
     }
@@ -1884,6 +2043,7 @@ function renderSourcesSubtab(state) {
                     <div class="source-card-name">
                         ${escapeHtml(src.name)}
                         ${isCustom ? '<span class="custom-source-badge">CUSTOM</span>' : ''}
+                        <button class="source-language-badge" title="Zmień język źródła">${sourceLanguageLabel(src.language)}</button>
                     </div>
                     ${src.description ? `<div class="source-card-desc">${escapeHtml(src.description)}</div>` : ''}
                     <div class="source-card-url">${escapeHtml(src.url)}</div>
@@ -1898,6 +2058,14 @@ function renderSourcesSubtab(state) {
             </div>
             ${cpTokenHtml}
         `;
+
+        const langBadge = card.querySelector('.source-language-badge');
+        if (langBadge) {
+            langBadge.onclick = (e) => {
+                e.stopPropagation();
+                window.go.main.App.SetSourceLanguage(src.id, nextSourceLanguage(src.language)).then(renderState);
+            };
+        }
 
         card.querySelector('.chk-source').onchange = (e) => {
             window.go.main.App.ToggleSource(src.id, e.target.checked).then(renderState);
@@ -1934,7 +2102,7 @@ function renderSourcesSubtab(state) {
         return card;
     }
 
-    if (xSources.length === 0 && tgSources.length === 0 && genSources.length === 0 && q) {
+    if (xSources.length === 0 && tgSources.length === 0 && genSources.length === 0 && (q || sourceManageLanguageFilter !== 'all')) {
         const empty = document.createElement('div');
         empty.className = 'empty-state-box';
         empty.style.padding = '20px 10px';

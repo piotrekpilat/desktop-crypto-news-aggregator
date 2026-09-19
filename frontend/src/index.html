@@ -305,7 +305,13 @@
                     <div class="news-scroll-list" id="favCardsList"></div>
                 </div>
 
-                <!-- TAB 4: SETTINGS WITH 3 SUB-TABS -->
+                <!-- TAB 4: INTEGRATIONS -->
+                <div class="view-tab" id="viewIntegrations" style="display: none;">
+                    <div class="settings-header-title" id="txtIntegrationsTitle">Integracje</div>
+                    <div class="integrations-list" id="integrationsList"></div>
+                </div>
+
+                <!-- TAB 5: SETTINGS WITH 3 SUB-TABS -->
                 <div class="view-tab" id="viewSettings" style="display: none;">
                     <div class="settings-header-title" id="txtSettingsTitle">Ustawienia Aplikacji</div>
                     
@@ -335,6 +341,7 @@
                             <input type="text" class="search-input" id="inputSourceManageSearch" placeholder="Szukaj źródła (np. telegram, coindesk, btc)...">
                             <button class="search-clear-btn" id="btnClearSourceManageSearch" style="display: none;">✕</button>
                         </div>
+                        <div class="source-language-filter-row" id="sourceLanguageFilterRow"></div>
                         <div class="sources-manage-toolbar" style="display: flex; justify-content: space-between; align-items: center; padding: 7px 12px; margin-bottom: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px;">
                             <label class="toggle-all-sources-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; font-size: 13px; font-weight: 600; color: #fff; margin: 0;">
                                 <input type="checkbox" class="custom-checkbox" id="chkToggleAllSources">
@@ -652,6 +659,12 @@
                         <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                     </svg>
                     <span class="nav-label" id="lblNavFav">Ulubione</span>
+                </div>
+                <div class="nav-item" data-tab="INTEGRATIONS" id="navItemIntegrations">
+                    <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2zM4 4h16c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2H8l-4 4v-4H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    </svg>
+                    <span class="nav-label" id="lblNavIntegrations">Integracje</span>
                 </div>
                 <div class="nav-item" data-tab="SETTINGS" id="navItemSettings">
                     <svg class="nav-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">

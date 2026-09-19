@@ -9,36 +9,43 @@ import (
 )
 
 type SavedSettings struct {
-	FavoriteNewsIDs       []string         `json:"favoriteNewsIds"`
-	SeenNewsIDs           []string         `json:"seenNewsIds"`
-	SelectedSourceFilters []string         `json:"selectedSourceFilters"`
-	ObservedCoins         []string         `json:"observedCoins"`
-	CurrentCoin           string           `json:"currentCoin"`
-	FilterKeywords        []string         `json:"filterKeywords"`
-	AlarmEnabled          bool             `json:"alarmEnabled"`
-	MaxVibrations         int              `json:"maxVibrations"`
-	NightModeEnabled      bool             `json:"nightModeEnabled"`
-	NightModeStart        string           `json:"nightModeStart"`
-	NightModeEnd          string           `json:"nightModeEnd"`
-	CheckInterval         int              `json:"checkInterval"`
-	NightCheckInterval    int              `json:"nightCheckInterval"`
-	XCheckInterval        int              `json:"xCheckInterval"`
-	XNightCheckInterval   int              `json:"xNightCheckInterval"`
-	AppLanguage           string           `json:"appLanguage"`
-	MaxStoredNews         int              `json:"maxStoredNews"`
-	UseInternalBrowser    bool             `json:"useInternalBrowser"`
-	AlwaysOnTop           bool             `json:"alwaysOnTop"`
-	Autostart             bool             `json:"autostart"`
-	CryptoPanicToken      string           `json:"cryptoPanicToken"`
-	XAuthToken            string           `json:"xAuthToken,omitempty"`
-	XCT0                  string           `json:"xCt0,omitempty"`
-	Sources               []FeedSource     `json:"sources"`
-	NewsHistory           []CryptoNewsItem `json:"newsHistory"`
-	HistoryClearedAt      int64            `json:"historyClearedAt"`
-	WindowWidth           int              `json:"windowWidth,omitempty"`
-	WindowHeight          int              `json:"windowHeight,omitempty"`
-	ShowChart             bool             `json:"showChart"`
-	DeletedNewsIDs        []string         `json:"deletedNewsIds,omitempty"`
+	FavoriteNewsIDs            []string         `json:"favoriteNewsIds"`
+	SeenNewsIDs                []string         `json:"seenNewsIds"`
+	SelectedSourceFilters      []string         `json:"selectedSourceFilters"`
+	ObservedCoins              []string         `json:"observedCoins"`
+	CurrentCoin                string           `json:"currentCoin"`
+	FilterKeywords             []string         `json:"filterKeywords"`
+	AlarmEnabled               bool             `json:"alarmEnabled"`
+	MaxVibrations              int              `json:"maxVibrations"`
+	NightModeEnabled           bool             `json:"nightModeEnabled"`
+	NightModeStart             string           `json:"nightModeStart"`
+	NightModeEnd               string           `json:"nightModeEnd"`
+	CheckInterval              int              `json:"checkInterval"`
+	NightCheckInterval         int              `json:"nightCheckInterval"`
+	XCheckInterval             int              `json:"xCheckInterval"`
+	XNightCheckInterval        int              `json:"xNightCheckInterval"`
+	AppLanguage                string           `json:"appLanguage"`
+	MaxStoredNews              int              `json:"maxStoredNews"`
+	UseInternalBrowser         bool             `json:"useInternalBrowser"`
+	AlwaysOnTop                bool             `json:"alwaysOnTop"`
+	Autostart                  bool             `json:"autostart"`
+	CryptoPanicToken           string           `json:"cryptoPanicToken"`
+	DiscordWebhookEnabled      bool             `json:"discordWebhookEnabled"`
+	DiscordWebhookURL          string           `json:"discordWebhookUrl,omitempty"`
+	TelegramIntegrationEnabled bool             `json:"telegramIntegrationEnabled"`
+	TelegramBotToken           string           `json:"telegramBotToken,omitempty"`
+	TelegramChatID             string           `json:"telegramChatId,omitempty"`
+	SlackWebhookEnabled        bool             `json:"slackWebhookEnabled"`
+	SlackWebhookURL            string           `json:"slackWebhookUrl,omitempty"`
+	XAuthToken                 string           `json:"xAuthToken,omitempty"`
+	XCT0                       string           `json:"xCt0,omitempty"`
+	Sources                    []FeedSource     `json:"sources"`
+	NewsHistory                []CryptoNewsItem `json:"newsHistory"`
+	HistoryClearedAt           int64            `json:"historyClearedAt"`
+	WindowWidth                int              `json:"windowWidth,omitempty"`
+	WindowHeight               int              `json:"windowHeight,omitempty"`
+	ShowChart                  bool             `json:"showChart"`
+	DeletedNewsIDs             []string         `json:"deletedNewsIds,omitempty"`
 }
 
 type StorageManager struct {
@@ -146,12 +153,16 @@ func (sm *StorageManager) Load() *SavedSettings {
 				if settings.Sources[i].Description == "" && defS.Description != "" {
 					settings.Sources[i].Description = defS.Description
 				}
+				if settings.Sources[i].Language == "" {
+					settings.Sources[i].Language = defS.Language
+				}
 				if settings.Sources[i].ID == "binance_announcements" && !settings.Sources[i].IsActive {
 					settings.Sources[i].IsActive = true
 				}
 			} else if settings.Sources[i].Type == "" {
 				settings.Sources[i].Type = GuessFeedSourceType(settings.Sources[i].URL, settings.Sources[i].ID)
 			}
+			settings.Sources[i].Language = NormalizeSourceLanguage(settings.Sources[i].Language, settings.Sources[i].ID, settings.Sources[i].Name, settings.Sources[i].URL)
 		}
 		for _, defS := range defSources {
 			if !existingMap[defS.ID] {
@@ -221,29 +232,36 @@ Comment=Crypto News & Market Desktop Widget
 
 func (sm *StorageManager) defaultSettings() *SavedSettings {
 	return &SavedSettings{
-		FavoriteNewsIDs:       []string{},
-		SeenNewsIDs:           []string{},
-		SelectedSourceFilters: []string{"Wszystkie"},
-		ObservedCoins:         []string{"ADAUSDT", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"},
-		CurrentCoin:           "ADAUSDT",
-		FilterKeywords:        []string{},
-		AlarmEnabled:          true,
-		MaxVibrations:         10,
-		NightModeEnabled:      true,
-		NightModeStart:        "22:00",
-		NightModeEnd:          "07:00",
-		CheckInterval:         60,
-		NightCheckInterval:    900,
-		XCheckInterval:        300,
-		XNightCheckInterval:   600,
-		AppLanguage:           "pl",
-		MaxStoredNews:         3650,
-		UseInternalBrowser:    false,
-		AlwaysOnTop:           false,
-		Autostart:             false,
-		CryptoPanicToken:      "",
-		Sources:               GetDefaultSources(),
-		NewsHistory:           []CryptoNewsItem{},
-		HistoryClearedAt:      0,
+		FavoriteNewsIDs:            []string{},
+		SeenNewsIDs:                []string{},
+		SelectedSourceFilters:      []string{"Wszystkie"},
+		ObservedCoins:              []string{"ADAUSDT", "BTCUSDT", "ETHUSDT", "SOLUSDT", "XRPUSDT"},
+		CurrentCoin:                "ADAUSDT",
+		FilterKeywords:             []string{},
+		AlarmEnabled:               true,
+		MaxVibrations:              10,
+		NightModeEnabled:           true,
+		NightModeStart:             "22:00",
+		NightModeEnd:               "07:00",
+		CheckInterval:              60,
+		NightCheckInterval:         900,
+		XCheckInterval:             300,
+		XNightCheckInterval:        600,
+		AppLanguage:                "pl",
+		MaxStoredNews:              3650,
+		UseInternalBrowser:         false,
+		AlwaysOnTop:                false,
+		Autostart:                  false,
+		CryptoPanicToken:           "",
+		DiscordWebhookEnabled:      false,
+		DiscordWebhookURL:          "",
+		TelegramIntegrationEnabled: false,
+		TelegramBotToken:           "",
+		TelegramChatID:             "",
+		SlackWebhookEnabled:        false,
+		SlackWebhookURL:            "",
+		Sources:                    GetDefaultSources(),
+		NewsHistory:                []CryptoNewsItem{},
+		HistoryClearedAt:           0,
 	}
 }

@@ -22,50 +22,57 @@ import (
 )
 
 type App struct {
-	ctx           context.Context
-	mu            sync.Mutex
-	storage       *StorageManager
-	feedCli       *FeedClient
-	binanceCli    *BinanceClient
+	ctx        context.Context
+	mu         sync.Mutex
+	storage    *StorageManager
+	feedCli    *FeedClient
+	binanceCli *BinanceClient
 
 	// Internal state
-	allNews               []CryptoNewsItem
-	sources               []FeedSource
-	cryptoPanicToken      string
-	xAuthToken            string
-	xCt0                  string
-	pricePoints           []PricePoint
-	favoriteIDs           map[string]bool
-	seenNewsIDs           map[string]bool
-	allAvailableCoins     []CoinInfo
-	observedSymbols       map[string]bool
-	currentCoinSymbol     string
-	activeKeywords        []string
-	selectedSourceFilters []string
+	allNews                    []CryptoNewsItem
+	sources                    []FeedSource
+	cryptoPanicToken           string
+	discordWebhookEnabled      bool
+	discordWebhookURL          string
+	telegramIntegrationEnabled bool
+	telegramBotToken           string
+	telegramChatID             string
+	slackWebhookEnabled        bool
+	slackWebhookURL            string
+	xAuthToken                 string
+	xCt0                       string
+	pricePoints                []PricePoint
+	favoriteIDs                map[string]bool
+	seenNewsIDs                map[string]bool
+	allAvailableCoins          []CoinInfo
+	observedSymbols            map[string]bool
+	currentCoinSymbol          string
+	activeKeywords             []string
+	selectedSourceFilters      []string
 
 	// X (Twitter) Rate Limiting & Anti-Ban Throttling
 	xLastFetchTimes map[string]time.Time
 	xNextIntervals  map[string]time.Duration
 	xFetchMu        sync.Mutex
 
-	alarmEnabled       bool
-	maxVibrations      int
-	nightModeEnabled   bool
-	nightModeStart     string
-	nightModeEnd       string
+	alarmEnabled        bool
+	maxVibrations       int
+	nightModeEnabled    bool
+	nightModeStart      string
+	nightModeEnd        string
 	checkInterval       int
 	nightCheckInterval  int
 	xCheckInterval      int
 	xNightCheckInterval int
 	pollWakeChan        chan struct{}
-	currentLanguage    string
-	maxStoredNews      int
-	useInternalBrowser bool
-	alwaysOnTop        bool
-	autostart          bool
-	windowVisible      bool
-	windowWidth        int
-	windowHeight       int
+	currentLanguage     string
+	maxStoredNews       int
+	useInternalBrowser  bool
+	alwaysOnTop         bool
+	autostart           bool
+	windowVisible       bool
+	windowWidth         int
+	windowHeight        int
 
 	currentTab         AppTab
 	settingsSubTab     SettingsSubTab
@@ -77,13 +84,13 @@ type App struct {
 	isLiveMarket       bool
 	isOffline          bool
 
-	alarmCycle         AlarmCycleState
-	alarmTickerStop    chan struct{}
-	knownNewsIDs       map[string]bool
-	deletedNewsIDs     map[string]bool
-	historyClearedAt   int64
-	isFetchingDirect   atomic.Bool
-	showChart          bool
+	alarmCycle       AlarmCycleState
+	alarmTickerStop  chan struct{}
+	knownNewsIDs     map[string]bool
+	deletedNewsIDs   map[string]bool
+	historyClearedAt int64
+	isFetchingDirect atomic.Bool
+	showChart        bool
 }
 
 func NewApp() *App {
@@ -201,6 +208,13 @@ func (a *App) loadSettings() {
 	a.alwaysOnTop = s.AlwaysOnTop
 	a.autostart = s.Autostart
 	a.cryptoPanicToken = s.CryptoPanicToken
+	a.discordWebhookEnabled = s.DiscordWebhookEnabled
+	a.discordWebhookURL = s.DiscordWebhookURL
+	a.telegramIntegrationEnabled = s.TelegramIntegrationEnabled
+	a.telegramBotToken = s.TelegramBotToken
+	a.telegramChatID = s.TelegramChatID
+	a.slackWebhookEnabled = s.SlackWebhookEnabled
+	a.slackWebhookURL = s.SlackWebhookURL
 	a.xAuthToken = s.XAuthToken
 	a.xCt0 = s.XCT0
 	if a.xAuthToken == "" {
@@ -292,36 +306,43 @@ func (a *App) saveSettingsLocked() {
 	}
 
 	settings := &SavedSettings{
-		FavoriteNewsIDs:       favList,
-		SeenNewsIDs:           seenList,
-		SelectedSourceFilters: a.selectedSourceFilters,
-		ObservedCoins:         obsList,
-		CurrentCoin:           a.currentCoinSymbol,
-		FilterKeywords:        a.activeKeywords,
-		AlarmEnabled:          a.alarmEnabled,
-		MaxVibrations:         a.maxVibrations,
-		NightModeEnabled:      a.nightModeEnabled,
-		NightModeStart:        a.nightModeStart,
-		NightModeEnd:          a.nightModeEnd,
-		CheckInterval:         a.checkInterval,
-		NightCheckInterval:    a.nightCheckInterval,
-		XCheckInterval:        a.xCheckInterval,
-		XNightCheckInterval:   a.xNightCheckInterval,
-		AppLanguage:           a.currentLanguage,
-		MaxStoredNews:         a.maxStoredNews,
-		UseInternalBrowser:    a.useInternalBrowser,
-		AlwaysOnTop:           a.alwaysOnTop,
-		Autostart:             a.autostart,
-		CryptoPanicToken:      a.cryptoPanicToken,
-		XAuthToken:            a.xAuthToken,
-		XCT0:                  a.xCt0,
-		Sources:               a.sources,
-		NewsHistory:           history,
-		HistoryClearedAt:      a.historyClearedAt,
-		WindowWidth:           a.windowWidth,
-		WindowHeight:          a.windowHeight,
-		ShowChart:             a.showChart,
-		DeletedNewsIDs:        deletedList,
+		FavoriteNewsIDs:            favList,
+		SeenNewsIDs:                seenList,
+		SelectedSourceFilters:      a.selectedSourceFilters,
+		ObservedCoins:              obsList,
+		CurrentCoin:                a.currentCoinSymbol,
+		FilterKeywords:             a.activeKeywords,
+		AlarmEnabled:               a.alarmEnabled,
+		MaxVibrations:              a.maxVibrations,
+		NightModeEnabled:           a.nightModeEnabled,
+		NightModeStart:             a.nightModeStart,
+		NightModeEnd:               a.nightModeEnd,
+		CheckInterval:              a.checkInterval,
+		NightCheckInterval:         a.nightCheckInterval,
+		XCheckInterval:             a.xCheckInterval,
+		XNightCheckInterval:        a.xNightCheckInterval,
+		AppLanguage:                a.currentLanguage,
+		MaxStoredNews:              a.maxStoredNews,
+		UseInternalBrowser:         a.useInternalBrowser,
+		AlwaysOnTop:                a.alwaysOnTop,
+		Autostart:                  a.autostart,
+		CryptoPanicToken:           a.cryptoPanicToken,
+		DiscordWebhookEnabled:      a.discordWebhookEnabled,
+		DiscordWebhookURL:          a.discordWebhookURL,
+		TelegramIntegrationEnabled: a.telegramIntegrationEnabled,
+		TelegramBotToken:           a.telegramBotToken,
+		TelegramChatID:             a.telegramChatID,
+		SlackWebhookEnabled:        a.slackWebhookEnabled,
+		SlackWebhookURL:            a.slackWebhookURL,
+		XAuthToken:                 a.xAuthToken,
+		XCT0:                       a.xCt0,
+		Sources:                    a.sources,
+		NewsHistory:                history,
+		HistoryClearedAt:           a.historyClearedAt,
+		WindowWidth:                a.windowWidth,
+		WindowHeight:               a.windowHeight,
+		ShowChart:                  a.showChart,
+		DeletedNewsIDs:             deletedList,
 	}
 
 	go a.storage.Save(settings)
@@ -582,9 +603,152 @@ func (a *App) fetchFeedsDirect(notifyOnNew bool) []CryptoNewsItem {
 			}
 			go a.SendDesktopNotification(title, body)
 		}
+		a.dispatchIntegrationsLocked(newlyArrived)
 	}
 
 	return newlyArrived
+}
+
+func (a *App) dispatchIntegrationsLocked(items []CryptoNewsItem) {
+	if len(items) == 0 {
+		return
+	}
+	discordEnabled := a.discordWebhookEnabled
+	discordURL := strings.TrimSpace(a.discordWebhookURL)
+	telegramEnabled := a.telegramIntegrationEnabled
+	telegramToken := strings.TrimSpace(a.telegramBotToken)
+	telegramChatID := strings.TrimSpace(a.telegramChatID)
+	slackEnabled := a.slackWebhookEnabled
+	slackURL := strings.TrimSpace(a.slackWebhookURL)
+	itemsCopy := make([]CryptoNewsItem, len(items))
+	copy(itemsCopy, items)
+	go func() {
+		if discordEnabled && discordURL != "" {
+			_ = SendDiscordWebhook(discordURL, itemsCopy)
+		}
+		if telegramEnabled && telegramToken != "" && telegramChatID != "" {
+			_ = SendTelegramMessages(telegramToken, telegramChatID, itemsCopy)
+		}
+		if slackEnabled && slackURL != "" {
+			_ = SendSlackWebhook(slackURL, itemsCopy)
+		}
+	}()
+}
+
+func (a *App) SetDiscordWebhookEnabled(enabled bool) FullAppState {
+	a.mu.Lock()
+	a.discordWebhookEnabled = enabled
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SaveDiscordWebhookURL(url string) (FullAppState, error) {
+	cleanURL := strings.TrimSpace(url)
+	if cleanURL != "" && !IsValidDiscordWebhookURL(cleanURL) {
+		return a.GetState(), fmt.Errorf("Nieprawidłowy webhook Discord")
+	}
+	a.mu.Lock()
+	a.discordWebhookURL = cleanURL
+	a.discordWebhookEnabled = cleanURL != ""
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState(), nil
+}
+
+func (a *App) ClearDiscordWebhookURL() FullAppState {
+	a.mu.Lock()
+	a.discordWebhookURL = ""
+	a.discordWebhookEnabled = false
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SetTelegramIntegrationEnabled(enabled bool) FullAppState {
+	a.mu.Lock()
+	a.telegramIntegrationEnabled = enabled
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SaveTelegramIntegration(botToken string, chatID string) (FullAppState, error) {
+	cleanToken := strings.TrimSpace(botToken)
+	cleanChatID := strings.TrimSpace(chatID)
+	if cleanToken != "" && !IsValidTelegramBotToken(cleanToken) {
+		return a.GetState(), fmt.Errorf("Nieprawidłowy token bota Telegram")
+	}
+	if cleanToken != "" && cleanChatID == "" {
+		return a.GetState(), fmt.Errorf("Podaj chat ID Telegram")
+	}
+	a.mu.Lock()
+	a.telegramBotToken = cleanToken
+	a.telegramChatID = cleanChatID
+	a.telegramIntegrationEnabled = cleanToken != "" && cleanChatID != ""
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState(), nil
+}
+
+func (a *App) ClearTelegramIntegration() FullAppState {
+	a.mu.Lock()
+	a.telegramBotToken = ""
+	a.telegramChatID = ""
+	a.telegramIntegrationEnabled = false
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SetSlackWebhookEnabled(enabled bool) FullAppState {
+	a.mu.Lock()
+	a.slackWebhookEnabled = enabled
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SaveSlackWebhookURL(url string) (FullAppState, error) {
+	cleanURL := strings.TrimSpace(url)
+	if cleanURL != "" && !IsValidSlackWebhookURL(cleanURL) {
+		return a.GetState(), fmt.Errorf("Nieprawidłowy webhook Slack")
+	}
+	a.mu.Lock()
+	a.slackWebhookURL = cleanURL
+	a.slackWebhookEnabled = cleanURL != ""
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState(), nil
+}
+
+func (a *App) ClearSlackWebhookURL() FullAppState {
+	a.mu.Lock()
+	a.slackWebhookURL = ""
+	a.slackWebhookEnabled = false
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
+func (a *App) SendNewsToIntegrations(newsID string) (FullAppState, error) {
+	a.mu.Lock()
+	var item CryptoNewsItem
+	found := false
+	for _, n := range a.allNews {
+		if n.ID == newsID {
+			item = n
+			found = true
+			break
+		}
+	}
+	if !found {
+		a.mu.Unlock()
+		return a.GetState(), fmt.Errorf("Nie znaleziono wiadomości")
+	}
+	a.dispatchIntegrationsLocked([]CryptoNewsItem{item})
+	a.mu.Unlock()
+	return a.GetState(), nil
 }
 
 func (a *App) mergeNews(existing []CryptoNewsItem, incoming []CryptoNewsItem) []CryptoNewsItem {
@@ -914,6 +1078,14 @@ func (a *App) GetState() FullAppState {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
+	if len(a.sources) == 0 {
+		a.sources = GetDefaultSources()
+		a.saveSettingsLocked()
+	}
+	for i := range a.sources {
+		a.sources[i].Language = NormalizeSourceLanguage(a.sources[i].Language, a.sources[i].ID, a.sources[i].Name, a.sources[i].URL)
+	}
+
 	var observedCoins []CoinInfo
 	var selectedCoin CoinInfo
 
@@ -973,43 +1145,49 @@ func (a *App) GetState() FullAppState {
 	}
 
 	return FullAppState{
-		PricePoints:                a.pricePoints,
-		NewsList:                   filteredNews,
-		SourcesList:                a.sources,
-		SelectedCoin:               selectedCoin,
-		ObservedCoins:              observedCoins,
-		AllAvailableCoins:          a.allAvailableCoins,
-		Keywords:                   a.activeKeywords,
-		CurrentPrice:               a.currentPrice,
-		PriceChangePercent:         a.priceChangePercent,
-		SelectedNewsID:             selectedNewsID,
-		ActiveSourceFilter:         a.activeSourceFilter,
-		SelectedSourceFilters:      a.selectedSourceFilters,
-		CurrentTab:                 a.currentTab,
-		SettingsSubTab:             a.settingsSubTab,
-		IsOffline:                  a.isOffline,
-		IsLiveMarket:               a.isLiveMarket,
-		AlarmEnabled:               a.alarmEnabled,
-		MaxVibrations:              a.maxVibrations,
-		NightModeEnabled:           a.nightModeEnabled,
-		NightModeStart:             a.nightModeStart,
-		NightModeEnd:               a.nightModeEnd,
-		IsNightTimeNow:             a.isNightModeNow(),
-		CheckInterval:              a.checkInterval,
-		NightCheckInterval:         a.nightCheckInterval,
-		XCheckInterval:             a.xCheckInterval,
-		XNightCheckInterval:        a.xNightCheckInterval,
-		CurrentLanguage:            a.currentLanguage,
-		CryptoPanicTokenConfigured: strings.TrimSpace(a.cryptoPanicToken) != "",
-		AlarmCycle:                 a.alarmCycle,
-		MaxStoredNews:              a.maxStoredNews,
-		TotalStoredNewsCount:       len(a.allNews),
-		UnreadNewsCount:            unreadNewsCount,
-		UseInternalBrowser:         a.useInternalBrowser,
-		AlwaysOnTop:                a.alwaysOnTop,
-		Autostart:                  a.autostart,
-		IsXLoggedIn:                a.xAuthToken != "",
-		ShowChart:                  a.showChart,
+		PricePoints:                   a.pricePoints,
+		NewsList:                      filteredNews,
+		SourcesList:                   a.sources,
+		SelectedCoin:                  selectedCoin,
+		ObservedCoins:                 observedCoins,
+		AllAvailableCoins:             a.allAvailableCoins,
+		Keywords:                      a.activeKeywords,
+		CurrentPrice:                  a.currentPrice,
+		PriceChangePercent:            a.priceChangePercent,
+		SelectedNewsID:                selectedNewsID,
+		ActiveSourceFilter:            a.activeSourceFilter,
+		SelectedSourceFilters:         a.selectedSourceFilters,
+		CurrentTab:                    a.currentTab,
+		SettingsSubTab:                a.settingsSubTab,
+		IsOffline:                     a.isOffline,
+		IsLiveMarket:                  a.isLiveMarket,
+		AlarmEnabled:                  a.alarmEnabled,
+		MaxVibrations:                 a.maxVibrations,
+		NightModeEnabled:              a.nightModeEnabled,
+		NightModeStart:                a.nightModeStart,
+		NightModeEnd:                  a.nightModeEnd,
+		IsNightTimeNow:                a.isNightModeNow(),
+		CheckInterval:                 a.checkInterval,
+		NightCheckInterval:            a.nightCheckInterval,
+		XCheckInterval:                a.xCheckInterval,
+		XNightCheckInterval:           a.xNightCheckInterval,
+		CurrentLanguage:               a.currentLanguage,
+		CryptoPanicTokenConfigured:    strings.TrimSpace(a.cryptoPanicToken) != "",
+		DiscordWebhookEnabled:         a.discordWebhookEnabled,
+		DiscordWebhookConfigured:      strings.TrimSpace(a.discordWebhookURL) != "",
+		TelegramIntegrationEnabled:    a.telegramIntegrationEnabled,
+		TelegramIntegrationConfigured: strings.TrimSpace(a.telegramBotToken) != "" && strings.TrimSpace(a.telegramChatID) != "",
+		SlackWebhookEnabled:           a.slackWebhookEnabled,
+		SlackWebhookConfigured:        strings.TrimSpace(a.slackWebhookURL) != "",
+		AlarmCycle:                    a.alarmCycle,
+		MaxStoredNews:                 a.maxStoredNews,
+		TotalStoredNewsCount:          len(a.allNews),
+		UnreadNewsCount:               unreadNewsCount,
+		UseInternalBrowser:            a.useInternalBrowser,
+		AlwaysOnTop:                   a.alwaysOnTop,
+		Autostart:                     a.autostart,
+		IsXLoggedIn:                   a.xAuthToken != "",
+		ShowChart:                     a.showChart,
 	}
 }
 
@@ -1270,6 +1448,19 @@ func (a *App) ToggleSource(sourceID string, active bool) FullAppState {
 	return a.GetState()
 }
 
+func (a *App) SetSourceLanguage(sourceID string, language string) FullAppState {
+	a.mu.Lock()
+	for i := range a.sources {
+		if a.sources[i].ID == sourceID {
+			a.sources[i].Language = NormalizeSourceLanguage(language, "", "", "")
+			break
+		}
+	}
+	a.saveSettingsLocked()
+	a.mu.Unlock()
+	return a.GetState()
+}
+
 func (a *App) ToggleAllSources(active bool, sourceIDs []string) FullAppState {
 	a.mu.Lock()
 	idMap := make(map[string]bool)
@@ -1428,6 +1619,7 @@ func (a *App) AddXSource(handleOrUrl string, customName string, description stri
 		Type:        FeedSourceTypeX,
 		Description: strings.TrimSpace(description),
 		IsActive:    true,
+		Language:    NormalizeSourceLanguage("", sourceID, displayName, "https://x.com/"+cleanHandle),
 	}
 
 	a.sources = append(a.sources, newSource)
@@ -1899,28 +2091,35 @@ func (a *App) ExportSettingsJSON() (string, error) {
 	copy(sourceFiltersCopy, a.selectedSourceFilters)
 
 	settings := AppSettingsExport{
-		Version:               1,
-		ExportedAt:            time.Now().UnixMilli(),
-		ObservedCoins:         obsList,
-		CurrentCoin:           a.currentCoinSymbol,
-		FilterKeywords:        keywordsCopy,
-		AlarmEnabled:          a.alarmEnabled,
-		MaxVibrations:         a.maxVibrations,
-		NightModeEnabled:      a.nightModeEnabled,
-		NightModeStart:        a.nightModeStart,
-		NightModeEnd:          a.nightModeEnd,
-		CheckInterval:         a.checkInterval,
-		NightCheckInterval:    a.nightCheckInterval,
-		XCheckInterval:        a.xCheckInterval,
-		XNightCheckInterval:   a.xNightCheckInterval,
-		AppLanguage:           a.currentLanguage,
-		MaxStoredNews:         a.maxStoredNews,
-		UseInternalBrowser:    a.useInternalBrowser,
-		Sources:               sourcesCopy,
-		FavoriteNewsIDs:       favList,
-		SeenNewsIDs:           seenList,
-		SelectedSourceFilters: sourceFiltersCopy,
-		CryptoPanicToken:      a.cryptoPanicToken,
+		Version:                    1,
+		ExportedAt:                 time.Now().UnixMilli(),
+		ObservedCoins:              obsList,
+		CurrentCoin:                a.currentCoinSymbol,
+		FilterKeywords:             keywordsCopy,
+		AlarmEnabled:               a.alarmEnabled,
+		MaxVibrations:              a.maxVibrations,
+		NightModeEnabled:           a.nightModeEnabled,
+		NightModeStart:             a.nightModeStart,
+		NightModeEnd:               a.nightModeEnd,
+		CheckInterval:              a.checkInterval,
+		NightCheckInterval:         a.nightCheckInterval,
+		XCheckInterval:             a.xCheckInterval,
+		XNightCheckInterval:        a.xNightCheckInterval,
+		AppLanguage:                a.currentLanguage,
+		MaxStoredNews:              a.maxStoredNews,
+		UseInternalBrowser:         a.useInternalBrowser,
+		Sources:                    sourcesCopy,
+		FavoriteNewsIDs:            favList,
+		SeenNewsIDs:                seenList,
+		SelectedSourceFilters:      sourceFiltersCopy,
+		CryptoPanicToken:           a.cryptoPanicToken,
+		DiscordWebhookEnabled:      a.discordWebhookEnabled,
+		DiscordWebhookURL:          a.discordWebhookURL,
+		TelegramIntegrationEnabled: a.telegramIntegrationEnabled,
+		TelegramBotToken:           a.telegramBotToken,
+		TelegramChatID:             a.telegramChatID,
+		SlackWebhookEnabled:        a.slackWebhookEnabled,
+		SlackWebhookURL:            a.slackWebhookURL,
 	}
 
 	return ExportSettingsToJSON(settings)
@@ -1979,6 +2178,9 @@ func (a *App) ImportSettingsJSON(jsonContent string) (FullAppState, error) {
 
 	if len(imported.Sources) > 0 {
 		a.sources = imported.Sources
+		for i := range a.sources {
+			a.sources[i].Language = NormalizeSourceLanguage(a.sources[i].Language, a.sources[i].ID, a.sources[i].Name, a.sources[i].URL)
+		}
 	}
 
 	if len(imported.FavoriteNewsIDs) > 0 {
@@ -2013,6 +2215,21 @@ func (a *App) ImportSettingsJSON(jsonContent string) (FullAppState, error) {
 	if imported.CryptoPanicToken != "" {
 		a.cryptoPanicToken = imported.CryptoPanicToken
 	}
+	if imported.DiscordWebhookURL != "" {
+		a.discordWebhookURL = strings.TrimSpace(imported.DiscordWebhookURL)
+	}
+	a.discordWebhookEnabled = imported.DiscordWebhookEnabled && strings.TrimSpace(a.discordWebhookURL) != ""
+	if imported.TelegramBotToken != "" {
+		a.telegramBotToken = strings.TrimSpace(imported.TelegramBotToken)
+	}
+	if imported.TelegramChatID != "" {
+		a.telegramChatID = strings.TrimSpace(imported.TelegramChatID)
+	}
+	a.telegramIntegrationEnabled = imported.TelegramIntegrationEnabled && strings.TrimSpace(a.telegramBotToken) != "" && strings.TrimSpace(a.telegramChatID) != ""
+	if imported.SlackWebhookURL != "" {
+		a.slackWebhookURL = strings.TrimSpace(imported.SlackWebhookURL)
+	}
+	a.slackWebhookEnabled = imported.SlackWebhookEnabled && strings.TrimSpace(a.slackWebhookURL) != ""
 
 	a.saveSettingsLocked()
 	a.mu.Unlock()
@@ -2125,4 +2342,3 @@ func (a *App) ImportNewsCsvDialog() (FullAppState, error) {
 	}
 	return a.ImportNewsCSV(string(data))
 }
-

@@ -11,49 +11,63 @@ import (
 )
 
 type AppSettingsExport struct {
-	Version               int          `json:"version"`
-	ExportedAt            int64        `json:"exported_at"`
-	ObservedCoins         []string     `json:"observed_coins"`
-	CurrentCoin           string       `json:"current_coin"`
-	FilterKeywords        []string     `json:"filter_keywords"`
-	AlarmEnabled          bool         `json:"alarm_enabled"`
-	MaxVibrations         int          `json:"max_vibrations"`
-	NightModeEnabled      bool         `json:"night_mode_enabled"`
-	NightModeStart        string       `json:"night_mode_start"`
-	NightModeEnd          string       `json:"night_mode_end"`
-	CheckInterval         int          `json:"check_interval"`
-	NightCheckInterval    int          `json:"night_check_interval"`
-	XCheckInterval        int          `json:"x_check_interval"`
-	XNightCheckInterval   int          `json:"x_night_check_interval"`
-	AppLanguage           string       `json:"app_language"`
-	MaxStoredNews         int          `json:"max_stored_news"`
-	UseInternalBrowser    bool         `json:"use_internal_browser"`
-	Sources               []FeedSource `json:"sources"`
-	FavoriteNewsIDs       []string     `json:"favorite_news_ids"`
-	SeenNewsIDs           []string     `json:"seen_news_ids"`
-	SelectedSourceFilters []string     `json:"selected_source_filters"`
-	CryptoPanicToken      string       `json:"cryptopanic_token,omitempty"`
+	Version                    int          `json:"version"`
+	ExportedAt                 int64        `json:"exported_at"`
+	ObservedCoins              []string     `json:"observed_coins"`
+	CurrentCoin                string       `json:"current_coin"`
+	FilterKeywords             []string     `json:"filter_keywords"`
+	AlarmEnabled               bool         `json:"alarm_enabled"`
+	MaxVibrations              int          `json:"max_vibrations"`
+	NightModeEnabled           bool         `json:"night_mode_enabled"`
+	NightModeStart             string       `json:"night_mode_start"`
+	NightModeEnd               string       `json:"night_mode_end"`
+	CheckInterval              int          `json:"check_interval"`
+	NightCheckInterval         int          `json:"night_check_interval"`
+	XCheckInterval             int          `json:"x_check_interval"`
+	XNightCheckInterval        int          `json:"x_night_check_interval"`
+	AppLanguage                string       `json:"app_language"`
+	MaxStoredNews              int          `json:"max_stored_news"`
+	UseInternalBrowser         bool         `json:"use_internal_browser"`
+	Sources                    []FeedSource `json:"sources"`
+	FavoriteNewsIDs            []string     `json:"favorite_news_ids"`
+	SeenNewsIDs                []string     `json:"seen_news_ids"`
+	SelectedSourceFilters      []string     `json:"selected_source_filters"`
+	CryptoPanicToken           string       `json:"cryptopanic_token,omitempty"`
+	DiscordWebhookEnabled      bool         `json:"discord_webhook_enabled,omitempty"`
+	DiscordWebhookURL          string       `json:"discord_webhook_url,omitempty"`
+	TelegramIntegrationEnabled bool         `json:"telegram_integration_enabled,omitempty"`
+	TelegramBotToken           string       `json:"telegram_bot_token,omitempty"`
+	TelegramChatID             string       `json:"telegram_chat_id,omitempty"`
+	SlackWebhookEnabled        bool         `json:"slack_webhook_enabled,omitempty"`
+	SlackWebhookURL            string       `json:"slack_webhook_url,omitempty"`
 
 	// Fallback alias fields for camelCase JSON compatibility
-	ObservedCoinsCamel         []string     `json:"observedCoins,omitempty"`
-	CurrentCoinCamel           string       `json:"currentCoin,omitempty"`
-	FilterKeywordsCamel        []string     `json:"filterKeywords,omitempty"`
-	AlarmEnabledCamel          *bool        `json:"alarmEnabled,omitempty"`
-	MaxVibrationsCamel         *int         `json:"maxVibrations,omitempty"`
-	NightModeEnabledCamel      *bool        `json:"nightModeEnabled,omitempty"`
-	NightModeStartCamel        string       `json:"nightModeStart,omitempty"`
-	NightModeEndCamel          string       `json:"nightModeEnd,omitempty"`
-	CheckIntervalCamel         *int         `json:"checkInterval,omitempty"`
-	NightCheckIntervalCamel    *int         `json:"nightCheckInterval,omitempty"`
-	XCheckIntervalCamel        *int         `json:"xCheckInterval,omitempty"`
-	XNightCheckIntervalCamel   *int         `json:"xNightCheckInterval,omitempty"`
-	AppLanguageCamel           string       `json:"appLanguage,omitempty"`
-	MaxStoredNewsCamel         *int         `json:"maxStoredNews,omitempty"`
-	UseInternalBrowserCamel    *bool        `json:"useInternalBrowser,omitempty"`
-	FavoriteNewsIDsCamel       []string     `json:"favoriteNewsIds,omitempty"`
-	SeenNewsIDsCamel           []string     `json:"seenNewsIds,omitempty"`
-	SelectedSourceFiltersCamel []string     `json:"selectedSourceFilters,omitempty"`
-	CryptoPanicTokenCamel      string       `json:"cryptoPanicToken,omitempty"`
+	ObservedCoinsCamel              []string `json:"observedCoins,omitempty"`
+	CurrentCoinCamel                string   `json:"currentCoin,omitempty"`
+	FilterKeywordsCamel             []string `json:"filterKeywords,omitempty"`
+	AlarmEnabledCamel               *bool    `json:"alarmEnabled,omitempty"`
+	MaxVibrationsCamel              *int     `json:"maxVibrations,omitempty"`
+	NightModeEnabledCamel           *bool    `json:"nightModeEnabled,omitempty"`
+	NightModeStartCamel             string   `json:"nightModeStart,omitempty"`
+	NightModeEndCamel               string   `json:"nightModeEnd,omitempty"`
+	CheckIntervalCamel              *int     `json:"checkInterval,omitempty"`
+	NightCheckIntervalCamel         *int     `json:"nightCheckInterval,omitempty"`
+	XCheckIntervalCamel             *int     `json:"xCheckInterval,omitempty"`
+	XNightCheckIntervalCamel        *int     `json:"xNightCheckInterval,omitempty"`
+	AppLanguageCamel                string   `json:"appLanguage,omitempty"`
+	MaxStoredNewsCamel              *int     `json:"maxStoredNews,omitempty"`
+	UseInternalBrowserCamel         *bool    `json:"useInternalBrowser,omitempty"`
+	FavoriteNewsIDsCamel            []string `json:"favoriteNewsIds,omitempty"`
+	SeenNewsIDsCamel                []string `json:"seenNewsIds,omitempty"`
+	SelectedSourceFiltersCamel      []string `json:"selectedSourceFilters,omitempty"`
+	CryptoPanicTokenCamel           string   `json:"cryptoPanicToken,omitempty"`
+	DiscordWebhookEnabledCamel      *bool    `json:"discordWebhookEnabled,omitempty"`
+	DiscordWebhookURLCamel          string   `json:"discordWebhookUrl,omitempty"`
+	TelegramIntegrationEnabledCamel *bool    `json:"telegramIntegrationEnabled,omitempty"`
+	TelegramBotTokenCamel           string   `json:"telegramBotToken,omitempty"`
+	TelegramChatIDCamel             string   `json:"telegramChatId,omitempty"`
+	SlackWebhookEnabledCamel        *bool    `json:"slackWebhookEnabled,omitempty"`
+	SlackWebhookURLCamel            string   `json:"slackWebhookUrl,omitempty"`
 }
 
 func ExportSettingsToJSON(settings AppSettingsExport) (string, error) {
@@ -138,6 +152,27 @@ func ImportSettingsFromJSON(jsonContent string) (*AppSettingsExport, error) {
 	}
 	if parsed.CryptoPanicToken == "" && parsed.CryptoPanicTokenCamel != "" {
 		parsed.CryptoPanicToken = parsed.CryptoPanicTokenCamel
+	}
+	if parsed.DiscordWebhookEnabledCamel != nil {
+		parsed.DiscordWebhookEnabled = *parsed.DiscordWebhookEnabledCamel
+	}
+	if parsed.DiscordWebhookURL == "" && parsed.DiscordWebhookURLCamel != "" {
+		parsed.DiscordWebhookURL = parsed.DiscordWebhookURLCamel
+	}
+	if parsed.TelegramIntegrationEnabledCamel != nil {
+		parsed.TelegramIntegrationEnabled = *parsed.TelegramIntegrationEnabledCamel
+	}
+	if parsed.TelegramBotToken == "" && parsed.TelegramBotTokenCamel != "" {
+		parsed.TelegramBotToken = parsed.TelegramBotTokenCamel
+	}
+	if parsed.TelegramChatID == "" && parsed.TelegramChatIDCamel != "" {
+		parsed.TelegramChatID = parsed.TelegramChatIDCamel
+	}
+	if parsed.SlackWebhookEnabledCamel != nil {
+		parsed.SlackWebhookEnabled = *parsed.SlackWebhookEnabledCamel
+	}
+	if parsed.SlackWebhookURL == "" && parsed.SlackWebhookURLCamel != "" {
+		parsed.SlackWebhookURL = parsed.SlackWebhookURLCamel
 	}
 
 	// Default fallback values
@@ -323,7 +358,7 @@ func ImportNewsFromCSV(csvContent string) ([]CryptoNewsItem, error) {
 
 		id := idRaw
 		if id == "" {
-			id = fmt.Sprintf("csv_%x", Md5Hash(url+title+strconv.FormatInt(publishedMillis, 10))[:10])
+			id = fmt.Sprintf("csv_%x", Md5Hash(url + title + strconv.FormatInt(publishedMillis, 10))[:10])
 		}
 
 		if formattedTime == "" {

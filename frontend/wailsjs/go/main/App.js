@@ -22,6 +22,10 @@ export function AddXSource(arg1, arg2, arg3) {
   return window['go']['main']['App']['AddXSource'](arg1, arg2, arg3);
 }
 
+export function ClearDiscordWebhookURL() {
+  return window['go']['main']['App']['ClearDiscordWebhookURL']();
+}
+
 export function ClearKeywords() {
   return window['go']['main']['App']['ClearKeywords']();
 }
@@ -30,8 +34,16 @@ export function ClearNewsHistory() {
   return window['go']['main']['App']['ClearNewsHistory']();
 }
 
+export function ClearSlackWebhookURL() {
+  return window['go']['main']['App']['ClearSlackWebhookURL']();
+}
+
 export function ClearSourceFilters() {
   return window['go']['main']['App']['ClearSourceFilters']();
+}
+
+export function ClearTelegramIntegration() {
+  return window['go']['main']['App']['ClearTelegramIntegration']();
 }
 
 export function CloseWindow() {
@@ -134,6 +146,18 @@ export function SaveCryptoPanicToken(arg1) {
   return window['go']['main']['App']['SaveCryptoPanicToken'](arg1);
 }
 
+export function SaveDiscordWebhookURL(arg1) {
+  return window['go']['main']['App']['SaveDiscordWebhookURL'](arg1);
+}
+
+export function SaveSlackWebhookURL(arg1) {
+  return window['go']['main']['App']['SaveSlackWebhookURL'](arg1);
+}
+
+export function SaveTelegramIntegration(arg1, arg2) {
+  return window['go']['main']['App']['SaveTelegramIntegration'](arg1, arg2);
+}
+
 export function SaveWindowSize(arg1, arg2) {
   return window['go']['main']['App']['SaveWindowSize'](arg1, arg2);
 }
@@ -154,6 +178,10 @@ export function SendDesktopNotification(arg1, arg2) {
   return window['go']['main']['App']['SendDesktopNotification'](arg1, arg2);
 }
 
+export function SendNewsToIntegrations(arg1) {
+  return window['go']['main']['App']['SendNewsToIntegrations'](arg1);
+}
+
 export function SetAlarmEnabled(arg1) {
   return window['go']['main']['App']['SetAlarmEnabled'](arg1);
 }
@@ -164,6 +192,10 @@ export function SetAutostart(arg1) {
 
 export function SetCheckInterval(arg1) {
   return window['go']['main']['App']['SetCheckInterval'](arg1);
+}
+
+export function SetDiscordWebhookEnabled(arg1) {
+  return window['go']['main']['App']['SetDiscordWebhookEnabled'](arg1);
 }
 
 export function SetLanguage(arg1) {
@@ -198,12 +230,24 @@ export function SetShowChart(arg1) {
   return window['go']['main']['App']['SetShowChart'](arg1);
 }
 
+export function SetSlackWebhookEnabled(arg1) {
+  return window['go']['main']['App']['SetSlackWebhookEnabled'](arg1);
+}
+
 export function SetSourceFilter(arg1) {
   return window['go']['main']['App']['SetSourceFilter'](arg1);
 }
 
 export function SetSourceFilters(arg1) {
   return window['go']['main']['App']['SetSourceFilters'](arg1);
+}
+
+export function SetSourceLanguage(arg1, arg2) {
+  return window['go']['main']['App']['SetSourceLanguage'](arg1, arg2);
+}
+
+export function SetTelegramIntegrationEnabled(arg1) {
+  return window['go']['main']['App']['SetTelegramIntegrationEnabled'](arg1);
 }
 
 export function SetUseInternalBrowser(arg1) {
